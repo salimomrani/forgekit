@@ -101,7 +101,7 @@ function generatePom(
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>4.0.2</version>
         <relativePath/>
     </parent>
 
@@ -114,7 +114,7 @@ function generatePom(
     <properties>
         <java.version>21</java.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <springdoc.version>2.8.5</springdoc.version>
+        <springdoc.version>3.0.1</springdoc.version>
     </properties>
 
     <dependencies>

@@ -56,8 +56,8 @@ forgekit new mon-app --group com.salim --backend --frontend --docker --claude-co
 
 ```
 mon-projet/
-├── backend/                 # Spring Boot 3.4.3 / Java 21
-├── frontend/                # Angular 19 / PrimeNG
+├── backend/                 # Spring Boot 4.0.2 / Java 21
+├── frontend/                # Angular 21 / PrimeNG 21
 ├── docker-compose.yml       # PostgreSQL 17 + pgAdmin
 ├── CLAUDE.md                # Conventions Claude Code
 ├── .claude/settings.json    # Permissions Claude Code
