@@ -1,0 +1,169 @@
+# ForgeKit
+
+CLI de scaffolding full-stack qui génère des projets **Spring Boot + Angular** préconfigurés et prêts à l'emploi.
+
+Fini la configuration répétitive : une commande, un projet complet.
+
+## Installation
+
+```bash
+git clone https://github.com/salimomrani/forgekit.git
+cd forgekit
+npm install
+npm run build
+npm link
+```
+
+## Utilisation
+
+### Mode interactif (wizard)
+
+```bash
+forgekit new
+```
+
+Un wizard vous guide avec des valeurs par défaut modifiables :
+
+```
+? Nom du projet : (mon-app)
+? Group ID : (com.example)
+? Description : (Mon application)
+? Que voulez-vous générer ? (Backend + Frontend)
+? Configurer Docker Compose ? (Oui)
+? Configurer Claude Code ? (Oui)
+? Initialiser Git ? (Oui)
+```
+
+### Mode commande directe
+
+```bash
+forgekit new mon-app --group com.salim --backend --frontend --docker --claude-code
+```
+
+### Options disponibles
+
+| Flag | Description |
+|---|---|
+| `--group <id>` | Group ID Java (ex: `com.salim`) |
+| `--description <desc>` | Description du projet |
+| `--backend` | Inclure le backend Spring Boot |
+| `--frontend` | Inclure le frontend Angular |
+| `--docker` | Inclure Docker Compose |
+| `--claude-code` | Inclure la config Claude Code |
+| `--no-git` | Ne pas initialiser Git |
+
+## Projet généré
+
+```
+mon-projet/
+├── backend/                 # Spring Boot 3.4.3 / Java 21
+├── frontend/                # Angular 19 / PrimeNG
+├── docker-compose.yml       # PostgreSQL 17 + pgAdmin
+├── CLAUDE.md                # Conventions Claude Code
+├── .claude/settings.json    # Permissions Claude Code
+├── .gitignore
+└── README.md
+```
+
+### Backend — Spring Boot
+
+**Dépendances incluses :**
+Spring Web, Spring Data JPA, PostgreSQL, Spring Security, Spring Validation, Lombok, MapStruct, SpringDoc OpenAPI, Flyway, Spring Actuator.
+
+**Structure :**
+
+```
+backend/src/main/java/com/{group}/{name}/
+├── Application.java
+├── config/
+│   ├── SecurityConfig.java           # CORS, CSRF, JWT-ready
+│   └── OpenApiConfig.java
+├── shared/
+│   ├── exception/
+│   │   ├── GlobalExceptionHandler.java
+│   │   └── ApiError.java             # Record
+│   └── dto/
+│       └── PageResponse.java         # Record pagination
+└── feature/                          # Structure par feature
+```
+
+**Configurations :**
+- `application.yml` — Config principale avec variables d'env
+- `application-dev.yml` — Profil dev pointant vers Docker Compose
+- `db/migration/V1__init.sql` — Migration Flyway prête
+
+### Frontend — Angular
+
+**Dépendances incluses :**
+Angular (dernière version), PrimeNG (thème Aura), PrimeIcons, PrimeFlex, NgRx SignalStore.
+
+**Structure :**
+
+```
+frontend/src/app/
+├── app.component.ts            # Standalone, OnPush
+├── app.routes.ts               # Routes lazy-loaded
+├── app.config.ts               # Providers
+├── layout/
+│   ├── layout.component.ts     # Shell (sidebar + topbar + router-outlet)
+│   ├── sidebar/
+│   └── topbar/
+├── core/
+│   ├── interceptors/           # Auth + Error interceptors
+│   ├── guards/                 # Auth guard
+│   └── services/               # Auth service (signals)
+├── shared/                     # Composants et pipes réutilisables
+└── features/                   # Structure par feature
+```
+
+**Prêt à l'emploi :**
+- Layout sidebar/topbar fonctionnel
+- Thème Aura PrimeNG appliqué
+- Intercepteurs HTTP câblés
+- NgRx SignalStore prêt par feature
+- Standalone components, signals, `@if`/`@for`, OnPush
+
+### Docker Compose
+
+| Service | Port | Description |
+|---|---|---|
+| PostgreSQL 17 | 5432 | Base de données avec volume persistant |
+| pgAdmin | 5050 | Interface web (admin@admin.com / admin) |
+
+### Claude Code
+
+Génère automatiquement :
+- **`CLAUDE.md`** — Conventions du projet, commandes, structure
+- **`.claude/settings.json`** — Permissions préconfigurées (mvn, ng, npm, docker)
+
+## Démarrage rapide d'un projet généré
+
+```bash
+# Générer le projet
+forgekit new mon-app --group com.salim --backend --frontend --docker --claude-code
+
+# Démarrer l'infrastructure
+cd mon-app
+docker compose up -d
+
+# Démarrer le backend (port 8080)
+cd backend && ./mvnw spring-boot:run
+
+# Démarrer le frontend (port 4200)
+cd frontend && npm install && ng serve
+```
+
+## Config persistante
+
+ForgeKit retient vos préférences dans `~/.forgekit/config.json` (Group ID, etc.) pour les réutiliser automatiquement.
+
+## Stack technique du CLI
+
+- **Runtime :** Node.js / TypeScript
+- **Commandes :** Commander.js
+- **Prompts :** Inquirer.js
+- **Utilitaires :** fs-extra, chalk
+
+## Licence
+
+MIT
