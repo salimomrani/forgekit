@@ -1,6 +1,6 @@
 {
-  "name": "forgekit",
-  "version": "1.0.0",
+  "name": "@salimomrani/forgekit",
+  "version": "1.0.1",
   "description": "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
   "type": "module",
   "bin": {
