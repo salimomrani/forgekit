@@ -12,7 +12,7 @@
 ## Installation
 
 ```bash
-git clone https://github.com/salimomrani/forgekit.git
+git clone https://github.com/iconsulting/forgekit.git
 cd forgekit
 npm install
 npm run build

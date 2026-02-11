@@ -1,5 +1,5 @@
 {
-  "name": "@salimomrani/forgekit",
+  "name": "@iconsulting/forgekit",
   "version": "1.1.0",
   "description": "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
   "type": "module",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/salimomrani/forgekit.git"
+    "url": "https://github.com/iconsulting/forgekit.git"
   },
   "files": [
     "dist/"
