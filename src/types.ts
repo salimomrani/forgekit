@@ -5,6 +5,7 @@ export interface ProjectConfig {
   backend: boolean;
   frontend: boolean;
   docker: boolean;
+  ci: boolean;
   claudeCode: boolean;
   gitInit: boolean;
 }

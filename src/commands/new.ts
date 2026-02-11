@@ -7,6 +7,7 @@ import { saveConfig } from "../config.js";
 import { generateBackend } from "../generators/backend/index.js";
 import { generateFrontend } from "../generators/frontend/index.js";
 import { generateDocker } from "../generators/docker/index.js";
+import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
@@ -21,6 +22,7 @@ export const newCommand = new Command("new")
   .option("--backend", "Inclure le backend Spring Boot")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--docker", "Inclure Docker Compose")
+  .option("--ci", "Inclure GitHub Actions CI")
   .option("--claude-code", "Inclure config Claude Code")
   .option("--no-git", "Ne pas initialiser Git")
   .action(
@@ -36,6 +38,7 @@ export const newCommand = new Command("new")
         defaults.description = options.description as string;
       if (options.backend) defaults.backend = true;
       if (options.frontend) defaults.frontend = true;
+      if (options.ci) defaults.ci = true;
       if (options.docker) defaults.docker = true;
       if (options.claudeCode) defaults.claudeCode = true;
       if (typeof options.git === "boolean") defaults.gitInit = options.git;
@@ -88,6 +91,12 @@ export const newCommand = new Command("new")
           process.stdout.write(chalk.yellow("  ⏳ Docker Compose..."));
           await generateDocker(projectDir, config);
           console.log(chalk.green("\r  ✔ Docker Compose généré             "));
+        }
+
+        if (config.ci) {
+          process.stdout.write(chalk.yellow("  ⏳ GitHub Actions CI..."));
+          await generateCI(projectDir, config);
+          console.log(chalk.green("\r  ✔ GitHub Actions CI configuré       "));
         }
 
         if (config.claudeCode) {

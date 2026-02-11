@@ -48,6 +48,13 @@ export async function promptProjectConfig(
       })))
     : "com.example";
 
+  const ci =
+    defaults.ci ??
+    (await confirm({
+      message: "Configurer GitHub Actions CI ?",
+      default: true,
+    }));
+
   const docker =
     defaults.docker ??
     (await confirm({
@@ -75,6 +82,7 @@ export async function promptProjectConfig(
     description,
     backend,
     frontend,
+    ci,
     docker,
     claudeCode,
     gitInit,
