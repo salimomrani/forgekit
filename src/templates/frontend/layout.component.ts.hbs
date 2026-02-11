@@ -1,0 +1,42 @@
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { TopbarComponent } from './topbar/topbar.component';
+
+@Component({
+  selector: 'app-layout',
+  standalone: true,
+  imports: [RouterOutlet, SidebarComponent, TopbarComponent],
+  template: `
+    <div class="layout-wrapper">
+      <app-topbar (toggleSidebar)="sidebarVisible.set(!sidebarVisible())" />
+      <div class="layout-content-wrapper">
+        <app-sidebar [visible]="sidebarVisible()" />
+        <main class="layout-main">
+          <router-outlet />
+        </main>
+      </div>
+    </div>
+  `,
+  styles: `
+    .layout-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .layout-content-wrapper {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .layout-main {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class LayoutComponent {
+  sidebarVisible = signal(true);
+}

@@ -8,10 +8,10 @@ import { generateBackend } from "../generators/backend/index.js";
 import { generateFrontend } from "../generators/frontend/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
+import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { resolveVersions } from "../versions.js";
 import type { ProjectConfig } from "../types.js";
-import type { ResolvedVersions } from "../versions.js";
 
 export const newCommand = new Command("new")
   .description("Créer un nouveau projet full-stack")
@@ -48,123 +48,82 @@ export const newCommand = new Command("new")
         process.exit(1);
       }
 
-      await fs.ensureDir(projectDir);
-      console.log(chalk.gray(`\nCréation du projet ${config.name}...\n`));
+      try {
+        await fs.ensureDir(projectDir);
+        console.log(chalk.gray(`\nCréation du projet ${config.name}...\n`));
 
-      const versions = await resolveVersions({
-        backend: config.backend,
-        frontend: config.frontend,
-      });
+        const versions = await resolveVersions({
+          backend: config.backend,
+          frontend: config.frontend,
+        });
 
-      if (config.backend) {
-        process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
-        await generateBackend(projectDir, config, versions);
+        if (config.backend) {
+          process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
+          await generateBackend(projectDir, config, versions);
+          console.log(
+            chalk.green(
+              `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
+            ),
+          );
+        }
+
+        if (config.frontend) {
+          process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
+          await generateFrontend(projectDir, config, versions);
+          console.log(
+            chalk.green(
+              `\r  ✔ Frontend Angular ${versions.angular} généré           `,
+            ),
+          );
+        }
+
+        if (config.docker) {
+          process.stdout.write(chalk.yellow("  ⏳ Docker Compose..."));
+          await generateDocker(projectDir, config);
+          console.log(chalk.green("\r  ✔ Docker Compose généré             "));
+        }
+
+        if (config.claudeCode) {
+          process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
+          await generateClaudeCode(projectDir, config, versions);
+          console.log(chalk.green("\r  ✔ Claude Code configuré             "));
+        }
+
+        await generateRoot(projectDir, config, versions);
+
+        if (config.gitInit) {
+          process.stdout.write(chalk.yellow("  ⏳ Git..."));
+          await initGit(projectDir);
+          console.log(chalk.green("\r  ✔ Git initialisé + premier commit   "));
+        }
+
+        await saveConfig({ groupId: config.groupId });
+
+        console.log(chalk.bold.green(`\n🚀 Projet "${config.name}" prêt !\n`));
+        console.log(chalk.white("Pour démarrer :"));
+        console.log(chalk.cyan(`  cd ${config.name}`));
+        if (config.docker) console.log(chalk.cyan("  docker compose up -d"));
+        if (config.backend)
+          console.log(chalk.cyan("  cd backend && ./mvnw spring-boot:run"));
+        if (config.frontend)
+          console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
+        console.log("");
+      } catch (error) {
         console.log(
-          chalk.green(
-            `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
+          chalk.red(
+            `\n✖ Erreur lors de la génération : ${error instanceof Error ? error.message : error}`,
           ),
         );
+
+        // Rollback: remove the partially created project directory
+        if (await fs.pathExists(projectDir)) {
+          await fs.remove(projectDir);
+          console.log(
+            chalk.gray(`  Dossier "${config.name}" supprimé (rollback).`),
+          );
+        }
+
+        process.exit(1);
       }
-
-      if (config.frontend) {
-        process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
-        await generateFrontend(projectDir, config, versions);
-        console.log(
-          chalk.green(
-            `\r  ✔ Frontend Angular ${versions.angular} généré           `,
-          ),
-        );
-      }
-
-      if (config.docker) {
-        process.stdout.write(chalk.yellow("  ⏳ Docker Compose..."));
-        await generateDocker(projectDir, config);
-        console.log(chalk.green("\r  ✔ Docker Compose généré             "));
-      }
-
-      if (config.claudeCode) {
-        process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
-        await generateClaudeCode(projectDir, config, versions);
-        console.log(chalk.green("\r  ✔ Claude Code configuré             "));
-      }
-
-      await generateReadme(projectDir, config, versions);
-      await generateRootGitignore(projectDir);
-
-      if (config.gitInit) {
-        process.stdout.write(chalk.yellow("  ⏳ Git..."));
-        await initGit(projectDir);
-        console.log(chalk.green("\r  ✔ Git initialisé + premier commit   "));
-      }
-
-      await saveConfig({ groupId: config.groupId });
-
-      console.log(chalk.bold.green(`\n🚀 Projet "${config.name}" prêt !\n`));
-      console.log(chalk.white("Pour démarrer :"));
-      console.log(chalk.cyan(`  cd ${config.name}`));
-      if (config.docker) console.log(chalk.cyan("  docker compose up -d"));
-      if (config.backend)
-        console.log(chalk.cyan("  cd backend && ./mvnw spring-boot:run"));
-      if (config.frontend)
-        console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
-      console.log("");
     },
   );
-
-async function generateReadme(
-  projectDir: string,
-  config: ProjectConfig,
-  versions: ResolvedVersions,
-): Promise<void> {
-  const sections = [`# ${config.name}\n\n${config.description}\n`];
-
-  sections.push("## Stack\n");
-  if (config.backend)
-    sections.push(
-      `- **Backend:** Spring Boot ${versions.springBoot} / Java 21`,
-    );
-  if (config.frontend)
-    sections.push(
-      `- **Frontend:** Angular ${versions.angular} / PrimeNG ${versions.primeng}`,
-    );
-  if (config.docker)
-    sections.push("- **Infra:** Docker Compose (PostgreSQL 17 + pgAdmin)");
-  sections.push("");
-
-  sections.push("## Démarrage rapide\n");
-  sections.push("```bash");
-  if (config.docker)
-    sections.push("# Démarrer l'infrastructure\ndocker compose up -d\n");
-  if (config.backend)
-    sections.push(
-      "# Démarrer le backend\ncd backend && ./mvnw spring-boot:run\n",
-    );
-  if (config.frontend)
-    sections.push(
-      "# Démarrer le frontend\ncd frontend && npm install && ng serve",
-    );
-  sections.push("```\n");
-
-  sections.push(
-    "---\n*Généré avec [ForgeKit](https://github.com/salimomrani/forgekit)*",
-  );
-
-  await fs.writeFile(path.join(projectDir, "README.md"), sections.join("\n"));
-}
-
-async function generateRootGitignore(projectDir: string): Promise<void> {
-  const content = `# IDE
-.idea/
-.vscode/
-*.iml
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Env
-.env
-.env.local
-`;
-  await fs.writeFile(path.join(projectDir, ".gitignore"), content);
-}

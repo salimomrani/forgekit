@@ -1,6 +1,7 @@
 import { input, confirm, checkbox } from "@inquirer/prompts";
 import path from "node:path";
 import { loadConfig } from "../config.js";
+import { validateProjectName, validateGroupId } from "../utils/validation.js";
 import type { ProjectConfig } from "../types.js";
 
 export async function promptProjectConfig(
@@ -14,6 +15,7 @@ export async function promptProjectConfig(
     (await input({
       message: "Nom du projet",
       default: currentDir,
+      validate: validateProjectName,
     }));
 
   const groupId =
@@ -21,6 +23,7 @@ export async function promptProjectConfig(
     (await input({
       message: "Group ID",
       default: saved.groupId ?? "com.example",
+      validate: validateGroupId,
     }));
 
   const description =

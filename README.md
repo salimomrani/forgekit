@@ -157,9 +157,38 @@ cd frontend && npm install && ng serve
 
 ForgeKit retient vos préférences dans `~/.forgekit/config.json` (Group ID, etc.) pour les réutiliser automatiquement.
 
-## Stack technique du CLI
+## Architecture du CLI
 
-- **Runtime :** Node.js / TypeScript
+```
+src/
+├── commands/new.ts              # Commande principale (try/catch + rollback)
+├── prompts/project.ts           # Wizard interactif avec validation
+├── generators/
+│   ├── base-generator.ts        # Classe abstraite commune
+│   ├── backend/index.ts         # BackendGenerator
+│   ├── frontend/index.ts        # FrontendGenerator
+│   ├── docker/index.ts          # DockerGenerator
+│   ├── claude-code/index.ts     # ClaudeCodeGenerator
+│   ├── root/index.ts            # RootGenerator (README + .gitignore)
+│   └── git.ts                   # Initialisation Git
+├── templates/                   # 39 templates Handlebars (.hbs)
+│   ├── backend/                 # 14 templates
+│   ├── frontend/                # 20 templates
+│   ├── docker/                  # 1 template
+│   ├── claude-code/             # 2 templates
+│   └── root/                    # 2 templates
+├── utils/
+│   ├── template-engine.ts       # Handlebars compile + render
+│   └── validation.ts            # Validation inputs
+├── types.ts
+├── versions.ts                  # Résolution dynamique Maven + NPM
+└── config.ts                    # Config persistante (~/.forgekit)
+```
+
+### Stack technique
+
+- **Runtime :** Node.js / TypeScript (ESM)
+- **Templates :** Handlebars
 - **Commandes :** Commander.js
 - **Prompts :** Inquirer.js
 - **Utilitaires :** fs-extra, chalk

@@ -1,0 +1,37 @@
+# {{name}}
+
+{{description}}
+
+## Stack
+
+{{#if backend}}
+- **Backend:** Spring Boot {{versions.springBoot}} / Java 21
+{{/if}}
+{{#if frontend}}
+- **Frontend:** Angular {{versions.angular}} / PrimeNG {{versions.primeng}}
+{{/if}}
+{{#if docker}}
+- **Infra:** Docker Compose (PostgreSQL 17 + pgAdmin)
+{{/if}}
+
+## Démarrage rapide
+
+```bash
+{{#if docker}}
+# Démarrer l'infrastructure
+docker compose up -d
+
+{{/if}}
+{{#if backend}}
+# Démarrer le backend
+cd backend && ./mvnw spring-boot:run
+
+{{/if}}
+{{#if frontend}}
+# Démarrer le frontend
+cd frontend && npm install && ng serve
+{{/if}}
+```
+
+---
+*Généré avec [ForgeKit](https://github.com/salimomrani/forgekit)*

@@ -1,0 +1,18 @@
+import { Injectable, signal, computed } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly token = signal<string | null>(localStorage.getItem('access_token'));
+
+  readonly isAuthenticated = computed(() => !!this.token());
+
+  login(token: string): void {
+    localStorage.setItem('access_token', token);
+    this.token.set(token);
+  }
+
+  logout(): void {
+    localStorage.removeItem('access_token');
+    this.token.set(null);
+  }
+}

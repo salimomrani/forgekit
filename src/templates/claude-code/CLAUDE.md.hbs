@@ -1,0 +1,79 @@
+# {{name}}
+
+{{description}}
+
+## Project Structure
+
+```
+{{name}}/
+{{#if backend}}
+├── backend/        # Spring Boot API
+{{/if}}
+{{#if frontend}}
+├── frontend/       # Angular SPA
+{{/if}}
+{{#if docker}}
+├── docker-compose.yml
+{{/if}}
+└── README.md
+```
+
+{{#if backend}}
+## Backend — Spring Boot {{versions.springBoot}}
+
+- **Java 21** with records, pattern matching, sealed classes
+- **Architecture:** Feature-based package structure
+- **DB:** PostgreSQL, Flyway migrations in `backend/src/main/resources/db/migration/`
+- **Conventions:** Records for DTOs, Lombok where useful, MapStruct for mappings
+- **Validation:** Jakarta Bean Validation
+- **Logging:** SLF4J
+
+### Commands
+
+```bash
+cd backend
+./mvnw spring-boot:run          # Start dev server
+./mvnw test                      # Run tests
+./mvnw package -DskipTests       # Build JAR
+```
+
+{{/if}}
+{{#if frontend}}
+## Frontend — Angular
+
+- **Angular {{versions.angular}}** with strict mode, standalone components, signals
+- **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex
+- **State:** NgRx SignalStore
+- **Conventions:** OnPush change detection, `input()`/`output()` functions, `inject()` for DI
+- **Control flow:** `@if`, `@for` (not *ngIf/*ngFor)
+- **Indentation:** 2 spaces
+
+### Commands
+
+```bash
+cd frontend
+npm install                      # Install dependencies
+ng serve                         # Start dev server (port 4200)
+ng build                         # Production build
+ng test                          # Run tests
+```
+
+{{/if}}
+{{#if docker}}
+## Infrastructure
+
+```bash
+docker compose up -d             # Start PostgreSQL + pgAdmin
+docker compose down              # Stop services
+```
+
+- **PostgreSQL:** localhost:5432
+- **pgAdmin:** localhost:5050 (admin@admin.com / admin)
+
+{{/if}}
+## Conventions
+
+- **Git:** Conventional commits (`feat:`, `fix:`, `refactor:`, `chore:`)
+- **Branches:** `feature/`, `fix/`, `refactor/`, `chore/`
+- **DB:** snake_case naming
+- **Security:** Never commit secrets, use environment variables
