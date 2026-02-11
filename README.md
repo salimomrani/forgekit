@@ -12,6 +12,12 @@
 ## Installation
 
 ```bash
+npm i -g @iconsulting-dev/forgekit
+```
+
+### Depuis les sources
+
+```bash
 git clone https://github.com/iconsulting/forgekit.git
 cd forgekit
 npm install
