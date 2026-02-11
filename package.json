@@ -1,5 +1,5 @@
 {
-  "name": "@iconsulting/forgekit",
+  "name": "@iconsulting-dev/forgekit",
   "version": "1.1.0",
   "description": "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
   "type": "module",
