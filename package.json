@@ -7,7 +7,7 @@
     "forgekit": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc && rm -rf dist/templates && cp -r src/templates dist/templates",
+    "build": "tsc && chmod +x dist/index.js && rm -rf dist/templates && cp -r src/templates dist/templates",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js"
   },

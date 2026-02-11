@@ -40,7 +40,14 @@ export const newCommand = new Command("new")
       if (options.claudeCode) defaults.claudeCode = true;
       if (typeof options.git === "boolean") defaults.gitInit = options.git;
 
-      const config = await promptProjectConfig(defaults);
+      let config;
+      try {
+        config = await promptProjectConfig(defaults);
+      } catch {
+        console.log(chalk.yellow("\n\n👋 Génération annulée."));
+        process.exit(0);
+      }
+
       const projectDir = path.resolve(process.cwd(), config.name);
 
       if (await fs.pathExists(projectDir)) {

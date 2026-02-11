@@ -18,14 +18,6 @@ export async function promptProjectConfig(
       validate: validateProjectName,
     }));
 
-  const groupId =
-    defaults.groupId ??
-    (await input({
-      message: "Group ID",
-      default: saved.groupId ?? "com.example",
-      validate: validateGroupId,
-    }));
-
   const description =
     defaults.description ??
     (await input({
@@ -46,6 +38,15 @@ export async function promptProjectConfig(
 
   const backend = defaults.backend ?? stacks.includes("backend");
   const frontend = defaults.frontend ?? stacks.includes("frontend");
+
+  const groupId = backend
+    ? (defaults.groupId ??
+      (await input({
+        message: "Group ID",
+        default: saved.groupId ?? "com.example",
+        validate: validateGroupId,
+      })))
+    : "com.example";
 
   const docker =
     defaults.docker ??
