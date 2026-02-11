@@ -1,8 +1,13 @@
-# ForgeKit
+<p align="center">
+  <img src="assets/logo.svg" alt="ForgeKit" width="120" />
+</p>
 
-CLI de scaffolding full-stack qui génère des projets **Spring Boot + Angular** préconfigurés et prêts à l'emploi.
+<h1 align="center">ForgeKit</h1>
 
-Fini la configuration répétitive : une commande, un projet complet.
+<p align="center">
+  CLI de scaffolding full-stack qui génère des projets <strong>Spring Boot + Angular</strong> préconfigurés et prêts à l'emploi.<br/>
+  Fini la configuration répétitive : une commande, un projet complet.
+</p>
 
 ## Installation
 
