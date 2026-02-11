@@ -32,7 +32,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iconsulting/forgekit.git"
+    "url": "git+https://github.com/salimomrani/forgekit.git"
   },
   "files": [
     "dist/"
