@@ -9,7 +9,9 @@ import { generateFrontend } from "../generators/frontend/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { initGit } from "../generators/git.js";
+import { resolveVersions } from "../versions.js";
 import type { ProjectConfig } from "../types.js";
+import type { ResolvedVersions } from "../versions.js";
 
 export const newCommand = new Command("new")
   .description("Créer un nouveau projet full-stack")
@@ -49,16 +51,29 @@ export const newCommand = new Command("new")
       await fs.ensureDir(projectDir);
       console.log(chalk.gray(`\nCréation du projet ${config.name}...\n`));
 
+      const versions = await resolveVersions({
+        backend: config.backend,
+        frontend: config.frontend,
+      });
+
       if (config.backend) {
         process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
-        await generateBackend(projectDir, config);
-        console.log(chalk.green("\r  ✔ Backend Spring Boot généré       "));
+        await generateBackend(projectDir, config, versions);
+        console.log(
+          chalk.green(
+            `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
+          ),
+        );
       }
 
       if (config.frontend) {
         process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
-        await generateFrontend(projectDir, config);
-        console.log(chalk.green("\r  ✔ Frontend Angular généré           "));
+        await generateFrontend(projectDir, config, versions);
+        console.log(
+          chalk.green(
+            `\r  ✔ Frontend Angular ${versions.angular} généré           `,
+          ),
+        );
       }
 
       if (config.docker) {
@@ -69,14 +84,11 @@ export const newCommand = new Command("new")
 
       if (config.claudeCode) {
         process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
-        await generateClaudeCode(projectDir, config);
+        await generateClaudeCode(projectDir, config, versions);
         console.log(chalk.green("\r  ✔ Claude Code configuré             "));
       }
 
-      // Génère le README
-      await generateReadme(projectDir, config);
-
-      // Génère le .gitignore racine
+      await generateReadme(projectDir, config, versions);
       await generateRootGitignore(projectDir);
 
       if (config.gitInit) {
@@ -102,14 +114,19 @@ export const newCommand = new Command("new")
 async function generateReadme(
   projectDir: string,
   config: ProjectConfig,
+  versions: ResolvedVersions,
 ): Promise<void> {
   const sections = [`# ${config.name}\n\n${config.description}\n`];
 
   sections.push("## Stack\n");
   if (config.backend)
-    sections.push("- **Backend:** Spring Boot 4.0.1 / Java 21");
+    sections.push(
+      `- **Backend:** Spring Boot ${versions.springBoot} / Java 21`,
+    );
   if (config.frontend)
-    sections.push("- **Frontend:** Angular 21 / PrimeNG v21");
+    sections.push(
+      `- **Frontend:** Angular ${versions.angular} / PrimeNG ${versions.primeng}`,
+    );
   if (config.docker)
     sections.push("- **Infra:** Docker Compose (PostgreSQL 17 + pgAdmin)");
   sections.push("");

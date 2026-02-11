@@ -1,10 +1,12 @@
 import path from "node:path";
 import fs from "fs-extra";
 import type { ProjectConfig } from "../../types.js";
+import type { ResolvedVersions } from "../../versions.js";
 
 export async function generateBackend(
   projectDir: string,
   config: ProjectConfig,
+  versions: ResolvedVersions,
 ): Promise<void> {
   const backendDir = path.join(projectDir, "backend");
   const groupPath = config.groupId.replace(/\./g, "/");
@@ -35,7 +37,7 @@ export async function generateBackend(
   await Promise.all([
     fs.writeFile(
       path.join(backendDir, "pom.xml"),
-      generatePom(config, artifactId, packageName),
+      generatePom(config, artifactId, packageName, versions),
     ),
     fs.writeFile(
       path.join(javaDir, "Application.java"),
@@ -91,6 +93,7 @@ function generatePom(
   config: ProjectConfig,
   artifactId: string,
   packageName: string,
+  versions: ResolvedVersions,
 ): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -101,7 +104,7 @@ function generatePom(
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.2</version>
+        <version>${versions.springBoot}</version>
         <relativePath/>
     </parent>
 
@@ -113,8 +116,8 @@ function generatePom(
 
     <properties>
         <java.version>21</java.version>
-        <mapstruct.version>1.6.3</mapstruct.version>
-        <springdoc.version>3.0.1</springdoc.version>
+        <mapstruct.version>${versions.mapstruct}</mapstruct.version>
+        <springdoc.version>${versions.springDoc}</springdoc.version>
     </properties>
 
     <dependencies>

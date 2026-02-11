@@ -1,10 +1,12 @@
 import path from "node:path";
 import fs from "fs-extra";
 import type { ProjectConfig } from "../../types.js";
+import type { ResolvedVersions } from "../../versions.js";
 
 export async function generateFrontend(
   projectDir: string,
   config: ProjectConfig,
+  versions: ResolvedVersions,
 ): Promise<void> {
   const frontendDir = path.join(projectDir, "frontend");
   const srcDir = path.join(frontendDir, "src");
@@ -29,7 +31,7 @@ export async function generateFrontend(
   await Promise.all([
     fs.writeFile(
       path.join(frontendDir, "package.json"),
-      generatePackageJson(config),
+      generatePackageJson(config, versions),
     ),
     fs.writeFile(
       path.join(frontendDir, "angular.json"),
@@ -89,7 +91,12 @@ export async function generateFrontend(
   ]);
 }
 
-function generatePackageJson(config: ProjectConfig): string {
+function generatePackageJson(
+  config: ProjectConfig,
+  versions: ResolvedVersions,
+): string {
+  const ngVersion = `^${versions.angular}`;
+  const majorVersion = versions.angular.split(".")[0];
   return JSON.stringify(
     {
       name: config.name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-frontend",
@@ -103,27 +110,27 @@ function generatePackageJson(config: ProjectConfig): string {
       },
       private: true,
       dependencies: {
-        "@angular/animations": "^21.0.0",
-        "@angular/common": "^21.0.0",
-        "@angular/compiler": "^21.0.0",
-        "@angular/core": "^21.0.0",
-        "@angular/forms": "^21.0.0",
-        "@angular/platform-browser": "^21.0.0",
-        "@angular/platform-browser-dynamic": "^21.0.0",
-        "@angular/router": "^21.0.0",
-        "@ngrx/signals": "^21.0.1",
-        primeng: "^21.1.1",
-        primeicons: "^7.0.0",
-        primeflex: "^4.0.0",
-        rxjs: "~7.8.0",
+        "@angular/animations": ngVersion,
+        "@angular/common": ngVersion,
+        "@angular/compiler": ngVersion,
+        "@angular/core": ngVersion,
+        "@angular/forms": ngVersion,
+        "@angular/platform-browser": ngVersion,
+        "@angular/platform-browser-dynamic": ngVersion,
+        "@angular/router": ngVersion,
+        "@ngrx/signals": `^${versions.ngrxSignals}`,
+        primeng: `^${versions.primeng}`,
+        primeicons: `^${versions.primeicons}`,
+        primeflex: `^${versions.primeflex}`,
+        rxjs: `~${versions.rxjs}`,
         tslib: "^2.8.0",
-        "zone.js": "~0.15.0",
+        "zone.js": `~${versions.zoneJs}`,
       },
       devDependencies: {
-        "@angular/build": "^21.0.0",
-        "@angular/cli": "^21.0.0",
-        "@angular/compiler-cli": "^21.0.0",
-        typescript: "~5.9.0",
+        "@angular/build": ngVersion,
+        "@angular/cli": ngVersion,
+        "@angular/compiler-cli": ngVersion,
+        typescript: `~${versions.typescript}`,
       },
     },
     null,

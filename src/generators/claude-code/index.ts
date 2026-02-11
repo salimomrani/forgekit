@@ -1,13 +1,15 @@
 import path from "node:path";
 import fs from "fs-extra";
 import type { ProjectConfig } from "../../types.js";
+import type { ResolvedVersions } from "../../versions.js";
 
 export async function generateClaudeCode(
   projectDir: string,
   config: ProjectConfig,
+  versions: ResolvedVersions,
 ): Promise<void> {
   await Promise.all([
-    generateClaudeMd(projectDir, config),
+    generateClaudeMd(projectDir, config, versions),
     generateClaudeSettings(projectDir, config),
   ]);
 }
@@ -15,6 +17,7 @@ export async function generateClaudeCode(
 async function generateClaudeMd(
   projectDir: string,
   config: ProjectConfig,
+  versions: ResolvedVersions,
 ): Promise<void> {
   const sections: string[] = [];
 
@@ -31,7 +34,7 @@ async function generateClaudeMd(
   sections.push("```\n");
 
   if (config.backend) {
-    sections.push("## Backend — Spring Boot\n");
+    sections.push(`## Backend — Spring Boot ${versions.springBoot}\n`);
     sections.push(
       "- **Java 21** with records, pattern matching, sealed classes",
     );
@@ -56,9 +59,11 @@ async function generateClaudeMd(
   if (config.frontend) {
     sections.push("## Frontend — Angular\n");
     sections.push(
-      "- **Angular 21** with strict mode, standalone components, signals",
+      `- **Angular ${versions.angular}** with strict mode, standalone components, signals`,
     );
-    sections.push("- **UI:** PrimeNG v21, theme Aura, PrimeFlex");
+    sections.push(
+      `- **UI:** PrimeNG ${versions.primeng}, theme Aura, PrimeFlex`,
+    );
     sections.push("- **State:** NgRx SignalStore");
     sections.push(
       "- **Conventions:** OnPush change detection, `input()`/`output()` functions, `inject()` for DI",
