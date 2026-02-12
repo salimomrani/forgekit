@@ -1,0 +1,108 @@
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  template: `
+    <div class="home">
+      <div class="welcome-card">
+        <div class="welcome-icon">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <h1>Bienvenue sur {{name}}</h1>
+        <p>Votre application est prête. Commencez à construire vos fonctionnalités.</p>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">
+            <i class="pi pi-code"></i>
+          </div>
+          <h3>Composants</h3>
+          <p>Ajoutez vos composants dans <code>src/app/features/</code></p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <i class="pi pi-sitemap"></i>
+          </div>
+          <h3>Routes</h3>
+          <p>Configurez vos routes dans <code>app.routes.ts</code></p>
+        </div>
+        <div class="card">
+          <div class="card-icon">
+            <i class="pi pi-palette"></i>
+          </div>
+          <h3>PrimeNG</h3>
+          <p>Utilisez les composants PrimeNG pour votre interface</p>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: `
+    .home {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .welcome-card {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: var(--p-surface-0);
+      border-radius: var(--p-content-border-radius);
+      border: 1px solid var(--p-surface-200);
+      margin-bottom: 2rem;
+    }
+    .welcome-icon {
+      font-size: 3rem;
+      color: var(--p-primary-color);
+      margin-bottom: 1rem;
+    }
+    .welcome-card h1 {
+      margin: 0 0 0.5rem;
+      color: var(--p-text-color);
+      font-size: 1.75rem;
+    }
+    .welcome-card p {
+      margin: 0;
+      color: var(--p-text-muted-color);
+      font-size: 1.1rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+    .card {
+      background: var(--p-surface-0);
+      border: 1px solid var(--p-surface-200);
+      border-radius: var(--p-content-border-radius);
+      padding: 1.5rem;
+      transition: box-shadow 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .card-icon {
+      font-size: 1.5rem;
+      color: var(--p-primary-color);
+      margin-bottom: 0.75rem;
+    }
+    .card h3 {
+      margin: 0 0 0.5rem;
+      color: var(--p-text-color);
+    }
+    .card p {
+      margin: 0;
+      color: var(--p-text-muted-color);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .card code {
+      background: var(--p-surface-100);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class HomeComponent {}

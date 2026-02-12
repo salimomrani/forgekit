@@ -28,7 +28,7 @@ class FrontendGenerator extends BaseGenerator {
       path.join(appDir, "layout/topbar"),
       path.join(appDir, "shared/components"),
       path.join(appDir, "shared/pipes"),
-      path.join(appDir, "features"),
+      path.join(appDir, "features/home"),
       path.join(srcDir, "environments"),
     ];
 
@@ -128,6 +128,11 @@ class FrontendGenerator extends BaseGenerator {
       renderAndWrite(
         "frontend/topbar.component.ts.hbs",
         path.join(appDir, "layout/topbar/topbar.component.ts"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/home.component.ts.hbs",
+        path.join(appDir, "features/home/home.component.ts"),
         data,
       ),
     ]);
