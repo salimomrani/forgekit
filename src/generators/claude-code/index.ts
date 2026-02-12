@@ -52,29 +52,29 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
     if (this.config.backend) {
       commands.push(
-        "bash(./mvnw spring-boot:run)",
-        "bash(./mvnw test)",
-        "bash(./mvnw package)",
-        "bash(./mvnw clean)",
+        "Bash(./mvnw spring-boot:run)",
+        "Bash(./mvnw test)",
+        "Bash(./mvnw package)",
+        "Bash(./mvnw clean)",
       );
     }
 
     if (this.config.frontend) {
       commands.push(
-        "bash(ng serve)",
-        "bash(ng build)",
-        "bash(ng test)",
-        "bash(ng generate)",
-        "bash(npm install)",
-        "bash(npm run)",
+        "Bash(ng serve)",
+        "Bash(ng build)",
+        "Bash(ng test)",
+        "Bash(ng generate)",
+        "Bash(npm install)",
+        "Bash(npm run)",
       );
     }
 
     if (this.config.docker) {
       commands.push(
-        "bash(docker compose up)",
-        "bash(docker compose down)",
-        "bash(docker compose ps)",
+        "Bash(docker compose up)",
+        "Bash(docker compose down)",
+        "Bash(docker compose ps)",
       );
     }
 
