@@ -37,12 +37,15 @@ export const newCommand = new Command("new")
       if (options.group) defaults.groupId = options.group as string;
       if (options.description)
         defaults.description = options.description as string;
-      if (options.backend) defaults.backend = true;
-      if (options.frontend) defaults.frontend = true;
-      if (options.auth) defaults.auth = true;
-      if (options.ci) defaults.ci = true;
-      if (options.docker) defaults.docker = true;
-      if (options.claudeCode) defaults.claudeCode = true;
+      if (typeof options.backend === "boolean")
+        defaults.backend = options.backend;
+      if (typeof options.frontend === "boolean")
+        defaults.frontend = options.frontend;
+      if (typeof options.auth === "boolean") defaults.auth = options.auth;
+      if (typeof options.ci === "boolean") defaults.ci = options.ci;
+      if (typeof options.docker === "boolean") defaults.docker = options.docker;
+      if (typeof options.claudeCode === "boolean")
+        defaults.claudeCode = options.claudeCode;
       if (typeof options.git === "boolean") defaults.gitInit = options.git;
 
       let config;

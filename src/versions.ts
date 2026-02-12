@@ -23,7 +23,7 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   mapstruct: "1.6.3",
   angular: "21.0.0",
   primeng: "21.1.1",
-  primeuixThemes: "4.3.0",
+  primeuixThemes: "2.0.3",
   primeicons: "7.0.0",
   primeflex: "4.0.0",
   ngrxSignals: "21.0.1",
