@@ -24,9 +24,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styles: `
     .layout-sidebar {
       width: 250px;
-      background: var(--surface-card);
-      border-right: 1px solid var(--surface-border);
-      padding: 1rem;
+      min-width: 250px;
+      background: var(--p-surface-0);
+      border-right: 1px solid var(--p-surface-200);
+      padding: 1rem 0.75rem;
     }
     .sidebar-menu {
       list-style: none;
@@ -38,17 +39,18 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       align-items: center;
       gap: 0.75rem;
       padding: 0.75rem 1rem;
-      border-radius: var(--border-radius);
-      color: var(--text-color);
+      border-radius: var(--p-content-border-radius);
+      color: var(--p-text-color);
       text-decoration: none;
       transition: background 0.2s;
+      font-weight: 500;
     }
     .sidebar-menu a:hover {
-      background: var(--surface-hover);
+      background: var(--p-surface-100);
     }
     .active-link {
-      background: var(--primary-color) !important;
-      color: var(--primary-color-text) !important;
+      background: var(--p-primary-color) !important;
+      color: var(--p-primary-contrast-color) !important;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
