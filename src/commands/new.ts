@@ -21,6 +21,7 @@ export const newCommand = new Command("new")
   .option("--description <desc>", "Description du projet")
   .option("--backend", "Inclure le backend Spring Boot")
   .option("--frontend", "Inclure le frontend Angular")
+  .option("--auth", "Inclure l'authentification")
   .option("--docker", "Inclure Docker Compose")
   .option("--ci", "Inclure GitHub Actions CI")
   .option("--claude-code", "Inclure config Claude Code")
@@ -38,6 +39,7 @@ export const newCommand = new Command("new")
         defaults.description = options.description as string;
       if (options.backend) defaults.backend = true;
       if (options.frontend) defaults.frontend = true;
+      if (options.auth) defaults.auth = true;
       if (options.ci) defaults.ci = true;
       if (options.docker) defaults.docker = true;
       if (options.claudeCode) defaults.claudeCode = true;

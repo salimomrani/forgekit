@@ -58,6 +58,7 @@ class BackendGenerator extends BaseGenerator {
       packageName: this.packageName,
       name: this.config.name,
       description: this.config.description,
+      auth: this.config.auth,
       dbName: this.dbName,
       datasourceUrl: `\${DB_URL:jdbc:postgresql://localhost:5432/${this.dbName}}`,
       versions: this.versions,
@@ -72,11 +73,6 @@ class BackendGenerator extends BaseGenerator {
       renderAndWrite(
         "backend/Application.java.hbs",
         path.join(javaDir, "Application.java"),
-        data,
-      ),
-      renderAndWrite(
-        "backend/SecurityConfig.java.hbs",
-        path.join(javaDir, "config/SecurityConfig.java"),
         data,
       ),
       renderAndWrite(
@@ -137,6 +133,14 @@ class BackendGenerator extends BaseGenerator {
         data,
       ),
     ]);
+
+    if (this.config.auth) {
+      await renderAndWrite(
+        "backend/SecurityConfig.java.hbs",
+        path.join(javaDir, "config/SecurityConfig.java"),
+        data,
+      );
+    }
   }
 }
 

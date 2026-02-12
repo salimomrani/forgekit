@@ -23,21 +23,29 @@ class FrontendGenerator extends BaseGenerator {
     const srcDir = path.join(frontendDir, "src");
     const appDir = path.join(srcDir, "app");
 
-    await this.ensureDirs([
+    const dirs = [
       path.join(appDir, "layout/sidebar"),
       path.join(appDir, "layout/topbar"),
-      path.join(appDir, "core/interceptors"),
-      path.join(appDir, "core/guards"),
-      path.join(appDir, "core/services"),
       path.join(appDir, "shared/components"),
       path.join(appDir, "shared/pipes"),
       path.join(appDir, "features"),
       path.join(srcDir, "environments"),
-    ]);
+    ];
+
+    if (this.config.auth) {
+      dirs.push(
+        path.join(appDir, "core/interceptors"),
+        path.join(appDir, "core/guards"),
+        path.join(appDir, "core/services"),
+      );
+    }
+
+    await this.ensureDirs(dirs);
 
     const data = {
       projectName: this.projectName,
       name: this.config.name,
+      auth: this.config.auth,
       versions: this.versions,
     };
 
@@ -122,27 +130,32 @@ class FrontendGenerator extends BaseGenerator {
         path.join(appDir, "layout/topbar/topbar.component.ts"),
         data,
       ),
-      renderAndWrite(
-        "frontend/auth.interceptor.ts.hbs",
-        path.join(appDir, "core/interceptors/auth.interceptor.ts"),
-        data,
-      ),
-      renderAndWrite(
-        "frontend/error.interceptor.ts.hbs",
-        path.join(appDir, "core/interceptors/error.interceptor.ts"),
-        data,
-      ),
-      renderAndWrite(
-        "frontend/auth.guard.ts.hbs",
-        path.join(appDir, "core/guards/auth.guard.ts"),
-        data,
-      ),
-      renderAndWrite(
-        "frontend/auth.service.ts.hbs",
-        path.join(appDir, "core/services/auth.service.ts"),
-        data,
-      ),
     ]);
+
+    if (this.config.auth) {
+      await Promise.all([
+        renderAndWrite(
+          "frontend/auth.interceptor.ts.hbs",
+          path.join(appDir, "core/interceptors/auth.interceptor.ts"),
+          data,
+        ),
+        renderAndWrite(
+          "frontend/error.interceptor.ts.hbs",
+          path.join(appDir, "core/interceptors/error.interceptor.ts"),
+          data,
+        ),
+        renderAndWrite(
+          "frontend/auth.guard.ts.hbs",
+          path.join(appDir, "core/guards/auth.guard.ts"),
+          data,
+        ),
+        renderAndWrite(
+          "frontend/auth.service.ts.hbs",
+          path.join(appDir, "core/services/auth.service.ts"),
+          data,
+        ),
+      ]);
+    }
   }
 }
 

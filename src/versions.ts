@@ -8,6 +8,7 @@ export interface ResolvedVersions {
   // Frontend
   angular: string;
   primeng: string;
+  primeuixThemes: string;
   primeicons: string;
   primeflex: string;
   ngrxSignals: string;
@@ -22,6 +23,7 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   mapstruct: "1.6.3",
   angular: "21.0.0",
   primeng: "21.1.1",
+  primeuixThemes: "4.3.0",
   primeicons: "7.0.0",
   primeflex: "4.0.0",
   ngrxSignals: "21.0.1",
@@ -99,6 +101,9 @@ export async function resolveVersions(opts: {
       }),
       fetchNpmVersion("primeng").then((v) => {
         if (v) versions.primeng = v;
+      }),
+      fetchNpmVersion("@primeuix/themes").then((v) => {
+        if (v) versions.primeuixThemes = v;
       }),
       fetchNpmVersion("primeicons").then((v) => {
         if (v) versions.primeicons = v;

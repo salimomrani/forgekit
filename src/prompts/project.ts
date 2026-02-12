@@ -48,6 +48,16 @@ export async function promptProjectConfig(
       })))
     : "com.example";
 
+  const auth =
+    defaults.auth ??
+    (backend || frontend
+      ? await confirm({
+          message:
+            "Inclure l'authentification (Spring Security + interceptors Angular) ?",
+          default: false,
+        })
+      : false);
+
   const ci =
     defaults.ci ??
     (await confirm({
@@ -82,6 +92,7 @@ export async function promptProjectConfig(
     description,
     backend,
     frontend,
+    auth,
     ci,
     docker,
     claudeCode,

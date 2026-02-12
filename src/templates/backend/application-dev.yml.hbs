@@ -4,4 +4,7 @@ spring:
 
 logging:
   level:
+{{#if auth}}
     org.springframework.security: DEBUG
+{{/if}}
+    {{packageName}}: DEBUG

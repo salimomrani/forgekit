@@ -4,6 +4,7 @@ export interface ProjectConfig {
   description: string;
   backend: boolean;
   frontend: boolean;
+  auth: boolean;
   docker: boolean;
   ci: boolean;
   claudeCode: boolean;
