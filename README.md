@@ -18,7 +18,7 @@ npm i -g @iconsulting-dev/forgekit
 ### Depuis les sources
 
 ```bash
-git clone https://github.com/iconsulting/forgekit.git
+git clone https://github.com/salimomrani/forgekit.git
 cd forgekit
 npm install
 npm run build
@@ -40,6 +40,8 @@ Un wizard vous guide avec des valeurs par défaut modifiables :
 ? Group ID : (com.example)
 ? Description : (Mon application)
 ? Que voulez-vous générer ? (Backend + Frontend)
+? Inclure l'authentification ? (Non)
+? Configurer GitHub Actions CI ? (Oui)
 ? Configurer Docker Compose ? (Oui)
 ? Configurer Claude Code ? (Oui)
 ? Initialiser Git ? (Oui)
@@ -59,7 +61,9 @@ forgekit new mon-app --group com.salim --backend --frontend --docker --claude-co
 | `--description <desc>` | Description du projet |
 | `--backend` | Inclure le backend Spring Boot |
 | `--frontend` | Inclure le frontend Angular |
+| `--auth` | Inclure l'authentification (Spring Security + interceptors Angular) |
 | `--docker` | Inclure Docker Compose |
+| `--ci` | Inclure GitHub Actions CI |
 | `--claude-code` | Inclure la config Claude Code |
 | `--no-git` | Ne pas initialiser Git |
 
@@ -67,9 +71,10 @@ forgekit new mon-app --group com.salim --backend --frontend --docker --claude-co
 
 ```
 mon-projet/
-├── backend/                 # Spring Boot 4.0.2 / Java 21
+├── backend/                 # Spring Boot 4.x / Java 21
 ├── frontend/                # Angular 21 / PrimeNG 21
 ├── docker-compose.yml       # PostgreSQL 17 + pgAdmin
+├── .github/workflows/       # CI GitHub Actions
 ├── CLAUDE.md                # Conventions Claude Code
 ├── .claude/settings.json    # Permissions Claude Code
 ├── .gitignore
@@ -79,7 +84,9 @@ mon-projet/
 ### Backend — Spring Boot
 
 **Dépendances incluses :**
-Spring Web, Spring Data JPA, PostgreSQL, Spring Security, Spring Validation, Lombok, MapStruct, SpringDoc OpenAPI, Flyway, Spring Actuator.
+Spring Web, Spring Data JPA, PostgreSQL, Spring Validation, Lombok, MapStruct, SpringDoc OpenAPI, Flyway, Spring Actuator.
+
+**Avec `--auth` :** Spring Security (CORS, CSRF disabled, stateless, JWT-ready).
 
 **Structure :**
 
@@ -87,7 +94,7 @@ Spring Web, Spring Data JPA, PostgreSQL, Spring Security, Spring Validation, Lom
 backend/src/main/java/com/{group}/{name}/
 ├── Application.java
 ├── config/
-│   ├── SecurityConfig.java           # CORS, CSRF, JWT-ready
+│   ├── SecurityConfig.java           # (si --auth) CORS, stateless, JWT-ready
 │   └── OpenApiConfig.java
 ├── shared/
 │   ├── exception/
@@ -106,7 +113,7 @@ backend/src/main/java/com/{group}/{name}/
 ### Frontend — Angular
 
 **Dépendances incluses :**
-Angular (dernière version), PrimeNG (thème Aura), PrimeIcons, PrimeFlex, NgRx SignalStore.
+Angular (dernière version), PrimeNG (thème Aura via `@primeuix/themes`), PrimeIcons, PrimeFlex, NgRx SignalStore.
 
 **Structure :**
 
@@ -114,25 +121,28 @@ Angular (dernière version), PrimeNG (thème Aura), PrimeIcons, PrimeFlex, NgRx 
 frontend/src/app/
 ├── app.component.ts            # Standalone, OnPush
 ├── app.routes.ts               # Routes lazy-loaded
-├── app.config.ts               # Providers
+├── app.config.ts               # Providers (PrimeNG Aura, HttpClient, Router)
 ├── layout/
 │   ├── layout.component.ts     # Shell (sidebar + topbar + router-outlet)
 │   ├── sidebar/
 │   └── topbar/
-├── core/
+├── core/                       # (si --auth)
 │   ├── interceptors/           # Auth + Error interceptors
 │   ├── guards/                 # Auth guard
 │   └── services/               # Auth service (signals)
 ├── shared/                     # Composants et pipes réutilisables
-└── features/                   # Structure par feature
+└── features/
+    └── home/                   # Page d'accueil par défaut
 ```
 
 **Prêt à l'emploi :**
-- Layout sidebar/topbar fonctionnel
-- Thème Aura PrimeNG appliqué
-- Intercepteurs HTTP câblés
+- Layout sidebar/topbar fonctionnel avec design tokens PrimeNG v20+
+- Page d'accueil avec cards de démarrage
+- Thème Aura PrimeNG appliqué via `providePrimeNG`
+- PrimeIcons intégrés
 - NgRx SignalStore prêt par feature
 - Standalone components, signals, `@if`/`@for`, OnPush
+- **Avec `--auth` :** Intercepteurs HTTP + guard + AuthService câblés
 
 ### Docker Compose
 
@@ -164,6 +174,14 @@ cd backend && ./mvnw spring-boot:run
 cd frontend && npm install && ng serve
 ```
 
+## Versions dynamiques
+
+ForgeKit résout automatiquement les dernières versions stables depuis npm et Maven Central au moment de la génération :
+- Angular, PrimeNG, @primeuix/themes, NgRx Signals, RxJS, TypeScript, zone.js
+- Spring Boot, SpringDoc, MapStruct
+
+Des versions fallback sont utilisées si la résolution échoue.
+
 ## Config persistante
 
 ForgeKit retient vos préférences dans `~/.forgekit/config.json` (Group ID, etc.) pour les réutiliser automatiquement.
@@ -182,12 +200,12 @@ src/
 │   ├── claude-code/index.ts     # ClaudeCodeGenerator
 │   ├── root/index.ts            # RootGenerator (README + .gitignore)
 │   └── git.ts                   # Initialisation Git
-├── templates/                   # 39 templates Handlebars (.hbs)
+├── templates/                   # 41 templates Handlebars (.hbs)
 │   ├── backend/                 # 14 templates
-│   ├── frontend/                # 20 templates
+│   ├── frontend/                # 21 templates
 │   ├── docker/                  # 1 template
 │   ├── claude-code/             # 2 templates
-│   └── root/                    # 2 templates
+│   └── root/                    # 2 templates + 1 CI
 ├── utils/
 │   ├── template-engine.ts       # Handlebars compile + render
 │   └── validation.ts            # Validation inputs
