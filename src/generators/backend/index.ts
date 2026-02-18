@@ -41,16 +41,22 @@ class BackendGenerator extends BaseGenerator {
       this.config.name.toLowerCase().replace(/[^a-z0-9]/g, ""),
     );
 
-    await this.ensureDirs([
+    const dirs = [
       javaDir,
       path.join(javaDir, "config"),
       path.join(javaDir, "shared/exception"),
       path.join(javaDir, "shared/dto"),
       path.join(javaDir, "feature"),
-      path.join(resourcesDir, "db/migration"),
+      resourcesDir,
       testDir,
       path.join(backendDir, ".mvn/wrapper"),
-    ]);
+    ];
+
+    if (this.config.flyway) {
+      dirs.push(path.join(resourcesDir, "db/migration"));
+    }
+
+    await this.ensureDirs(dirs);
 
     const data = {
       groupId: this.config.groupId,
@@ -59,6 +65,9 @@ class BackendGenerator extends BaseGenerator {
       name: this.config.name,
       description: this.config.description,
       auth: this.config.auth,
+      flyway: this.config.flyway,
+      openapi: this.config.openapi,
+      mapstruct: this.config.mapstruct,
       dbName: this.dbName,
       datasourceUrl: `\${DB_URL:jdbc:postgresql://localhost:5432/${this.dbName}}`,
       versions: this.versions,
@@ -73,11 +82,6 @@ class BackendGenerator extends BaseGenerator {
       renderAndWrite(
         "backend/Application.java.hbs",
         path.join(javaDir, "Application.java"),
-        data,
-      ),
-      renderAndWrite(
-        "backend/OpenApiConfig.java.hbs",
-        path.join(javaDir, "config/OpenApiConfig.java"),
         data,
       ),
       renderAndWrite(
@@ -105,10 +109,6 @@ class BackendGenerator extends BaseGenerator {
         path.join(resourcesDir, "application-dev.yml"),
         data,
       ),
-      fs.writeFile(
-        path.join(resourcesDir, "db/migration/V1__init.sql"),
-        "-- Initial migration\n",
-      ),
       renderAndWrite(
         "backend/ApplicationTests.java.hbs",
         path.join(testDir, "ApplicationTests.java"),
@@ -132,7 +132,23 @@ class BackendGenerator extends BaseGenerator {
         path.join(backendDir, "mvnw.cmd"),
         data,
       ),
+      ...(this.config.flyway
+        ? [
+            fs.writeFile(
+              path.join(resourcesDir, "db/migration/V1__init.sql"),
+              "-- Initial migration\n",
+            ),
+          ]
+        : []),
     ]);
+
+    if (this.config.openapi) {
+      await renderAndWrite(
+        "backend/OpenApiConfig.java.hbs",
+        path.join(javaDir, "config/OpenApiConfig.java"),
+        data,
+      );
+    }
 
     if (this.config.auth) {
       await renderAndWrite(
