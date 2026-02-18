@@ -15,6 +15,7 @@ export interface ResolvedVersions {
   rxjs: string;
   zoneJs: string;
   typescript: string;
+  tailwind: string;
 }
 
 const FALLBACK_VERSIONS: ResolvedVersions = {
@@ -30,6 +31,7 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   rxjs: "7.8.0",
   zoneJs: "0.15.0",
   typescript: "5.9.0",
+  tailwind: "4.0.0",
 };
 
 async function fetchNpmVersion(packageName: string): Promise<string | null> {
@@ -122,6 +124,9 @@ export async function resolveVersions(opts: {
       }),
       fetchNpmVersion("typescript").then((v) => {
         if (v) versions.typescript = v;
+      }),
+      fetchNpmVersion("tailwindcss").then((v) => {
+        if (v) versions.tailwind = v;
       }),
     );
   }
