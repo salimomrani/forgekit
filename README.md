@@ -37,14 +37,14 @@ Un wizard vous guide avec des valeurs par défaut modifiables :
 
 ```
 ? Nom du projet : (mon-app)
-? Group ID : (com.example)
 ? Description : (Mon application)
-? Que voulez-vous générer ? (Backend + Frontend)
-? Inclure l'authentification ? (Non)
-? Configurer GitHub Actions CI ? (Oui)
-? Configurer Docker Compose ? (Oui)
-? Configurer Claude Code ? (Oui)
-? Initialiser Git ? (Oui)
+? Stack à générer : (Backend + Frontend)
+? Group ID : (com.example)
+? Fonctionnalités backend : (Flyway ✓  OpenAPI ✓  JWT ✗  MapStruct ✓)
+? Framework UI : (PrimeNG)
+? Preset PrimeNG : (Aura)
+? Inclure NgRx SignalStore ? (Non)
+? Infrastructure : (Docker ✓  CI/CD ✓  Claude Code ✓  Git ✓)
 ```
 
 ### Mode commande directe
@@ -61,7 +61,13 @@ forgekit new mon-app --group com.salim --backend --frontend --docker --claude-co
 | `--description <desc>` | Description du projet |
 | `--backend` | Inclure le backend Spring Boot |
 | `--frontend` | Inclure le frontend Angular |
-| `--auth` | Inclure l'authentification (Spring Security + interceptors Angular) |
+| `--auth` | Inclure Spring Security + interceptors Angular |
+| `--flyway` / `--no-flyway` | Inclure/exclure Flyway (migrations SQL) |
+| `--openapi` / `--no-openapi` | Inclure/exclure OpenAPI / Swagger UI |
+| `--mapstruct` / `--no-mapstruct` | Inclure/exclure MapStruct |
+| `--ngrx` | Inclure NgRx SignalStore |
+| `--ui <framework>` | Framework UI : `primeng` \| `tailwind` \| `none` |
+| `--preset <preset>` | Preset PrimeNG : `Aura` \| `Lara` \| `Nora` |
 | `--docker` | Inclure Docker Compose |
 | `--ci` | Inclure GitHub Actions CI |
 | `--claude-code` | Inclure la config Claude Code |
@@ -83,8 +89,11 @@ mon-projet/
 
 ### Backend — Spring Boot
 
-**Dépendances incluses :**
-Spring Web, Spring Data JPA, PostgreSQL, Spring Validation, Lombok, MapStruct, SpringDoc OpenAPI, Flyway, Spring Actuator.
+**Dépendances incluses (par défaut) :**
+Spring Web, Spring Data JPA, PostgreSQL, Spring Validation, Lombok, Spring Actuator.
+
+**Optionnelles (activées par défaut, désactivables) :**
+Flyway (`--flyway`), SpringDoc OpenAPI (`--openapi`), MapStruct (`--mapstruct`).
 
 **Avec `--auth` :** Spring Security (CORS, CSRF disabled, stateless, JWT-ready).
 
@@ -112,8 +121,12 @@ backend/src/main/java/com/{group}/{name}/
 
 ### Frontend — Angular
 
-**Dépendances incluses :**
-Angular (dernière version), PrimeNG (thème Aura via `@primeuix/themes`), PrimeIcons, PrimeFlex, NgRx SignalStore.
+**Framework UI (choix exclusif) :**
+- `primeng` *(défaut)* — PrimeNG avec preset `Aura` / `Lara` / `Nora`
+- `tailwind` — Tailwind CSS v4 (`@import "tailwindcss"`, sans config JS)
+- `none` — Minimal, sans dépendance UI
+
+**Optionnel :** NgRx SignalStore (`--ngrx`) — store `AppStore` généré dans `core/store/`.
 
 **Structure :**
 
@@ -177,7 +190,7 @@ cd frontend && npm install && ng serve
 ## Versions dynamiques
 
 ForgeKit résout automatiquement les dernières versions stables depuis npm et Maven Central au moment de la génération :
-- Angular, PrimeNG, @primeuix/themes, NgRx Signals, RxJS, TypeScript, zone.js
+- Angular, PrimeNG, @primeuix/themes, NgRx Signals, Tailwind CSS, RxJS, TypeScript, zone.js
 - Spring Boot, SpringDoc, MapStruct
 
 Des versions fallback sont utilisées si la résolution échoue.
