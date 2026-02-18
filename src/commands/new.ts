@@ -22,6 +22,15 @@ export const newCommand = new Command("new")
   .option("--backend", "Inclure le backend Spring Boot")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--auth", "Inclure l'authentification")
+  .option("--flyway", "Inclure Flyway (migrations SQL)")
+  .option("--no-flyway", "Exclure Flyway")
+  .option("--openapi", "Inclure OpenAPI / Swagger UI")
+  .option("--no-openapi", "Exclure OpenAPI")
+  .option("--mapstruct", "Inclure MapStruct")
+  .option("--no-mapstruct", "Exclure MapStruct")
+  .option("--ngrx", "Inclure NgRx SignalStore")
+  .option("--ui <framework>", "Framework UI : primeng | tailwind | none")
+  .option("--preset <preset>", "Preset PrimeNG : Aura | Lara | Nora")
   .option("--docker", "Inclure Docker Compose")
   .option("--ci", "Inclure GitHub Actions CI")
   .option("--claude-code", "Inclure config Claude Code")
@@ -42,6 +51,17 @@ export const newCommand = new Command("new")
       if (typeof options.frontend === "boolean")
         defaults.frontend = options.frontend;
       if (typeof options.auth === "boolean") defaults.auth = options.auth;
+      if (typeof options.flyway === "boolean") defaults.flyway = options.flyway;
+      if (typeof options.openapi === "boolean")
+        defaults.openapi = options.openapi;
+      if (typeof options.mapstruct === "boolean")
+        defaults.mapstruct = options.mapstruct;
+      if (typeof options.ngrx === "boolean") defaults.ngrx = options.ngrx;
+      if (options.ui)
+        defaults.uiFramework = options.ui as ProjectConfig["uiFramework"];
+      if (options.preset)
+        defaults.primeNGPreset =
+          options.preset as ProjectConfig["primeNGPreset"];
       if (typeof options.ci === "boolean") defaults.ci = options.ci;
       if (typeof options.docker === "boolean") defaults.docker = options.docker;
       if (typeof options.claudeCode === "boolean")
