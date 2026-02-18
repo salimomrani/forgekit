@@ -1,4 +1,5 @@
 import path from "node:path";
+import fs from "fs-extra";
 import { renderAndWrite } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
@@ -16,6 +17,61 @@ class FrontendGenerator extends BaseGenerator {
     super(projectDir, config);
     this.versions = versions;
     this.projectName = config.name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+  }
+
+  private buildPackageJson(): Record<string, unknown> {
+    const deps: Record<string, string> = {
+      "@angular/animations": `^${this.versions.angular}`,
+      "@angular/common": `^${this.versions.angular}`,
+      "@angular/compiler": `^${this.versions.angular}`,
+      "@angular/core": `^${this.versions.angular}`,
+      "@angular/forms": `^${this.versions.angular}`,
+      "@angular/platform-browser": `^${this.versions.angular}`,
+      "@angular/platform-browser-dynamic": `^${this.versions.angular}`,
+      "@angular/router": `^${this.versions.angular}`,
+      rxjs: `~${this.versions.rxjs}`,
+      tslib: "^2.8.0",
+      "zone.js": `~${this.versions.zoneJs}`,
+    };
+
+    if (this.config.ngrx) {
+      deps["@ngrx/signals"] = `^${this.versions.ngrxSignals}`;
+    }
+
+    if (this.config.uiFramework === "primeng") {
+      deps["primeng"] = `^${this.versions.primeng}`;
+      deps["@primeuix/themes"] = `^${this.versions.primeuixThemes}`;
+      deps["primeicons"] = `^${this.versions.primeicons}`;
+      deps["primeflex"] = `^${this.versions.primeflex}`;
+    }
+
+    const devDeps: Record<string, string> = {
+      "@angular/build": `^${this.versions.angular}`,
+      "@angular/cli": `^${this.versions.angular}`,
+      "@angular/compiler-cli": `^${this.versions.angular}`,
+      typescript: `~${this.versions.typescript}`,
+    };
+
+    if (this.config.uiFramework === "tailwind") {
+      devDeps["tailwindcss"] = `^${this.versions.tailwind}`;
+      devDeps["@tailwindcss/postcss"] = `^${this.versions.tailwind}`;
+      devDeps["postcss"] = "^8.0.0";
+    }
+
+    return {
+      name: `${this.projectName}-frontend`,
+      version: "0.0.0",
+      scripts: {
+        ng: "ng",
+        start: "ng serve",
+        build: "ng build",
+        watch: "ng build --watch --configuration development",
+        test: "ng test",
+      },
+      private: true,
+      dependencies: deps,
+      devDependencies: devDeps,
+    };
   }
 
   async generate(): Promise<void> {
@@ -40,20 +96,29 @@ class FrontendGenerator extends BaseGenerator {
       );
     }
 
+    if (this.config.ngrx) {
+      dirs.push(path.join(appDir, "core/store"));
+    }
+
     await this.ensureDirs(dirs);
 
     const data = {
       projectName: this.projectName,
       name: this.config.name,
       auth: this.config.auth,
+      ngrx: this.config.ngrx,
+      uiPrimeNG: this.config.uiFramework === "primeng",
+      uiTailwind: this.config.uiFramework === "tailwind",
+      uiNone: this.config.uiFramework === "none",
+      primeNGPreset: this.config.primeNGPreset,
       versions: this.versions,
     };
 
     await Promise.all([
-      renderAndWrite(
-        "frontend/package.json.hbs",
+      fs.writeJSON(
         path.join(frontendDir, "package.json"),
-        data,
+        this.buildPackageJson(),
+        { spaces: 2 },
       ),
       renderAndWrite(
         "frontend/angular.json.hbs",
@@ -160,6 +225,14 @@ class FrontendGenerator extends BaseGenerator {
           data,
         ),
       ]);
+    }
+
+    if (this.config.ngrx) {
+      await renderAndWrite(
+        "frontend/ngrx-app-store.ts.hbs",
+        path.join(appDir, "core/store/app.store.ts"),
+        data,
+      );
     }
   }
 }
