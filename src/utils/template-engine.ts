@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 
+Handlebars.registerHelper("lowerCase", (str: string) => str.toLowerCase());
+
 export function renderTemplate(
   templatePath: string,
   data: Record<string, unknown>,

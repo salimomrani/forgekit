@@ -1,9 +1,11 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient{{#if auth}}, withInterceptors{{/if}} } from '@angular/common/http';
+{{#if uiPrimeNG}}
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
+import {{primeNGPreset}} from '@primeuix/themes/{{lowerCase primeNGPreset}}';
+{{/if}}
 import { routes } from './app.routes';
 {{#if auth}}
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -19,14 +21,16 @@ export const appConfig: ApplicationConfig = {
 {{else}}
     provideHttpClient(),
 {{/if}}
+{{#if uiPrimeNG}}
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: {{primeNGPreset}},
         options: {
           darkModeSelector: false,
         },
       },
     }),
+{{/if}}
   ],
 };

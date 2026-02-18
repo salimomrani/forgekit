@@ -1,0 +1,14 @@
+import { signalStore, withState } from '@ngrx/signals';
+
+export type AppState = {
+  loading: boolean;
+};
+
+const initialState: AppState = {
+  loading: false,
+};
+
+export const AppStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+);
