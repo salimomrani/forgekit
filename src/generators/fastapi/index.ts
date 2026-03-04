@@ -52,6 +52,11 @@ class FastAPIGenerator extends BaseGenerator {
         path.join(backendDir, "Dockerfile"),
         data,
       ),
+      renderAndWrite(
+        "fastapi/dockerignore.hbs",
+        path.join(backendDir, ".dockerignore"),
+        data,
+      ),
       fs.writeFile(path.join(appDir, "__init__.py"), ""),
       fs.writeFile(path.join(routersDir, "__init__.py"), ""),
       fs.writeFile(path.join(testsDir, "__init__.py"), ""),

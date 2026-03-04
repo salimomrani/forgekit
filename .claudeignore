@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+home-page.png
+localhost-4200.png
