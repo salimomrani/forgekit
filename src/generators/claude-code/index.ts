@@ -23,12 +23,21 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
     const allowedCommands = this.buildAllowedCommands();
 
+    const springBoot = this.config.backendType === "spring-boot";
+    const fastapi = this.config.backendType === "fastapi";
+    const backend = this.config.backendType !== null;
+
     const data = {
       name: this.config.name,
       description: this.config.description,
-      backend: this.config.backend,
+      backend,
+      springBoot,
+      fastapi,
       frontend: this.config.frontend,
       docker: this.config.docker,
+      flyway: this.config.flyway,
+      ngrx: this.config.ngrx,
+      auth: this.config.auth,
       versions: this.versions,
       allowedCommands,
     };
@@ -49,13 +58,24 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
   private buildAllowedCommands(): string[] {
     const commands: string[] = [];
+    const springBoot = this.config.backendType === "spring-boot";
+    const fastapi = this.config.backendType === "fastapi";
 
-    if (this.config.backend) {
+    if (springBoot) {
       commands.push(
         "Bash(./mvnw spring-boot:run)",
         "Bash(./mvnw test)",
         "Bash(./mvnw package)",
         "Bash(./mvnw clean)",
+      );
+    }
+
+    if (fastapi) {
+      commands.push(
+        "Bash(uvicorn app.main:app --reload)",
+        "Bash(pytest)",
+        "Bash(pip install)",
+        "Bash(pip freeze)",
       );
     }
 

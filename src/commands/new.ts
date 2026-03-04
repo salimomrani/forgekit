@@ -9,18 +9,21 @@ import { generateFrontend } from "../generators/frontend/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
+import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { resolveVersions } from "../versions.js";
-import type { ProjectConfig } from "../types.js";
+import type { ProjectConfig, BackendType } from "../types.js";
 
 export const newCommand = new Command("new")
   .description("Créer un nouveau projet full-stack")
   .argument("[name]", "Nom du projet")
   .option("--group <groupId>", "Group ID Java")
   .option("--description <desc>", "Description du projet")
-  .option("--backend", "Inclure le backend Spring Boot")
+  .option("--spring-boot", "Inclure le backend Spring Boot")
+  .option("--fastapi", "Inclure le backend FastAPI")
   .option("--frontend", "Inclure le frontend Angular")
+  .option("--no-frontend", "Exclure le frontend Angular")
   .option("--auth", "Inclure l'authentification")
   .option("--flyway", "Inclure Flyway (migrations SQL)")
   .option("--no-flyway", "Exclure Flyway")
@@ -50,8 +53,9 @@ export const newCommand = new Command("new")
       if (options.group) defaults.groupId = options.group as string;
       if (options.description)
         defaults.description = options.description as string;
-      if (typeof options.backend === "boolean")
-        defaults.backend = options.backend;
+      if (options.springBoot)
+        defaults.backendType = "spring-boot" as BackendType;
+      if (options.fastapi) defaults.backendType = "fastapi" as BackendType;
       if (typeof options.frontend === "boolean")
         defaults.frontend = options.frontend;
       if (typeof options.auth === "boolean") defaults.auth = options.auth;
@@ -92,17 +96,25 @@ export const newCommand = new Command("new")
         console.log(chalk.gray(`\nCréation du projet ${config.name}...\n`));
 
         const versions = await resolveVersions({
-          backend: config.backend,
+          backendType: config.backendType,
           frontend: config.frontend,
         });
 
-        if (config.backend) {
+        if (config.backendType === "spring-boot") {
           process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
           await generateBackend(projectDir, config, versions);
           console.log(
             chalk.green(
               `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
             ),
+          );
+        }
+
+        if (config.backendType === "fastapi") {
+          process.stdout.write(chalk.yellow("  ⏳ Backend FastAPI..."));
+          await generateFastAPIBackend(projectDir, config);
+          console.log(
+            chalk.green("\r  ✔ Backend FastAPI généré               "),
           );
         }
 
@@ -148,8 +160,12 @@ export const newCommand = new Command("new")
         console.log(chalk.white("Pour démarrer :"));
         console.log(chalk.cyan(`  cd ${config.name}`));
         if (config.docker) console.log(chalk.cyan("  docker compose up -d"));
-        if (config.backend)
+        if (config.backendType === "spring-boot")
           console.log(chalk.cyan("  cd backend && ./mvnw spring-boot:run"));
+        if (config.backendType === "fastapi")
+          console.log(
+            chalk.cyan("  cd backend && uvicorn app.main:app --reload"),
+          );
         if (config.frontend)
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
         console.log("");

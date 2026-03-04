@@ -20,7 +20,7 @@ class RootGenerator extends BaseGenerator {
     const data = {
       name: this.config.name,
       description: this.config.description,
-      backend: this.config.backend,
+      backend: this.config.backendType !== null,
       frontend: this.config.frontend,
       docker: this.config.docker,
       versions: this.versions,

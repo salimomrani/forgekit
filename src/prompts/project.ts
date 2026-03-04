@@ -2,7 +2,12 @@ import { input, confirm, checkbox, select } from "@inquirer/prompts";
 import path from "node:path";
 import { loadConfig } from "../config.js";
 import { validateProjectName, validateGroupId } from "../utils/validation.js";
-import type { ProjectConfig, UIFramework, PrimeNGPreset } from "../types.js";
+import type {
+  ProjectConfig,
+  UIFramework,
+  PrimeNGPreset,
+  BackendType,
+} from "../types.js";
 
 export async function promptProjectConfig(
   defaults: Partial<ProjectConfig> = {},
@@ -27,28 +32,36 @@ export async function promptProjectConfig(
     }));
 
   // ── Section 2: Stack ──────────────────────────────────────────────────────
-  const stacks =
-    defaults.backend !== undefined && defaults.frontend !== undefined
-      ? []
-      : await checkbox({
-          message: "Stack à générer",
+  const backendType: BackendType =
+    defaults.backendType !== undefined
+      ? defaults.backendType
+      : await select<BackendType>({
+          message: "Backend",
           choices: [
-            { name: "Backend (Spring Boot)", value: "backend", checked: true },
-            { name: "Frontend (Angular)", value: "frontend", checked: true },
+            { name: "Spring Boot (Java 21)", value: "spring-boot" },
+            { name: "FastAPI (Python)", value: "fastapi" },
+            { name: "Aucun", value: null },
           ],
+          default: "spring-boot",
         });
 
-  const backend = defaults.backend ?? stacks.includes("backend");
-  const frontend = defaults.frontend ?? stacks.includes("frontend");
+  const frontend =
+    defaults.frontend !== undefined
+      ? defaults.frontend
+      : await confirm({
+          message: "Inclure le frontend Angular ?",
+          default: true,
+        });
 
-  const groupId = backend
-    ? (defaults.groupId ??
-      (await input({
-        message: "Group ID",
-        default: saved.groupId ?? "com.example",
-        validate: validateGroupId,
-      })))
-    : "com.example";
+  const groupId =
+    backendType === "spring-boot"
+      ? (defaults.groupId ??
+        (await input({
+          message: "Group ID",
+          default: saved.groupId ?? "com.example",
+          validate: validateGroupId,
+        })))
+      : "com.example";
 
   // ── Section 3: Backend features ───────────────────────────────────────────
   let flyway = defaults.flyway ?? true;
@@ -57,7 +70,7 @@ export async function promptProjectConfig(
   let mapstruct = defaults.mapstruct ?? true;
 
   if (
-    backend &&
+    backendType === "spring-boot" &&
     defaults.flyway === undefined &&
     defaults.openapi === undefined &&
     defaults.auth === undefined &&
@@ -151,7 +164,7 @@ export async function promptProjectConfig(
     name,
     groupId,
     description,
-    backend,
+    backendType,
     frontend,
     flyway,
     openapi,

@@ -8,8 +8,13 @@ class CIGenerator extends BaseGenerator {
     const workflowsDir = path.join(this.projectDir, ".github", "workflows");
     await this.ensureDirs([workflowsDir]);
 
+    const springBoot = this.config.backendType === "spring-boot";
+    const fastapi = this.config.backendType === "fastapi";
+
     await renderAndWrite("ci/ci.yml.hbs", path.join(workflowsDir, "ci.yml"), {
-      backend: this.config.backend,
+      backend: this.config.backendType !== null,
+      springBoot,
+      fastapi,
       frontend: this.config.frontend,
     });
   }

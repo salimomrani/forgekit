@@ -7,7 +7,7 @@
 ```
 {{name}}/
 {{#if backend}}
-├── backend/        # Spring Boot API
+├── backend/        # Backend API
 {{/if}}
 {{#if frontend}}
 ├── frontend/       # Angular SPA
@@ -18,44 +18,63 @@
 └── README.md
 ```
 
-{{#if backend}}
+{{#if springBoot}}
 ## Backend — Spring Boot {{versions.springBoot}}
 
-- **Java 21** with records, pattern matching, sealed classes
-- **Architecture:** Feature-based package structure
-- **DB:** PostgreSQL, Flyway migrations in `backend/src/main/resources/db/migration/`
-- **Conventions:** Records for DTOs, Lombok where useful, MapStruct for mappings
-- **Validation:** Jakarta Bean Validation
-- **Logging:** SLF4J
+- **Java 21** — records, pattern matching, sealed classes, virtual threads
+- **Architecture:** Feature-based packages — `com.<groupId>.<feature>.{domain,application,infrastructure}`
+- **DB:** PostgreSQL{{#if flyway}}, Flyway migrations in `backend/src/main/resources/db/migration/`{{/if}}
+- **Conventions:** Records for DTOs, Lombok, MapStruct for mappings
+- **Validation:** Jakarta Bean Validation | **Logging:** `@Slf4j`
+- **Skill:** apply `applying-java-conventions` for all Java code
 
 ### Commands
 
 ```bash
 cd backend
 ./mvnw spring-boot:run          # Start dev server
-./mvnw test                      # Run tests
-./mvnw package -DskipTests       # Build JAR
+./mvnw test                     # Run tests
+./mvnw package -DskipTests      # Build JAR
+```
+
+{{/if}}
+{{#if fastapi}}
+## Backend — FastAPI (Python 3.12)
+
+- **FastAPI** with uvicorn, pydantic-settings
+- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
+- **Conventions:** Pydantic models, async endpoints, dependency injection
+- **Skill:** apply `applying-python-conventions` for all Python code
+
+### Commands
+
+```bash
+cd backend
+uvicorn app.main:app --reload   # Start dev server (port 8000)
+pytest                          # Run tests
+pip install -r requirements.txt # Install dependencies
 ```
 
 {{/if}}
 {{#if frontend}}
-## Frontend — Angular
+## Frontend — Angular {{versions.angular}}
 
-- **Angular {{versions.angular}}** with strict mode, standalone components, signals
+- **Angular {{versions.angular}}** — strict mode, standalone components, signals
 - **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex
+{{#if ngrx}}
 - **State:** NgRx SignalStore
-- **Conventions:** OnPush change detection, `input()`/`output()` functions, `inject()` for DI
-- **Control flow:** `@if`, `@for` (not *ngIf/*ngFor)
-- **Indentation:** 2 spaces
+{{/if}}
+- **Conventions:** OnPush, `input()`/`output()`, `inject()`, `@if`/`@for` control flow
+- **Skill:** apply `applying-angular-conventions` for all Angular/TypeScript code
 
 ### Commands
 
 ```bash
 cd frontend
-npm install                      # Install dependencies
-ng serve                         # Start dev server (port 4200)
-ng build                         # Production build
-ng test                          # Run tests
+npm install                     # Install dependencies
+ng serve                        # Start dev server (port 4200)
+ng build                        # Production build
+ng test                         # Run tests
 ```
 
 {{/if}}
@@ -63,17 +82,42 @@ ng test                          # Run tests
 ## Infrastructure
 
 ```bash
-docker compose up -d             # Start PostgreSQL + pgAdmin
-docker compose down              # Stop services
+docker compose up -d            # Start PostgreSQL + pgAdmin
+docker compose down             # Stop services
 ```
 
 - **PostgreSQL:** localhost:5432
 - **pgAdmin:** localhost:5050 (admin@admin.com / admin)
 
 {{/if}}
+## Workflow
+
+| Scenario | Action |
+|---|---|
+| New feature | `/speckit.workflow` — routes automatiquement (fast track ou full workflow spec→PR) |
+| Bug | Describe to Claude → apply `superpowers:systematic-debugging` |
+| UI component | Apply `frontend-design:frontend-design` skill |
+| Commit / PR | Use `commit-commands:commit-push-pr` skill |
+
+## TDD
+
+Write the failing test first — no implementation code before a red test.
+**Red → Green → Refactor.** This is not optional.
+
+## Source of Truth
+
+{{#if springBoot}}
+- **API contract:** OpenAPI annotations on controllers (Springdoc)
+{{#if flyway}}
+- **DB schema:** Flyway migrations — never modify existing migration files
+{{/if}}
+{{/if}}
+- **Config:** `application.yml` (never `application.properties`)
+- **Secrets:** environment variables only — never committed
+
 ## Conventions
 
 - **Git:** Conventional commits (`feat:`, `fix:`, `refactor:`, `chore:`)
 - **Branches:** `feature/`, `fix/`, `refactor/`, `chore/`
 - **DB:** snake_case naming
-- **Security:** Never commit secrets, use environment variables
+- **Security:** Never commit secrets — use environment variables
