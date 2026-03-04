@@ -1,14 +1,15 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
+export type BackendType = "spring-boot" | "fastapi" | null;
 
 export interface ProjectConfig {
   name: string;
   groupId: string;
   description: string;
   // Stack
-  backend: boolean;
+  backendType: BackendType;
   frontend: boolean;
-  // Backend features
+  // Backend features (Spring Boot only)
   flyway: boolean;
   openapi: boolean;
   auth: boolean;

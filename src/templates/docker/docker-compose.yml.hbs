@@ -29,6 +29,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+{{#if fastapi}}
+
+  api:
+    build: ./backend
+    container_name: {{name}}_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "false"
+{{/if}}
 
 volumes:
   postgres_data:

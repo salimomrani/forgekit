@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import type { BackendType } from "./types.js";
 
 export interface ResolvedVersions {
   // Backend
@@ -67,7 +68,7 @@ async function fetchMavenVersion(
 }
 
 export async function resolveVersions(opts: {
-  backend: boolean;
+  backendType: BackendType;
   frontend: boolean;
 }): Promise<ResolvedVersions> {
   const versions = { ...FALLBACK_VERSIONS };
@@ -76,7 +77,7 @@ export async function resolveVersions(opts: {
 
   const tasks: Promise<void>[] = [];
 
-  if (opts.backend) {
+  if (opts.backendType === "spring-boot") {
     tasks.push(
       fetchMavenVersion(
         "org.springframework.boot",
