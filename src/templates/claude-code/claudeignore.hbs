@@ -1,0 +1,45 @@
+# Version control
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env & secrets
+.env
+.env.local
+*.pem
+*.key
+
+{{#if frontend}}
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+{{/if}}
+{{#if springBoot}}
+# Backend — Spring Boot
+backend/target/
+backend/*.jar
+
+{{/if}}
+{{#if fastapi}}
+# Backend — FastAPI
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/.venv/
+backend/venv/
+backend/.pytest_cache/
+
+{{/if}}
+{{#if docker}}
+# Docker volumes
+.docker/
+
+{{/if}}
+# Build artifacts
+*.tsbuildinfo
+*.log

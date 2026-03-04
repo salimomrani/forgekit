@@ -53,6 +53,11 @@ class ClaudeCodeGenerator extends BaseGenerator {
         path.join(claudeDir, "settings.json"),
         data,
       ),
+      renderAndWrite(
+        "claude-code/claudeignore.hbs",
+        path.join(this.projectDir, ".claudeignore"),
+        data,
+      ),
     ]);
   }
 
