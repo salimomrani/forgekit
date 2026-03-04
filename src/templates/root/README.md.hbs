@@ -4,8 +4,11 @@
 
 ## Stack
 
-{{#if backend}}
+{{#if springBoot}}
 - **Backend:** Spring Boot {{versions.springBoot}} / Java 21
+{{/if}}
+{{#if fastapi}}
+- **Backend:** FastAPI / Python 3.12
 {{/if}}
 {{#if frontend}}
 - **Frontend:** Angular {{versions.angular}} / PrimeNG {{versions.primeng}}
@@ -22,16 +25,24 @@
 docker compose up -d
 
 {{/if}}
-{{#if backend}}
-# Démarrer le backend
+{{#if springBoot}}
+# Démarrer le backend (port 8080)
 cd backend && ./mvnw spring-boot:run
 
 {{/if}}
+{{#if fastapi}}
+# Installer les dépendances Python
+cd backend && pip install -r requirements.txt
+
+# Démarrer le backend (port 8000)
+uvicorn app.main:app --reload
+
+{{/if}}
 {{#if frontend}}
-# Démarrer le frontend
+# Démarrer le frontend (port 4200)
 cd frontend && npm install && ng serve
 {{/if}}
 ```
 
 ---
-*Généré avec [ForgeKit](https://github.com/iconsulting/forgekit)*
+*Généré avec [ForgeKit](https://github.com/salimomrani/forgekit)*

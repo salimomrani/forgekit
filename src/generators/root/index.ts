@@ -21,6 +21,8 @@ class RootGenerator extends BaseGenerator {
       name: this.config.name,
       description: this.config.description,
       backend: this.config.backendType !== null,
+      springBoot: this.config.backendType === "spring-boot",
+      fastapi: this.config.backendType === "fastapi",
       frontend: this.config.frontend,
       docker: this.config.docker,
       versions: this.versions,
