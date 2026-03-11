@@ -15,7 +15,6 @@ git tag vX.Y.Z && git push origin vX.Y.Z
 ## Workflow
 
 - Tout changement fonctionnel → **PR obligatoire** (jamais directement sur master)
-- Seuls les commits `chore` mineurs (gitignore, lock file) peuvent aller sur master directement
 - Branches : `feat/`, `fix/`, `refactor/`, `chore/` — conventional commits
 
 ## Tests
