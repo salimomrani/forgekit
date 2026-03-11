@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
+export const TEMPLATES_DIR = path.join(__dirname, "..", "templates");
 
 Handlebars.registerHelper("lowerCase", (str: string) => str.toLowerCase());
 

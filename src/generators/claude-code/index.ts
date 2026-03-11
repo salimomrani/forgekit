@@ -1,20 +1,25 @@
 import path from "node:path";
+import os from "node:os";
 import fs from "fs-extra";
-import { renderAndWrite } from "../../utils/template-engine.js";
+import { renderAndWrite, TEMPLATES_DIR } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
 
 class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
+  private readonly globalSkillsBase: string;
 
   constructor(
     projectDir: string,
     config: ProjectConfig,
     versions: ResolvedVersions,
+    globalSkillsBase?: string,
   ) {
     super(projectDir, config);
     this.versions = versions;
+    this.globalSkillsBase =
+      globalSkillsBase ?? path.join(os.homedir(), ".claude", "skills");
   }
 
   async generate(): Promise<void> {
@@ -26,6 +31,10 @@ class ClaudeCodeGenerator extends BaseGenerator {
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
     const backend = this.config.backendType !== null;
+
+    const hooksDir = path.join(claudeDir, "hooks");
+    await fs.ensureDir(hooksDir);
+    await fs.ensureDir(path.join(this.projectDir, ".specify", "memory"));
 
     const data = {
       name: this.config.name,
@@ -40,9 +49,21 @@ class ClaudeCodeGenerator extends BaseGenerator {
       auth: this.config.auth,
       versions: this.versions,
       allowedCommands,
+      claudeDir: ".claude",
     };
 
+    // Static hookify files (no templating needed)
+    const staticHookifyFiles = [
+      "block-dangerous-rm.local.md",
+      "block-force-push.local.md",
+      "block-no-verify.local.md",
+      "warn-console-log.local.md",
+      "warn-env-edit.local.md",
+      "warn-todo-fixme.local.md",
+    ];
+
     await Promise.all([
+      // Existing files
       renderAndWrite(
         "claude-code/CLAUDE.md.hbs",
         path.join(this.projectDir, "CLAUDE.md"),
@@ -58,7 +79,77 @@ class ClaudeCodeGenerator extends BaseGenerator {
         path.join(this.projectDir, ".claudeignore"),
         data,
       ),
+      // Hook scripts (templated, then chmod)
+      renderAndWrite(
+        "claude-code/hooks/pre-bash.sh.hbs",
+        path.join(hooksDir, "pre-bash.sh"),
+        data,
+        { mode: 0o755 },
+      ),
+      renderAndWrite(
+        "claude-code/hooks/session-start.sh.hbs",
+        path.join(hooksDir, "session-start.sh"),
+        data,
+        { mode: 0o755 },
+      ),
+      // Templated hookify files
+      renderAndWrite(
+        "claude-code/hookify/stop-verify-tests.local.md.hbs",
+        path.join(claudeDir, "hookify.stop-verify-tests.local.md"),
+        data,
+      ),
+      renderAndWrite(
+        "claude-code/hookify/warn-no-test-before-commit.local.md.hbs",
+        path.join(claudeDir, "hookify.warn-no-test-before-commit.local.md"),
+        data,
+      ),
+      // .specify constitution
+      renderAndWrite(
+        "claude-code/specify/constitution.md.hbs",
+        path.join(this.projectDir, ".specify", "memory", "constitution.md"),
+        data,
+      ),
+      // Static hookify files
+      ...staticHookifyFiles.map((f) =>
+        fs.copy(
+          path.join(TEMPLATES_DIR, "claude-code", "hookify", f),
+          path.join(claudeDir, `hookify.${f}`),
+        ),
+      ),
     ]);
+
+    await this.generateSkills();
+  }
+
+  private async generateSkills(): Promise<void> {
+    const globalSkillsBase = this.globalSkillsBase;
+    const skillsToGenerate: Array<{ name: string; condition: boolean }> = [
+      { name: "applying-angular-conventions", condition: this.config.frontend },
+      {
+        name: "applying-python-conventions",
+        condition: this.config.backendType === "fastapi",
+      },
+      {
+        name: "applying-java-conventions",
+        condition: this.config.backendType === "spring-boot",
+      },
+    ];
+
+    for (const { name, condition } of skillsToGenerate) {
+      if (!condition) continue;
+      const src = path.join(globalSkillsBase, name, "SKILL.md");
+      const dest = path.join(
+        this.projectDir,
+        ".claude",
+        "skills",
+        name,
+        "SKILL.md",
+      );
+      if (await fs.pathExists(src)) {
+        await fs.ensureDir(path.dirname(dest));
+        await fs.copy(src, dest);
+      }
+    }
   }
 
   private buildAllowedCommands(): string[] {
@@ -111,7 +202,13 @@ export async function generateClaudeCode(
   projectDir: string,
   config: ProjectConfig,
   versions: ResolvedVersions,
+  globalSkillsBase?: string,
 ): Promise<void> {
-  const generator = new ClaudeCodeGenerator(projectDir, config, versions);
+  const generator = new ClaudeCodeGenerator(
+    projectDir,
+    config,
+    versions,
+    globalSkillsBase,
+  );
   await generator.generate();
 }

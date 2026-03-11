@@ -1,0 +1,18 @@
+---
+name: warn-no-test-before-commit
+enabled: true
+event: bash
+pattern: git\s+commit
+action: warn
+---
+
+⚠️ **Commit détecté — tests lancés ?**
+
+Avant de committer, confirme :
+{{#if fastapi}}- [ ] `cd backend && .venv/bin/pytest tests/ -v` → vert
+{{/if}}{{#if springBoot}}- [ ] `cd backend && ./mvnw test` → vert
+{{/if}}{{#if frontend}}- [ ] `cd frontend && npm test -- --watch=false` → vert
+{{/if}}{{#if fastapi}}- [ ] `cd backend && .venv/bin/ruff check .` → propre
+{{/if}}{{#if frontend}}- [ ] `cd frontend && npm run lint` → propre
+{{/if}}
+Iron law : aucun commit sans tests verts.

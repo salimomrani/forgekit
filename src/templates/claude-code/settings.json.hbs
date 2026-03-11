@@ -2,9 +2,52 @@
   "permissions": {
     "allow": [
 {{#each allowedCommands}}
-      "{{this}}"{{#unless @last}},{{/unless}}
+      "{{this}}",
 {{/each}}
+      "Bash(.specify/scripts/bash/*)",
+      "Bash(git commit*)",
+      "Bash(gh *)",
+      "Skill(commit-commands:commit)",
+      "Skill(commit-commands:commit:*)",
+      "Skill(commit-commands:commit-push-pr)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:resources.anthropic.com)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{claudeDir}}/hooks/session-start.sh",
+            "once": true
+          }
+        ]
+      }
     ],
-    "defaultMode": "dontAsk"
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{claudeDir}}/hooks/pre-bash.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Compaction: KEEP: file diffs, failing test errors, architecture decisions from constitution.md. DROP: passing test output, startup logs, install output, resolved discussions.'"
+          }
+        ]
+      }
+    ]
   }
 }
