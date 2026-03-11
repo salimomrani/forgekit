@@ -3,5 +3,6 @@ dist/
 coverage/
 *.tsbuildinfo
 .DS_Store
-home-page.png
-localhost-4200.png
+*.png
+.playwright-mcp/
+docs/superpowers/
