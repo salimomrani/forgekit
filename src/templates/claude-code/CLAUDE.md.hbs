@@ -18,6 +18,20 @@
 └── README.md
 ```
 
+## Workflow Routing (mandatory)
+
+| Scenario | Action |
+|---|---|
+| New feature / non-trivial change | `/speckit.workflow` |
+| Small fix (1-2 lines, docs-only) | Direct edit, no spec |
+| Bug | Apply `superpowers:systematic-debugging` |
+| UI component | Apply `frontend-design:frontend-design` skill |
+| Commit / PR | Use `commit-commands:commit-push-pr` skill |
+
+## Architecture Constitution
+
+Read `.specify/memory/constitution.md` before any architectural decision. It is auto-loaded at session start.
+
 {{#if springBoot}}
 ## Backend — Spring Boot {{versions.springBoot}}
 
