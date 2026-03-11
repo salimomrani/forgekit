@@ -189,5 +189,7 @@ describe("ClaudeCodeGenerator", () => {
     );
     expect(content).toContain("Your first principle");
     expect(content).toContain("speckit.constitution");
+    // message must go to stderr so it's visible in the terminal immediately
+    expect(content).toContain(">&2");
   });
 });
