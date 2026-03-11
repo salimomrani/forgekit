@@ -2,6 +2,7 @@ import { input, confirm, checkbox, select } from "@inquirer/prompts";
 import path from "node:path";
 import { loadConfig } from "../config.js";
 import { validateProjectName, validateGroupId } from "../utils/validation.js";
+import { isClaudeInstalled } from "../utils/system.js";
 import type {
   ProjectConfig,
   UIFramework,
@@ -142,6 +143,7 @@ export async function promptProjectConfig(
     defaults.gitInit === undefined
   ) {
     const hasBackend = backendType !== null;
+    const claudeDetected = isClaudeInstalled();
     const infra = await checkbox({
       message: "Infrastructure",
       choices: [
@@ -155,7 +157,13 @@ export async function promptProjectConfig(
           value: "ci",
           checked: hasBackend || frontend,
         },
-        { name: "Claude Code", value: "claudeCode", checked: true },
+        {
+          name: claudeDetected
+            ? "Claude Code"
+            : "Claude Code (claude CLI non détecté)",
+          value: "claudeCode",
+          checked: claudeDetected,
+        },
         { name: "Initialiser Git", value: "gitInit", checked: true },
       ],
     });

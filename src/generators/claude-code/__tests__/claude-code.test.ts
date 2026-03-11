@@ -180,4 +180,14 @@ describe("ClaudeCodeGenerator", () => {
       false,
     );
   });
+
+  it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "hooks", "session-start.sh"),
+      "utf-8",
+    );
+    expect(content).toContain("Your first principle");
+    expect(content).toContain("speckit.constitution");
+  });
 });
