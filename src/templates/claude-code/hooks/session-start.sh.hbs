@@ -9,7 +9,13 @@ fi
 CONSTITUTION="$REPO_ROOT/.specify/memory/constitution.md"
 
 if [ -f "$CONSTITUTION" ]; then
-  echo "=== {{name}} Architecture Constitution (auto-loaded) ==="
-  cat "$CONSTITUTION"
-  echo "=== End Constitution ==="
+  if grep -q '\[Your first principle\]' "$CONSTITUTION" 2>/dev/null; then
+    echo "⚠️  Constitution not configured yet."
+    echo "Please initialize it now by running: /speckit.constitution"
+    echo "(This will ask a few questions and fill in your project architecture constitution.)"
+  else
+    echo "=== {{name}} Architecture Constitution (auto-loaded) ==="
+    cat "$CONSTITUTION"
+    echo "=== End Constitution ==="
+  fi
 fi
