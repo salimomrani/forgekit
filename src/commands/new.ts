@@ -43,7 +43,7 @@ export const newCommand = new Command("new")
   .option("--no-claude-code", "Exclure config Claude Code")
   .option("--no-git", "Ne pas initialiser Git")
   .action(
-    async (name: string | undefined, options: Record<string, unknown>) => {
+    async (name: string | undefined, options: Record<string, unknown>, cmd) => {
       console.log(
         chalk.bold.hex("#FF6B35")("\n🔨 ForgeKit — Scaffolding full-stack\n"),
       );
@@ -70,11 +70,13 @@ export const newCommand = new Command("new")
       if (options.preset)
         defaults.primeNGPreset =
           options.preset as ProjectConfig["primeNGPreset"];
-      if (typeof options.ci === "boolean") defaults.ci = options.ci;
-      if (typeof options.docker === "boolean") defaults.docker = options.docker;
-      if (typeof options.claudeCode === "boolean")
-        defaults.claudeCode = options.claudeCode;
-      if (typeof options.git === "boolean") defaults.gitInit = options.git;
+      const isExplicit = (key: string) =>
+        cmd.getOptionValueSource(key) === "cli";
+      if (isExplicit("ci")) defaults.ci = options.ci as boolean;
+      if (isExplicit("docker")) defaults.docker = options.docker as boolean;
+      if (isExplicit("claudeCode"))
+        defaults.claudeCode = options.claudeCode as boolean;
+      if (isExplicit("git")) defaults.gitInit = options.git as boolean;
 
       let config;
       try {
