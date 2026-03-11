@@ -8,14 +8,18 @@ import type { ResolvedVersions } from "../../versions.js";
 
 class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
+  private readonly globalSkillsBase: string;
 
   constructor(
     projectDir: string,
     config: ProjectConfig,
     versions: ResolvedVersions,
+    globalSkillsBase?: string,
   ) {
     super(projectDir, config);
     this.versions = versions;
+    this.globalSkillsBase =
+      globalSkillsBase ?? path.join(os.homedir(), ".claude", "skills");
   }
 
   async generate(): Promise<void> {
@@ -118,7 +122,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
   }
 
   private async generateSkills(): Promise<void> {
-    const globalSkillsBase = path.join(os.homedir(), ".claude", "skills");
+    const globalSkillsBase = this.globalSkillsBase;
     const skillsToGenerate: Array<{ name: string; condition: boolean }> = [
       { name: "applying-angular-conventions", condition: this.config.frontend },
       {
@@ -198,7 +202,13 @@ export async function generateClaudeCode(
   projectDir: string,
   config: ProjectConfig,
   versions: ResolvedVersions,
+  globalSkillsBase?: string,
 ): Promise<void> {
-  const generator = new ClaudeCodeGenerator(projectDir, config, versions);
+  const generator = new ClaudeCodeGenerator(
+    projectDir,
+    config,
+    versions,
+    globalSkillsBase,
+  );
   await generator.generate();
 }

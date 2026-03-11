@@ -3,6 +3,9 @@ import fs from "fs-extra";
 import path from "node:path";
 import os from "node:os";
 import { generateClaudeCode } from "../index.js";
+
+// Fake global skills dir — seeded in beforeEach, used in skill tests
+let fakeSkillsDir: string;
 import type { ProjectConfig } from "../../../types.js";
 import type { ResolvedVersions } from "../../../versions.js";
 
@@ -46,6 +49,18 @@ describe("ClaudeCodeGenerator", () => {
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "forgekit-test-"));
+    fakeSkillsDir = path.join(tmpDir, "fake-skills");
+    for (const skill of [
+      "applying-angular-conventions",
+      "applying-python-conventions",
+      "applying-java-conventions",
+    ]) {
+      await fs.ensureDir(path.join(fakeSkillsDir, skill));
+      await fs.writeFile(
+        path.join(fakeSkillsDir, skill, "SKILL.md"),
+        `# ${skill}`,
+      );
+    }
   });
 
   afterEach(async () => {
@@ -113,7 +128,7 @@ describe("ClaudeCodeGenerator", () => {
 
   it("generates angular skill when frontend is enabled", async () => {
     const config = { ...baseConfig, frontend: true };
-    await generateClaudeCode(tmpDir, config, baseVersions);
+    await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
     expect(
       await fs.pathExists(
         path.join(
@@ -129,7 +144,7 @@ describe("ClaudeCodeGenerator", () => {
 
   it("generates python skill when fastapi backend", async () => {
     const config = { ...baseConfig, backendType: "fastapi" as const };
-    await generateClaudeCode(tmpDir, config, baseVersions);
+    await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
     expect(
       await fs.pathExists(
         path.join(
@@ -145,7 +160,7 @@ describe("ClaudeCodeGenerator", () => {
 
   it("generates java skill when spring-boot backend", async () => {
     const config = { ...baseConfig, backendType: "spring-boot" as const };
-    await generateClaudeCode(tmpDir, config, baseVersions);
+    await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
     expect(
       await fs.pathExists(
         path.join(
@@ -160,7 +175,7 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("generates no stack skills when claude-only (no backend, no frontend)", async () => {
-    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions, fakeSkillsDir);
     expect(await fs.pathExists(path.join(tmpDir, ".claude", "skills"))).toBe(
       false,
     );
