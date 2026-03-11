@@ -2,7 +2,7 @@
 name: block-force-push
 enabled: true
 event: bash
-pattern: git\s+push\s+.*--force|git\s+push\s+.*-f\b
+pattern: git\s+push\s+.*--force(?!-with-lease)|git\s+push\s+.*\s-f\b
 action: block
 ---
 

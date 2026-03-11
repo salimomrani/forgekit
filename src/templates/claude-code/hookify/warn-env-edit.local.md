@@ -2,7 +2,7 @@
 name: warn-env-edit
 enabled: true
 event: file
-pattern: \.env
+pattern: (^|/)\.env(\.|$)
 action: warn
 ---
 

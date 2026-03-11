@@ -2,7 +2,7 @@
 name: block-dangerous-rm
 enabled: true
 event: bash
-pattern: rm\s+-rf
+pattern: rm\s+(-rf|-fr)
 action: block
 ---
 

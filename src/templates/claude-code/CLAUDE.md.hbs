@@ -104,15 +104,6 @@ docker compose down             # Stop services
 - **pgAdmin:** localhost:5050 (admin@admin.com / admin)
 
 {{/if}}
-## Workflow
-
-| Scenario | Action |
-|---|---|
-| New feature | `/speckit.workflow` — routes automatiquement (fast track ou full workflow spec→PR) |
-| Bug | Describe to Claude → apply `superpowers:systematic-debugging` |
-| UI component | Apply `frontend-design:frontend-design` skill |
-| Commit / PR | Use `commit-commands:commit-push-pr` skill |
-
 ## TDD
 
 Write the failing test first — no implementation code before a red test.
