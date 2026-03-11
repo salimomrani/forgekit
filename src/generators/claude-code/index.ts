@@ -46,7 +46,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       auth: this.config.auth,
       versions: this.versions,
       allowedCommands,
-      claudeDir,
+      claudeDir: ".claude",
     };
 
     // Static hookify files (no templating needed)

@@ -4,6 +4,7 @@ import path from "node:path";
 import os from "node:os";
 import { generateClaudeCode } from "../index.js";
 import type { ProjectConfig } from "../../../types.js";
+import type { ResolvedVersions } from "../../../versions.js";
 
 const baseConfig: ProjectConfig = {
   name: "test-project",
@@ -24,11 +25,20 @@ const baseConfig: ProjectConfig = {
   gitInit: false,
 };
 
-const baseVersions = {
+const baseVersions: ResolvedVersions = {
   springBoot: "3.4.0",
+  springDoc: "2.8.0",
+  mapstruct: "1.6.3",
   angular: "19.0.0",
   primeng: "19.0.0",
-  java: "21",
+  primeuixThemes: "2.0.3",
+  primeicons: "7.0.0",
+  primeflex: "3.3.1",
+  ngrxSignals: "19.0.0",
+  rxjs: "7.8.0",
+  zoneJs: "0.15.0",
+  typescript: "5.6.0",
+  tailwind: "4.0.0",
 };
 
 describe("ClaudeCodeGenerator", () => {
