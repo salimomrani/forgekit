@@ -1,14 +1,10 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
-import { renderAndWrite } from "../../utils/template-engine.js";
+import { renderAndWrite, TEMPLATES_DIR } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const TEMPLATES_DIR = path.join(__dirname, "../../", "templates");
 
 class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
