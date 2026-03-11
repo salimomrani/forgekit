@@ -1,6 +1,5 @@
 import path from "node:path";
 import os from "node:os";
-import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
 import { renderAndWrite, TEMPLATES_DIR } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
