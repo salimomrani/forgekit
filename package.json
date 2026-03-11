@@ -1,6 +1,6 @@
 {
   "name": "@iconsulting-dev/forgekit",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "description": "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
   "type": "module",
   "bin": {
