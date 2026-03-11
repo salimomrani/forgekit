@@ -90,8 +90,9 @@ mon-projet/
 ├── frontend/                # Angular 21 / PrimeNG 21
 ├── docker-compose.yml       # PostgreSQL 17 + pgAdmin (+ service api si FastAPI)
 ├── .github/workflows/       # CI GitHub Actions
-├── CLAUDE.md                # Conventions Claude Code
-├── .claude/settings.json    # Permissions Claude Code
+├── CLAUDE.md                # Conventions, workflow routing, constitution ref
+├── .claude/                 # Hooks, hookify guards, skills, settings
+├── .specify/memory/         # Constitution architecturale
 ├── .gitignore
 └── README.md
 ```
@@ -196,9 +197,35 @@ frontend/src/app/
 
 ### Claude Code
 
-Génère automatiquement :
-- **`CLAUDE.md`** — Conventions du projet, commandes, structure, workflow speckit
-- **`.claude/settings.json`** — Permissions préconfigurées selon le backend choisi
+Génère automatiquement une configuration complète et prête à l'emploi :
+
+```
+mon-projet/
+├── CLAUDE.md                          # Workflow routing, TDD rules, constitution ref
+├── .claudeignore                      # Fichiers exclus du contexte Claude
+├── .claude/
+│   ├── settings.json                  # Permissions + hooks (SessionStart, PreToolUse, PreCompact)
+│   ├── hooks/
+│   │   ├── pre-bash.sh               # Guard bash (ex: bloque npm install hors frontend/)
+│   │   └── session-start.sh          # Auto-charge la constitution au démarrage
+│   ├── hookify.block-dangerous-rm.local.md   # Bloque rm -rf
+│   ├── hookify.block-force-push.local.md     # Bloque git push --force
+│   ├── hookify.block-no-verify.local.md      # Bloque --no-verify
+│   ├── hookify.stop-verify-tests.local.md    # Rappel TDD à la fin de session
+│   ├── hookify.warn-console-log.local.md     # Avertit sur console.log
+│   ├── hookify.warn-env-edit.local.md        # Avertit sur édition .env
+│   ├── hookify.warn-no-test-before-commit.local.md  # Rappel tests avant commit
+│   ├── hookify.warn-todo-fixme.local.md      # Avertit sur TODO/FIXME
+│   └── skills/                        # Skills copiés selon le stack
+│       ├── applying-angular-conventions/SKILL.md   # si frontend Angular
+│       ├── applying-python-conventions/SKILL.md    # si backend FastAPI
+│       └── applying-java-conventions/SKILL.md      # si backend Spring Boot
+└── .specify/
+    └── memory/
+        └── constitution.md            # Constitution architecturale (auto-chargée)
+```
+
+Les skills sont copiés depuis `~/.claude/skills/` selon le stack sélectionné — chaque dev qui clone le projet dispose des mêmes conventions.
 
 ## Versions dynamiques
 
@@ -232,7 +259,7 @@ src/
 │   ├── fastapi/                 # FastAPI (8 templates)
 │   ├── frontend/                # Angular (21 templates)
 │   ├── docker/                  # Docker Compose
-│   ├── claude-code/             # CLAUDE.md + settings.json
+│   ├── claude-code/             # CLAUDE.md, settings.json, hooks, hookify, specify
 │   ├── ci/                      # GitHub Actions
 │   └── root/                    # README + .gitignore
 ├── utils/
