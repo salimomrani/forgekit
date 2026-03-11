@@ -141,15 +141,20 @@ export async function promptProjectConfig(
     defaults.claudeCode === undefined &&
     defaults.gitInit === undefined
   ) {
+    const hasBackend = backendType !== null;
     const infra = await checkbox({
       message: "Infrastructure",
       choices: [
         {
           name: "Docker Compose (PostgreSQL + pgAdmin)",
           value: "docker",
-          checked: true,
+          checked: hasBackend,
         },
-        { name: "GitHub Actions CI", value: "ci", checked: true },
+        {
+          name: "GitHub Actions CI",
+          value: "ci",
+          checked: hasBackend || frontend,
+        },
         { name: "Claude Code", value: "claudeCode", checked: true },
         { name: "Initialiser Git", value: "gitInit", checked: true },
       ],
