@@ -1,0 +1,21 @@
+---
+name: stop-verify-tests
+enabled: true
+event: stop
+pattern: .*
+action: warn
+---
+
+⚠️ **Avant de terminer — TDD check**
+
+As-tu :
+- [ ] Lancé les tests et vérifié qu'ils passent ?
+{{#if fastapi}}  - `cd backend && .venv/bin/pytest tests/ -v`
+{{/if}}{{#if springBoot}}  - `cd backend && ./mvnw test`
+{{/if}}{{#if frontend}}  - `cd frontend && npm test -- --watch=false`
+{{/if}}- [ ] Lancé le lint ?
+{{#if fastapi}}  - `cd backend && .venv/bin/ruff check .`
+{{/if}}{{#if springBoot}}  - `cd backend && ./mvnw checkstyle:check` (if configured)
+{{/if}}{{#if frontend}}  - `cd frontend && npm run lint`
+{{/if}}
+Iron law : aucun commit sans tests verts.
