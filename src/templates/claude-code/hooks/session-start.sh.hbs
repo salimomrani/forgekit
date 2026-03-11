@@ -10,9 +10,8 @@ CONSTITUTION="$REPO_ROOT/.specify/memory/constitution.md"
 
 if [ -f "$CONSTITUTION" ]; then
   if grep -q '\[Your first principle\]' "$CONSTITUTION" 2>/dev/null; then
-    echo "⚠️  Constitution not configured yet." >&2
-    echo "Please initialize it now by running: /speckit.constitution" >&2
-    echo "(This will ask a few questions and fill in your project architecture constitution.)" >&2
+    echo "IMPORTANT: The project constitution (.specify/memory/constitution.md) is not configured yet. On your very next response, you MUST tell the user to run /speckit.constitution immediately to set it up."
+    echo "⚠️  Constitution not configured yet. Run: /speckit.constitution" >&2
   else
     echo "=== {{name}} Architecture Constitution (auto-loaded) ==="
     cat "$CONSTITUTION"
