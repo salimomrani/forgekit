@@ -189,7 +189,9 @@ describe("ClaudeCodeGenerator", () => {
     );
     expect(content).toContain("Your first principle");
     expect(content).toContain("speckit.constitution");
-    // message must go to stderr so it's visible in the terminal immediately
+    // stdout carries an explicit instruction to Claude (injected into context)
+    // stderr carries the user-visible terminal message
     expect(content).toContain(">&2");
+    expect(content).toContain("IMPORTANT");
   });
 });
