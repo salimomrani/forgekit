@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import { createRequire } from "node:module";
 import { newCommand } from "./commands/new.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 
 const program = new Command();
 
@@ -10,7 +14,7 @@ program
   .description(
     "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
   )
-  .version("1.0.0");
+  .version(version);
 
 program.addCommand(newCommand);
 
