@@ -1,4 +1,5 @@
 import path from "node:path";
+import os from "node:os";
 import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
 import { renderAndWrite, TEMPLATES_DIR } from "../../utils/template-engine.js";
@@ -113,6 +114,39 @@ class ClaudeCodeGenerator extends BaseGenerator {
         ),
       ),
     ]);
+
+    await this.generateSkills();
+  }
+
+  private async generateSkills(): Promise<void> {
+    const globalSkillsBase = path.join(os.homedir(), ".claude", "skills");
+    const skillsToGenerate: Array<{ name: string; condition: boolean }> = [
+      { name: "applying-angular-conventions", condition: this.config.frontend },
+      {
+        name: "applying-python-conventions",
+        condition: this.config.backendType === "fastapi",
+      },
+      {
+        name: "applying-java-conventions",
+        condition: this.config.backendType === "spring-boot",
+      },
+    ];
+
+    for (const { name, condition } of skillsToGenerate) {
+      if (!condition) continue;
+      const src = path.join(globalSkillsBase, name, "SKILL.md");
+      const dest = path.join(
+        this.projectDir,
+        ".claude",
+        "skills",
+        name,
+        "SKILL.md",
+      );
+      if (await fs.pathExists(src)) {
+        await fs.ensureDir(path.dirname(dest));
+        await fs.copy(src, dest);
+      }
+    }
   }
 
   private buildAllowedCommands(): string[] {

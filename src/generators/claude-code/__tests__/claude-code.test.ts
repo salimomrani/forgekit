@@ -100,4 +100,59 @@ describe("ClaudeCodeGenerator", () => {
     expect(settings.hooks.PreToolUse).toBeDefined();
     expect(settings.hooks.PreCompact).toBeDefined();
   });
+
+  it("generates angular skill when frontend is enabled", async () => {
+    const config = { ...baseConfig, frontend: true };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(
+        path.join(
+          tmpDir,
+          ".claude",
+          "skills",
+          "applying-angular-conventions",
+          "SKILL.md",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it("generates python skill when fastapi backend", async () => {
+    const config = { ...baseConfig, backendType: "fastapi" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(
+        path.join(
+          tmpDir,
+          ".claude",
+          "skills",
+          "applying-python-conventions",
+          "SKILL.md",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it("generates java skill when spring-boot backend", async () => {
+    const config = { ...baseConfig, backendType: "spring-boot" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(
+        path.join(
+          tmpDir,
+          ".claude",
+          "skills",
+          "applying-java-conventions",
+          "SKILL.md",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it("generates no stack skills when claude-only (no backend, no frontend)", async () => {
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    expect(await fs.pathExists(path.join(tmpDir, ".claude", "skills"))).toBe(
+      false,
+    );
+  });
 });
