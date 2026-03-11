@@ -2,7 +2,7 @@
 # Hook: PreToolUse (Bash) — {{name}} project guards.
 # Exit 2 = block | Exit 0 = allow
 
-COMMAND=$(cat | jq -r '.tool_input.command // ""')
+COMMAND=$(jq -r '.tool_input.command // ""')
 
 # Strip heredoc bodies so patterns don't match inside commit messages.
 COMMAND_STRIPPED=$(echo "$COMMAND" | awk '

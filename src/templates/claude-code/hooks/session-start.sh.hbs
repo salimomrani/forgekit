@@ -1,7 +1,11 @@
 #!/bin/bash
 # Hook: SessionStart (once: true) — loads project constitution into context once per session.
 
-REPO_ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$REPO_ROOT" ]; then
+  exit 0
+fi
 CONSTITUTION="$REPO_ROOT/.specify/memory/constitution.md"
 
 if [ -f "$CONSTITUTION" ]; then
