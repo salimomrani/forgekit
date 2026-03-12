@@ -1,6 +1,6 @@
 {
   "name": "@iconsulting-dev/forgekit",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "CLI de scaffolding full-stack (Spring Boot, FastAPI, Angular) — une commande, un projet prêt à l'emploi",
   "type": "module",
   "bin": {
