@@ -256,15 +256,44 @@ mon-projet/
 
 **Workflow Spec-Driven Development :**
 
-| Étape | Commande | Description |
-|---|---|---|
-| 0 | `/speckit.constitution` | Renseigner la constitution du projet (une fois) |
-| 1 | `/speckit.specify` | Créer la spec feature à partir d'une description naturelle |
-| 2 | `/speckit.plan` | Générer le plan d'implémentation (architecture + décisions) |
-| 3 | `/speckit.tasks` | Découper le plan en tâches ordonnées et actionnables |
-| 4 | `/speckit.implement` | Exécuter les tâches avec checkpoints de review |
+Le point d'entrée unique est `/speckit.workflow` — il orchestre tout selon le contexte.
 
-**Constitution non renseignée ?** Le hook `session-start.sh` détecte automatiquement si la constitution est vide et demande à Claude de lancer `/speckit.constitution` en début de session.
+**Setup (une fois par projet) :**
+```
+/speckit.constitution   # Renseigner la constitution architecturale
+```
+Le hook `session-start.sh` détecte si la constitution est vide et demande à Claude de la configurer en début de session.
+
+**Fast Track** *(feature simple, 1-3 tâches)* :
+```
+/speckit.workflow "description de la feature"
+  → /speckit.specify   # spec.md
+  → /speckit.tasks     # tasks.md (plan sauté)
+  → implémentation TDD
+```
+
+**Full Workflow** *(feature complexe)* :
+```
+/speckit.workflow "description de la feature"
+  Phase 1 — SPEC
+    → /speckit.specify    # spec.md dans specs/<NNN>-<name>/
+    → /speckit.checklist  # validation qualité spec
+    → /speckit.clarify    # résolution ambiguïtés
+    → /speckit.plan       # plan.md, data-model.md, contracts/
+    → /speckit.tasks      # tasks.md ordonnées
+    → /speckit.analyze    # gate de cohérence (bloquant si CRITICAL)
+
+  Phase 2 — IMPLÉMENTATION
+    → worktree isolé + TDD (RED → GREEN → REFACTOR) par tâche
+
+  Phase 3 — COMPLETION
+    → code review → PR
+```
+
+**Reprendre un workflow en cours :**
+```
+/speckit.workflow   # sans arguments = reprend la dernière spec où elle s'est arrêtée
+```
 
 ## Versions dynamiques
 
