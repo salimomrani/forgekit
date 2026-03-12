@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 
 /** Returns true if the specify CLI binary is discoverable in PATH. */
 export function isSpecifyInstalled(): boolean {
-  const result = spawnSync("specify", ["--version"], { stdio: "ignore" });
+  const result = spawnSync("specify", ["--help"], { stdio: "ignore" });
   return result.status === 0;
 }
 
