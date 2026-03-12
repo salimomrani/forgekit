@@ -4,8 +4,9 @@ import path from "node:path";
 import os from "node:os";
 import { generateClaudeCode } from "../index.js";
 
-// Fake global skills dir — seeded in beforeEach, used in skill tests
+// Fake global dirs — seeded in beforeEach
 let fakeSkillsDir: string;
+let fakeCommandsDir: string;
 import type { ProjectConfig } from "../../../types.js";
 import type { ResolvedVersions } from "../../../versions.js";
 
@@ -50,6 +51,16 @@ describe("ClaudeCodeGenerator", () => {
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "forgekit-test-"));
     fakeSkillsDir = path.join(tmpDir, "fake-skills");
+    fakeCommandsDir = path.join(tmpDir, "fake-commands");
+    await fs.ensureDir(fakeCommandsDir);
+    await fs.writeFile(
+      path.join(fakeCommandsDir, "speckit.workflow.md"),
+      "# workflow",
+    );
+    await fs.writeFile(
+      path.join(fakeCommandsDir, "speckit.specify.md"),
+      "# specify",
+    );
     for (const skill of [
       "applying-angular-conventions",
       "applying-python-conventions",
@@ -177,6 +188,39 @@ describe("ClaudeCodeGenerator", () => {
   it("generates no stack skills when claude-only (no backend, no frontend)", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions, fakeSkillsDir);
     expect(await fs.pathExists(path.join(tmpDir, ".claude", "skills"))).toBe(
+      false,
+    );
+  });
+
+  it("copies global commands to .claude/commands/", async () => {
+    await generateClaudeCode(
+      tmpDir,
+      baseConfig,
+      baseVersions,
+      fakeSkillsDir,
+      fakeCommandsDir,
+    );
+    expect(
+      await fs.pathExists(
+        path.join(tmpDir, ".claude", "commands", "speckit.workflow.md"),
+      ),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(
+        path.join(tmpDir, ".claude", "commands", "speckit.specify.md"),
+      ),
+    ).toBe(true);
+  });
+
+  it("skips commands copy gracefully when global commands dir does not exist", async () => {
+    await generateClaudeCode(
+      tmpDir,
+      baseConfig,
+      baseVersions,
+      fakeSkillsDir,
+      "/nonexistent/commands",
+    );
+    expect(await fs.pathExists(path.join(tmpDir, ".claude", "commands"))).toBe(
       false,
     );
   });
