@@ -4,7 +4,7 @@ vi.mock("node:child_process", () => ({
   spawnSync: vi.fn(),
 }));
 
-import { isClaudeInstalled } from "../system.js";
+import { isClaudeInstalled, isSpecifyInstalled } from "../system.js";
 import { spawnSync } from "node:child_process";
 
 describe("isClaudeInstalled", () => {
@@ -28,5 +28,21 @@ describe("isClaudeInstalled", () => {
       error: new Error("ENOENT"),
     } as ReturnType<typeof spawnSync>);
     expect(isClaudeInstalled()).toBe(false);
+  });
+});
+
+describe("isSpecifyInstalled", () => {
+  it("returns true when specify binary is found in PATH", () => {
+    vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<
+      typeof spawnSync
+    >);
+    expect(isSpecifyInstalled()).toBe(true);
+  });
+
+  it("returns false when specify binary is not found", () => {
+    vi.mocked(spawnSync).mockReturnValue({ status: 1 } as ReturnType<
+      typeof spawnSync
+    >);
+    expect(isSpecifyInstalled()).toBe(false);
   });
 });

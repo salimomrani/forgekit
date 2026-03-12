@@ -12,6 +12,7 @@ import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
+import { initSpecify } from "../generators/speckit.js";
 import { resolveVersions } from "../versions.js";
 import type { ProjectConfig, BackendType } from "../types.js";
 
@@ -146,6 +147,12 @@ export const newCommand = new Command("new")
           process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
           await generateClaudeCode(projectDir, config, versions);
           console.log(chalk.green("\r  ✔ Claude Code configuré             "));
+        }
+
+        if (config.speckit) {
+          process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
+          initSpecify(projectDir);
+          console.log(chalk.green("\r  ✔ Speckit initialisé                "));
         }
 
         await generateRoot(projectDir, config, versions);

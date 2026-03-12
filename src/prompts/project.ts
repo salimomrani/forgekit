@@ -2,7 +2,7 @@ import { input, confirm, checkbox, select } from "@inquirer/prompts";
 import path from "node:path";
 import { loadConfig } from "../config.js";
 import { validateProjectName, validateGroupId } from "../utils/validation.js";
-import { isClaudeInstalled } from "../utils/system.js";
+import { isClaudeInstalled, isSpecifyInstalled } from "../utils/system.js";
 import type {
   ProjectConfig,
   UIFramework,
@@ -134,16 +134,19 @@ export async function promptProjectConfig(
   let docker = defaults.docker ?? true;
   let ci = defaults.ci ?? true;
   let claudeCode = defaults.claudeCode ?? true;
+  let speckit = defaults.speckit ?? true;
   let gitInit = defaults.gitInit ?? true;
 
   if (
     defaults.docker === undefined &&
     defaults.ci === undefined &&
     defaults.claudeCode === undefined &&
+    defaults.speckit === undefined &&
     defaults.gitInit === undefined
   ) {
     const hasBackend = backendType !== null;
     const claudeDetected = isClaudeInstalled();
+    const specifyDetected = isSpecifyInstalled();
     const infra = await checkbox({
       message: "Infrastructure",
       choices: [
@@ -164,12 +167,20 @@ export async function promptProjectConfig(
           value: "claudeCode",
           checked: claudeDetected,
         },
+        {
+          name: specifyDetected
+            ? "Speckit (specify templates)"
+            : "Speckit (specify CLI non détecté)",
+          value: "speckit",
+          checked: specifyDetected,
+        },
         { name: "Initialiser Git", value: "gitInit", checked: true },
       ],
     });
     docker = infra.includes("docker");
     ci = infra.includes("ci");
     claudeCode = infra.includes("claudeCode");
+    speckit = infra.includes("speckit");
     gitInit = infra.includes("gitInit");
   }
 
@@ -187,6 +198,7 @@ export async function promptProjectConfig(
     primeNGPreset,
     ngrx,
     docker,
+    speckit,
     ci,
     claudeCode,
     gitInit,

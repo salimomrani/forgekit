@@ -1,5 +1,11 @@
 import { spawnSync } from "node:child_process";
 
+/** Returns true if the specify CLI binary is discoverable in PATH. */
+export function isSpecifyInstalled(): boolean {
+  const result = spawnSync("specify", ["--version"], { stdio: "ignore" });
+  return result.status === 0;
+}
+
 /** Returns true if the claude CLI binary is discoverable in PATH. */
 export function isClaudeInstalled(): boolean {
   // Intentionally synchronous — called once during the interactive wizard prompt setup,
