@@ -59,10 +59,22 @@ jobs:
           name: coverage-report
           path: coverage/
 
+  test-results:
+    name: Test Results
+    runs-on: ubuntu-latest
+    needs: test
+    if: always()
+    steps:
+      - run: |
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "Tests failed"
+            exit 1
+          fi
+
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: test
+    needs: test-results
     steps:
       - uses: actions/checkout@v4
 
