@@ -1,7 +1,7 @@
 {
   "name": "@iconsulting-dev/forgekit",
   "version": "1.10.3",
-  "description": "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
+  "description": "CLI de scaffolding full-stack (Spring Boot, FastAPI, Angular) — une commande, un projet prêt à l'emploi",
   "type": "module",
   "bin": {
     "forgekit": "dist/index.js"
@@ -25,8 +25,10 @@
     "cli",
     "scaffold",
     "spring-boot",
+    "fastapi",
     "angular",
-    "fullstack"
+    "fullstack",
+    "claude-code"
   ],
   "author": "Salim Omrani",
   "license": "MIT",
