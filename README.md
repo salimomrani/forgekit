@@ -45,7 +45,7 @@ Un wizard vous guide avec des valeurs par défaut modifiables :
 ? Framework UI : (PrimeNG)
 ? Preset PrimeNG : (Aura)
 ? Inclure NgRx SignalStore ? (Non)
-? Infrastructure : (Docker ✓  CI/CD ✓  Claude Code ✓  Git ✓)
+? Infrastructure : (Docker ✓  CI/CD ✓  Claude Code ✓  Git ✓)    ← Claude Code auto-décoché si claude CLI absent
 ```
 
 ### Mode commande directe
@@ -207,7 +207,7 @@ mon-projet/
 │   ├── settings.json                  # Permissions + hooks (SessionStart, PreToolUse, PreCompact)
 │   ├── hooks/
 │   │   ├── pre-bash.sh               # Guard bash (ex: bloque npm install hors frontend/)
-│   │   └── session-start.sh          # Auto-charge la constitution au démarrage
+│   │   └── session-start.sh          # Auto-charge la constitution ; détecte si non configurée et demande /speckit.constitution
 │   ├── hookify.block-dangerous-rm.local.md   # Bloque rm -rf
 │   ├── hookify.block-force-push.local.md     # Bloque git push --force
 │   ├── hookify.block-no-verify.local.md      # Bloque --no-verify
@@ -264,7 +264,8 @@ src/
 │   └── root/                    # README + .gitignore
 ├── utils/
 │   ├── template-engine.ts       # Handlebars compile + render
-│   └── validation.ts            # Validation inputs
+│   ├── validation.ts            # Validation inputs
+│   └── system.ts                # isClaudeInstalled() — détection CLI
 ├── types.ts                     # BackendType, ProjectConfig
 ├── versions.ts                  # Résolution dynamique Maven + NPM
 └── config.ts                    # Config persistante (~/.forgekit)

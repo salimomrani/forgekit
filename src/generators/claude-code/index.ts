@@ -9,17 +9,21 @@ import type { ResolvedVersions } from "../../versions.js";
 class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
   private readonly globalSkillsBase: string;
+  private readonly globalCommandsBase: string;
 
   constructor(
     projectDir: string,
     config: ProjectConfig,
     versions: ResolvedVersions,
     globalSkillsBase?: string,
+    globalCommandsBase?: string,
   ) {
     super(projectDir, config);
     this.versions = versions;
     this.globalSkillsBase =
       globalSkillsBase ?? path.join(os.homedir(), ".claude", "skills");
+    this.globalCommandsBase =
+      globalCommandsBase ?? path.join(os.homedir(), ".claude", "commands");
   }
 
   async generate(): Promise<void> {
@@ -119,6 +123,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
     ]);
 
     await this.generateSkills();
+    await this.generateCommands();
   }
 
   private async generateSkills(): Promise<void> {
@@ -150,6 +155,20 @@ class ClaudeCodeGenerator extends BaseGenerator {
         await fs.copy(src, dest);
       }
     }
+  }
+
+  private async generateCommands(): Promise<void> {
+    const src = this.globalCommandsBase;
+    if (!(await fs.pathExists(src))) return;
+
+    const files = (await fs.readdir(src)).filter((f) => f.endsWith(".md"));
+    if (files.length === 0) return;
+
+    const dest = path.join(this.projectDir, ".claude", "commands");
+    await fs.ensureDir(dest);
+    await Promise.all(
+      files.map((f) => fs.copy(path.join(src, f), path.join(dest, f))),
+    );
   }
 
   private buildAllowedCommands(): string[] {
@@ -203,12 +222,14 @@ export async function generateClaudeCode(
   config: ProjectConfig,
   versions: ResolvedVersions,
   globalSkillsBase?: string,
+  globalCommandsBase?: string,
 ): Promise<void> {
   const generator = new ClaudeCodeGenerator(
     projectDir,
     config,
     versions,
     globalSkillsBase,
+    globalCommandsBase,
   );
   await generator.generate();
 }
