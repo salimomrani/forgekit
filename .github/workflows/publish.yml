@@ -72,9 +72,11 @@ jobs:
       - name: Commit version bump back to master
         env:
           TAG_NAME: ${{ github.ref_name }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/salimomrani/forgekit.git
           git add package.json package-lock.json
           git commit -m "chore: bump version to ${TAG_NAME#v}"
           git push origin HEAD:master
