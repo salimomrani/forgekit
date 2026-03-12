@@ -158,17 +158,12 @@ class ClaudeCodeGenerator extends BaseGenerator {
   }
 
   private async generateCommands(): Promise<void> {
-    const src = this.globalCommandsBase;
+    const src = path.join(this.globalCommandsBase, "speckit.workflow.md");
     if (!(await fs.pathExists(src))) return;
-
-    const files = (await fs.readdir(src)).filter((f) => f.endsWith(".md"));
-    if (files.length === 0) return;
 
     const dest = path.join(this.projectDir, ".claude", "commands");
     await fs.ensureDir(dest);
-    await Promise.all(
-      files.map((f) => fs.copy(path.join(src, f), path.join(dest, f))),
-    );
+    await fs.copy(src, path.join(dest, "speckit.workflow.md"));
   }
 
   private buildAllowedCommands(): string[] {

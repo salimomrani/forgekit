@@ -62,6 +62,14 @@ describe("ClaudeCodeGenerator", () => {
       path.join(fakeCommandsDir, "speckit.specify.md"),
       "# specify",
     );
+    await fs.writeFile(
+      path.join(fakeCommandsDir, "forgekit.install.md"),
+      "# forgekit install",
+    );
+    await fs.writeFile(
+      path.join(fakeCommandsDir, "forgekit.release.md"),
+      "# forgekit release",
+    );
     for (const skill of [
       "applying-angular-conventions",
       "applying-python-conventions",
@@ -193,7 +201,7 @@ describe("ClaudeCodeGenerator", () => {
     );
   });
 
-  it("copies global commands to .claude/commands/", async () => {
+  it("copies only speckit.workflow.md to .claude/commands/", async () => {
     await generateClaudeCode(
       tmpDir,
       baseConfig,
@@ -210,10 +218,20 @@ describe("ClaudeCodeGenerator", () => {
       await fs.pathExists(
         path.join(tmpDir, ".claude", "commands", "speckit.specify.md"),
       ),
-    ).toBe(true);
+    ).toBe(false);
+    expect(
+      await fs.pathExists(
+        path.join(tmpDir, ".claude", "commands", "forgekit.install.md"),
+      ),
+    ).toBe(false);
+    expect(
+      await fs.pathExists(
+        path.join(tmpDir, ".claude", "commands", "forgekit.release.md"),
+      ),
+    ).toBe(false);
   });
 
-  it("skips commands copy gracefully when global commands dir does not exist", async () => {
+  it("skips commands copy gracefully when speckit.workflow.md does not exist", async () => {
     await generateClaudeCode(
       tmpDir,
       baseConfig,
