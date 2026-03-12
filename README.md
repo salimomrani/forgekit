@@ -45,7 +45,7 @@ Un wizard vous guide avec des valeurs par défaut modifiables :
 ? Framework UI : (PrimeNG)
 ? Preset PrimeNG : (Aura)
 ? Inclure NgRx SignalStore ? (Non)
-? Infrastructure : (Docker ✓  CI/CD ✓  Claude Code ✓  Git ✓)    ← Claude Code auto-décoché si claude CLI absent
+? Infrastructure : (Docker ✓  CI/CD ✓  Claude Code ✓  Speckit ✓  Git ✓)    ← auto-décoché si CLI absent
 ```
 
 ### Mode commande directe
@@ -227,6 +227,45 @@ mon-projet/
 
 Les skills sont copiés depuis `~/.claude/skills/` selon le stack sélectionné — chaque dev qui clone le projet dispose des mêmes conventions.
 
+### Speckit — Spec-Driven Development
+
+ForgeKit intègre [spec-kit](https://github.com/github/spec-kit), un workflow de développement piloté par les spécifications.
+
+**Prérequis :**
+```bash
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+```
+
+L'option Speckit est **auto-cochée** si le binaire `specify` est détecté dans le PATH. Si absent, elle s'affiche avec une notice `(specify CLI non détecté)` et reste décochée.
+
+**Ce que génère ForgeKit :**
+
+```
+mon-projet/
+└── .specify/
+    ├── memory/
+    │   └── constitution.md        # Constitution architecturale du projet
+    └── templates/
+        ├── spec-template.md       # Template de spécification feature
+        ├── plan-template.md       # Template de plan d'implémentation
+        ├── tasks-template.md      # Template de liste de tâches
+        └── commands/              # Templates des commandes speckit
+```
+
+> Les commandes speckit (ex: `speckit.workflow.md`) sont copiées depuis `~/.claude/commands/` — elles ne sont pas générées par `specify init`.
+
+**Workflow Spec-Driven Development :**
+
+| Étape | Commande | Description |
+|---|---|---|
+| 0 | `/speckit.constitution` | Renseigner la constitution du projet (une fois) |
+| 1 | `/speckit.specify` | Créer la spec feature à partir d'une description naturelle |
+| 2 | `/speckit.plan` | Générer le plan d'implémentation (architecture + décisions) |
+| 3 | `/speckit.tasks` | Découper le plan en tâches ordonnées et actionnables |
+| 4 | `/speckit.implement` | Exécuter les tâches avec checkpoints de review |
+
+**Constitution non renseignée ?** Le hook `session-start.sh` détecte automatiquement si la constitution est vide et demande à Claude de lancer `/speckit.constitution` en début de session.
+
 ## Versions dynamiques
 
 ForgeKit résout automatiquement les dernières versions stables depuis npm et Maven Central au moment de la génération :
@@ -253,6 +292,7 @@ src/
 │   ├── docker/index.ts          # DockerGenerator
 │   ├── claude-code/index.ts     # ClaudeCodeGenerator
 │   ├── root/index.ts            # RootGenerator (README + .gitignore)
+│   ├── speckit.ts               # initSpecify() — appel specify init
 │   └── git.ts                   # Initialisation Git
 ├── templates/                   # Templates Handlebars (.hbs)
 │   ├── backend/                 # Spring Boot (14 templates)
@@ -265,7 +305,7 @@ src/
 ├── utils/
 │   ├── template-engine.ts       # Handlebars compile + render
 │   ├── validation.ts            # Validation inputs
-│   └── system.ts                # isClaudeInstalled() — détection CLI
+│   └── system.ts                # isClaudeInstalled(), isSpecifyInstalled() — détection CLI
 ├── types.ts                     # BackendType, ProjectConfig
 ├── versions.ts                  # Résolution dynamique Maven + NPM
 └── config.ts                    # Config persistante (~/.forgekit)

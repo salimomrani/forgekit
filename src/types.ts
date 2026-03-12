@@ -22,6 +22,7 @@ export interface ProjectConfig {
   docker: boolean;
   ci: boolean;
   claudeCode: boolean;
+  speckit: boolean;
   gitInit: boolean;
 }
 

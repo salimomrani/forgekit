@@ -26,6 +26,7 @@ const baseConfig: ProjectConfig = {
   docker: false,
   ci: false,
   claudeCode: true,
+  speckit: false,
   gitInit: false,
 };
 
