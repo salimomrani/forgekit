@@ -1,0 +1,20 @@
+#!/bin/bash
+# Hook: SessionStart (once: true) — loads project constitution into context once per session.
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"
+if [ -z "$REPO_ROOT" ]; then
+  exit 0
+fi
+CONSTITUTION="$REPO_ROOT/.specify/memory/constitution.md"
+
+if [ -f "$CONSTITUTION" ]; then
+  if grep -q '\[Your first principle\]' "$CONSTITUTION" 2>/dev/null; then
+    echo "IMPORTANT: The project constitution (.specify/memory/constitution.md) is not configured yet. On your very next response, you MUST tell the user to run /speckit.constitution immediately to set it up."
+    echo "⚠️  Constitution not configured yet. Run: /speckit.constitution" >&2
+  else
+    echo "=== ForgeKit Architecture Constitution (auto-loaded) ==="
+    cat "$CONSTITUTION"
+    echo "=== End Constitution ==="
+  fi
+fi
