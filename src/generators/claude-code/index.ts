@@ -10,6 +10,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
   private readonly globalSkillsBase: string;
   private readonly globalCommandsBase: string;
+  speckitWorkflowCopied = false;
 
   constructor(
     projectDir: string,
@@ -123,7 +124,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
     ]);
 
     await this.generateSkills();
-    await this.generateCommands();
+    this.speckitWorkflowCopied = await this.generateCommands();
   }
 
   private async generateSkills(): Promise<void> {
@@ -157,13 +158,14 @@ class ClaudeCodeGenerator extends BaseGenerator {
     }
   }
 
-  private async generateCommands(): Promise<void> {
+  private async generateCommands(): Promise<boolean> {
     const src = path.join(this.globalCommandsBase, "speckit.workflow.md");
-    if (!(await fs.pathExists(src))) return;
+    if (!(await fs.pathExists(src))) return false;
 
     const dest = path.join(this.projectDir, ".claude", "commands");
     await fs.ensureDir(dest);
     await fs.copy(src, path.join(dest, "speckit.workflow.md"));
+    return true;
   }
 
   private buildAllowedCommands(): string[] {
@@ -218,7 +220,7 @@ export async function generateClaudeCode(
   versions: ResolvedVersions,
   globalSkillsBase?: string,
   globalCommandsBase?: string,
-): Promise<void> {
+): Promise<{ speckitWorkflowCopied: boolean }> {
   const generator = new ClaudeCodeGenerator(
     projectDir,
     config,
@@ -227,4 +229,5 @@ export async function generateClaudeCode(
     globalCommandsBase,
   );
   await generator.generate();
+  return { speckitWorkflowCopied: generator.speckitWorkflowCopied };
 }
