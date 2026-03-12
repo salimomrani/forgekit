@@ -2,6 +2,8 @@
 # Hook: PreToolUse (Bash) — ForgeKit project guards.
 # Exit 2 = block | Exit 0 = allow
 
+command -v jq >/dev/null 2>&1 || exit 0
+
 COMMAND=$(jq -r '.tool_input.command // ""')
 
 # Strip heredoc bodies so patterns don't match inside commit messages.

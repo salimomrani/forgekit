@@ -145,8 +145,19 @@ export const newCommand = new Command("new")
 
         if (config.claudeCode) {
           process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
-          await generateClaudeCode(projectDir, config, versions);
+          const { speckitWorkflowCopied } = await generateClaudeCode(
+            projectDir,
+            config,
+            versions,
+          );
           console.log(chalk.green("\r  ✔ Claude Code configuré             "));
+          if (!speckitWorkflowCopied) {
+            console.log(
+              chalk.yellow(
+                "    ℹ  speckit.workflow.md absent — installez speckit puis copiez-le dans ~/.claude/commands/",
+              ),
+            );
+          }
         }
 
         if (config.speckit) {

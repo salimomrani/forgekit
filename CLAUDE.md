@@ -14,6 +14,7 @@ git tag vX.Y.Z && git push origin vX.Y.Z
 
 ## Workflow
 
+- TDD mandatory → write tests first, then implement features use superpowers:test-driven-development skill
 - All functional changes → **PR required** (never push directly to master)
 - Branches: `feat/`, `fix/`, `refactor/`, `chore/` — conventional commits
 

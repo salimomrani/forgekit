@@ -244,6 +244,28 @@ describe("ClaudeCodeGenerator", () => {
     );
   });
 
+  it("returns speckitWorkflowCopied=true when speckit.workflow.md exists", async () => {
+    const result = await generateClaudeCode(
+      tmpDir,
+      baseConfig,
+      baseVersions,
+      fakeSkillsDir,
+      fakeCommandsDir,
+    );
+    expect(result.speckitWorkflowCopied).toBe(true);
+  });
+
+  it("returns speckitWorkflowCopied=false when speckit.workflow.md is absent", async () => {
+    const result = await generateClaudeCode(
+      tmpDir,
+      baseConfig,
+      baseVersions,
+      fakeSkillsDir,
+      "/nonexistent/commands",
+    );
+    expect(result.speckitWorkflowCopied).toBe(false);
+  });
+
   it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const content = await fs.readFile(

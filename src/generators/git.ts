@@ -9,12 +9,15 @@ export async function initGit(projectDir: string): Promise<void> {
 
   execFileSync("git", ["init"], { cwd: projectDir, stdio: "ignore" });
   execFileSync("git", ["add", "-A"], { cwd: projectDir, stdio: "ignore" });
-  execFileSync(
-    "git",
-    ["commit", "-m", "chore: initial project setup with ForgeKit"],
-    {
-      cwd: projectDir,
-      stdio: "ignore",
-    },
-  );
+  try {
+    execFileSync(
+      "git",
+      ["commit", "-m", "chore: initial project setup with ForgeKit"],
+      { cwd: projectDir, stdio: "ignore" },
+    );
+  } catch {
+    throw new Error(
+      'Git commit échoué — vérifiez que user.name et user.email sont configurés (git config --global user.email "you@example.com")',
+    );
+  }
 }
