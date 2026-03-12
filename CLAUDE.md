@@ -2,7 +2,7 @@
 
 ## Release
 
-Toujours utiliser `/release` pour publier une nouvelle version.
+Toujours utiliser `/forgekit.release` pour publier une nouvelle version.
 
 ```bash
 git tag vX.Y.Z && git push origin vX.Y.Z
