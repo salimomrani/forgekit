@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B35"/>
+      <stop offset="100%" stop-color="#E84D0E"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#bg)"/>
+  <!-- Anvil shape -->
+  <path d="M30 78 L90 78 L90 86 L30 86 Z" fill="white"/>
+  <path d="M38 62 L82 62 L86 78 L34 78 Z" fill="white"/>
+  <!-- Hammer -->
+  <rect x="56" y="28" width="8" height="34" rx="2" fill="white" transform="rotate(-15 60 45)"/>
+  <rect x="44" y="22" width="28" height="14" rx="4" fill="white" transform="rotate(-15 60 29)"/>
+</svg>
