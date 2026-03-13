@@ -1,7 +1,11 @@
 import path from "node:path";
 import os from "node:os";
 import fs from "fs-extra";
-import { renderAndWrite, TEMPLATES_DIR } from "../../utils/template-engine.js";
+import {
+  renderAndWrite,
+  TEMPLATES_DIR,
+  BUNDLED_SKILLS_DIR,
+} from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
@@ -128,7 +132,6 @@ class ClaudeCodeGenerator extends BaseGenerator {
   }
 
   private async generateSkills(): Promise<void> {
-    const globalSkillsBase = this.globalSkillsBase;
     const skillsToGenerate: Array<{ name: string; condition: boolean }> = [
       { name: "applying-angular-conventions", condition: this.config.frontend },
       {
@@ -143,7 +146,9 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
     for (const { name, condition } of skillsToGenerate) {
       if (!condition) continue;
-      const src = path.join(globalSkillsBase, name, "SKILL.md");
+
+      const globalSrc = path.join(this.globalSkillsBase, name, "SKILL.md");
+      const bundledSrc = path.join(BUNDLED_SKILLS_DIR, name, "SKILL.md");
       const dest = path.join(
         this.projectDir,
         ".claude",
@@ -151,6 +156,9 @@ class ClaudeCodeGenerator extends BaseGenerator {
         name,
         "SKILL.md",
       );
+
+      const src = (await fs.pathExists(globalSrc)) ? globalSrc : bundledSrc;
+
       if (await fs.pathExists(src)) {
         await fs.ensureDir(path.dirname(dest));
         await fs.copy(src, dest);
