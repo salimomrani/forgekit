@@ -266,6 +266,44 @@ describe("ClaudeCodeGenerator", () => {
     expect(result.speckitWorkflowCopied).toBe(false);
   });
 
+  it("falls back to bundled skill when global skills dir does not exist", async () => {
+    const config = { ...baseConfig, frontend: true };
+    await generateClaudeCode(
+      tmpDir,
+      config,
+      baseVersions,
+      "/nonexistent/skills", // no global skills
+    );
+    expect(
+      await fs.pathExists(
+        path.join(
+          tmpDir,
+          ".claude",
+          "skills",
+          "applying-angular-conventions",
+          "SKILL.md",
+        ),
+      ),
+    ).toBe(true);
+  });
+
+  it("prefers global skill content over bundled when global exists", async () => {
+    const config = { ...baseConfig, backendType: "spring-boot" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
+    const content = await fs.readFile(
+      path.join(
+        tmpDir,
+        ".claude",
+        "skills",
+        "applying-java-conventions",
+        "SKILL.md",
+      ),
+      "utf-8",
+    );
+    // fakeSkillsDir seeds "# applying-java-conventions" — not the bundled content
+    expect(content).toBe("# applying-java-conventions");
+  });
+
   it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const content = await fs.readFile(

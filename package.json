@@ -8,7 +8,7 @@
     "forgekit": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod +x dist/index.js && rm -rf dist/templates && cp -r src/templates dist/templates",
+    "build": "tsc && chmod +x dist/index.js && rm -rf dist/templates && cp -r src/templates dist/templates && rm -rf dist/skills && cp -r src/skills dist/skills",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "test": "vitest run --coverage",
