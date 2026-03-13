@@ -4,36 +4,14 @@
 
 Always use `/forgekit.release` to publish a new version.
 
-```bash
-git tag vX.Y.Z && git push origin vX.Y.Z
-```
-
 - Never use `npm publish` directly
-- Never bump `package.json` manually
-- GitHub Actions pipeline handles everything: lint → test → build → npm → GitHub Release
-
-## Workflow
-
-- TDD mandatory → write tests first, then implement features use superpowers:test-driven-development skill
-- All functional changes → **PR required** (never push directly to master)
-- Branches: `feat/`, `fix/`, `refactor/`, `chore/` — conventional commits
+- Never bump `package.json` manually — tag triggers the pipeline: `git tag vX.Y.Z && git push origin vX.Y.Z`
+- GitHub Actions handles: lint → test → build → npm → GitHub Release
 
 ## Tests
 
-```bash
-npm test           # vitest run --coverage
-npm run typecheck  # tsc --noEmit
-npm run lint       # eslint src/
-```
+Scripts: `npm test` | `npm run typecheck` | `npm run lint`
 
 ## Skill
 
 The `forgekit-conventions` skill (~/.claude/skills/forgekit-conventions/SKILL.md) contains project conventions, debugged patterns, and the key structure. It triggers automatically when working on ForgeKit.
-
-## Stack
-
-- Runtime: Node.js / TypeScript ESM
-- Templates: Handlebars (.hbs) in `src/templates/`
-- CLI: Commander.js + Inquirer.js
-- Tests: Vitest
-- Build: `npm run build` → `dist/`
