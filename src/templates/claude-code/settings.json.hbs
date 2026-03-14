@@ -1,5 +1,15 @@
 {
   "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./*.key)",
+      "Read(./*.pem)",
+      "Read(./*.p12)",
+      "Read(./*secret*)",
+      "Read(./*credential*)",
+      "Read(./*token*)"
+    ],
     "allow": [
 {{#each allowedCommands}}
       "{{this}}",

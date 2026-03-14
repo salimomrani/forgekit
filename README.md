@@ -307,10 +307,9 @@ ForgeKit generates a complete, ready-to-use Claude Code configuration:
 
 ```
 my-project/
-├── CLAUDE.md                                     # Workflow routing, TDD rules
-├── .claudeignore
+├── CLAUDE.md                                     # Workflow routing, stack conventions
 └── .claude/
-    ├── settings.json                             # Permissions + hooks
+    ├── settings.json                             # Permissions (deny rules + allow) + hooks
     ├── hooks/
     │   ├── pre-bash.sh                          # Bash guard
     │   └── session-start.sh                     # Auto-loads constitution
