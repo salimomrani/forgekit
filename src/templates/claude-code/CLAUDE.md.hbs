@@ -2,22 +2,6 @@
 
 {{description}}
 
-## Project Structure
-
-```
-{{name}}/
-{{#if backend}}
-├── backend/        # Backend API
-{{/if}}
-{{#if frontend}}
-├── frontend/       # Angular SPA
-{{/if}}
-{{#if docker}}
-├── docker-compose.yml
-{{/if}}
-└── README.md
-```
-
 ## Workflow Routing (mandatory)
 
 | Scenario | Action |
@@ -25,61 +9,15 @@
 | New feature / non-trivial change | `/speckit.workflow` |
 | Small fix (1-2 lines, docs-only) | Direct edit, no spec |
 | Bug | Apply `superpowers:systematic-debugging` |
-| Commit / PR | Use `commit-commands:commit-push-pr` skill |
 
 ## Architecture Constitution
 
 Read `.specify/memory/constitution.md` before any architectural decision. It is auto-loaded at session start.
 
-{{#if springBoot}}
-## Backend — Spring Boot {{versions.springBoot}}
-
-- **Java 21** — records, pattern matching, sealed classes, virtual threads
-- **Architecture:** Feature-based packages — `com.<groupId>.<feature>.{domain,application,infrastructure}`
-- **DB:** PostgreSQL{{#if flyway}}, Flyway migrations in `backend/src/main/resources/db/migration/`{{/if}} — snake_case naming
-- **Conventions:** Records for DTOs, Lombok, MapStruct for mappings
-- **Validation:** Jakarta Bean Validation | **Logging:** `@Slf4j`
-- **Config:** `application.yml` (never `application.properties`)
-- **Skill:** `applying-java-conventions` for all Java code
-- **Commands:** `cd backend` → `./mvnw spring-boot:run` | `./mvnw test` | `./mvnw package -DskipTests`
-
-{{/if}}
-{{#if fastapi}}
-## Backend — FastAPI (Python 3.12)
-
-- **FastAPI** with uvicorn, pydantic-settings
-- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
-- **Conventions:** Pydantic models, async endpoints, dependency injection
-- **Skill:** `applying-python-conventions` for all Python code
-- **Commands:** `cd backend` → `uvicorn app.main:app --reload` | `pytest` | `pip install -r requirements.txt`
-
-{{/if}}
-{{#if frontend}}
-## Frontend — Angular {{versions.angular}}
-
-- **Angular {{versions.angular}}** — strict mode, standalone components, signals
-- **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex
-{{#if ngrx}}
-- **State:** NgRx SignalStore
-{{/if}}
-- **Conventions:** OnPush, `input()`/`output()`, `inject()`, `@if`/`@for` control flow
-- **Skill:** `applying-angular-conventions` for all Angular/TypeScript code
-- **Commands:** `cd frontend` → `npm install` | `ng serve` | `ng test` | `ng build`
-
-{{/if}}
 {{#if docker}}
 ## Infrastructure
 
 - **Docker:** `docker compose up -d` | `docker compose down`
 - **PostgreSQL:** localhost:5432 | **pgAdmin:** localhost:5050 (admin@admin.com / admin)
-
-{{/if}}
-{{#if springBoot}}
-## Source of Truth
-
-- **API contract:** OpenAPI annotations on controllers (Springdoc)
-{{#if flyway}}
-- **DB schema:** Flyway migrations — never modify existing migration files
-{{/if}}
 
 {{/if}}
