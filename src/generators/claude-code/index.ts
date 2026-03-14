@@ -45,6 +45,11 @@ class ClaudeCodeGenerator extends BaseGenerator {
     await fs.ensureDir(hooksDir);
     await fs.ensureDir(path.join(this.projectDir, ".specify", "memory"));
 
+    const rulesDir = path.join(claudeDir, "rules");
+    if (backend || this.config.frontend) {
+      await fs.ensureDir(rulesDir);
+    }
+
     const data = {
       name: this.config.name,
       description: this.config.description,
@@ -113,6 +118,25 @@ class ClaudeCodeGenerator extends BaseGenerator {
         path.join(this.projectDir, ".specify", "memory", "constitution.md"),
         data,
       ),
+      // .claude/rules — scoped per-stack context
+      ...(backend
+        ? [
+            renderAndWrite(
+              "claude-code/rules/backend.md.hbs",
+              path.join(rulesDir, "backend.md"),
+              data,
+            ),
+          ]
+        : []),
+      ...(this.config.frontend
+        ? [
+            renderAndWrite(
+              "claude-code/rules/frontend.md.hbs",
+              path.join(rulesDir, "frontend.md"),
+              data,
+            ),
+          ]
+        : []),
       // Static hookify files
       ...staticHookifyFiles.map((f) =>
         fs.copy(

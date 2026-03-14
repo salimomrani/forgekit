@@ -304,6 +304,75 @@ describe("ClaudeCodeGenerator", () => {
     expect(content).toBe("# applying-java-conventions");
   });
 
+  it("generates .claude/rules/backend.md when spring-boot backend", async () => {
+    const config = { ...baseConfig, backendType: "spring-boot" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "backend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/backend/**"]');
+    expect(content).toContain("Spring Boot");
+  });
+
+  it("generates .claude/rules/backend.md when fastapi backend", async () => {
+    const config = { ...baseConfig, backendType: "fastapi" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "backend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/backend/**"]');
+    expect(content).toContain("FastAPI");
+  });
+
+  it("generates .claude/rules/frontend.md when frontend is enabled", async () => {
+    const config = { ...baseConfig, frontend: true };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "frontend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/frontend/**"]');
+    expect(content).toContain("Angular");
+  });
+
+  it("does not generate .claude/rules/ when claude-only", async () => {
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    expect(await fs.pathExists(path.join(tmpDir, ".claude", "rules"))).toBe(
+      false,
+    );
+  });
+
+  it("CLAUDE.md does not contain project structure block", async () => {
+    const config = {
+      ...baseConfig,
+      backendType: "spring-boot" as const,
+      frontend: true,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("## Project Structure");
+  });
+
+  it("CLAUDE.md does not contain stack skill references", async () => {
+    const config = {
+      ...baseConfig,
+      backendType: "fastapi" as const,
+      frontend: true,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("applying-angular-conventions");
+    expect(content).not.toContain("applying-python-conventions");
+  });
+
+  it("CLAUDE.md does not contain Commit / PR row", async () => {
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("Commit / PR");
+  });
+
   it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const content = await fs.readFile(

@@ -1,0 +1,29 @@
+---
+paths: ["**/backend/**"]
+---
+{{#if springBoot}}
+## Backend — Spring Boot {{versions.springBoot}}
+
+- **Java 21** — records, pattern matching, sealed classes, virtual threads
+- **Architecture:** Feature-based packages — `com.<groupId>.<feature>.{domain,application,infrastructure}`
+- **DB:** PostgreSQL{{#if flyway}}, Flyway migrations in `backend/src/main/resources/db/migration/`{{/if}} — snake_case naming
+- **Conventions:** Records for DTOs, Lombok, MapStruct for mappings
+- **Validation:** Jakarta Bean Validation | **Logging:** `@Slf4j`
+- **Config:** `application.yml` (never `application.properties`)
+- **Commands:** `cd backend` → `./mvnw spring-boot:run` | `./mvnw test` | `./mvnw package -DskipTests`
+
+## Source of Truth
+
+- **API contract:** OpenAPI annotations on controllers (Springdoc)
+{{#if flyway}}
+- **DB schema:** Flyway migrations — never modify existing migration files
+{{/if}}
+{{/if}}
+{{#if fastapi}}
+## Backend — FastAPI (Python 3.12)
+
+- **FastAPI** with uvicorn, pydantic-settings
+- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
+- **Conventions:** Pydantic models, async endpoints, dependency injection
+- **Commands:** `cd backend` → `uvicorn app.main:app --reload` | `pytest` | `pip install -r requirements.txt`
+{{/if}}
