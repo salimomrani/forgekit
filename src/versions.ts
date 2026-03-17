@@ -27,7 +27,7 @@ export interface ResolvedVersions {
   prettier: string;
 }
 
-const FALLBACK_VERSIONS: ResolvedVersions = {
+export const FALLBACK_VERSIONS: ResolvedVersions = {
   springBoot: "4.0.2",
   springDoc: "3.0.1",
   mapstruct: "1.6.3",
