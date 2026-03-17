@@ -188,4 +188,72 @@ describe("ReactViteGenerator", () => {
     const viteVersion = pkg.devDependencies["vite"].replace("^", "");
     expect(viteVersion.startsWith("8.")).toBe(false);
   });
+
+  it("generates Layout, Header, Footer without auth", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const componentsDir = path.join(tmpDir, "frontend", "src", "components");
+    expect(await fs.pathExists(path.join(componentsDir, "Layout.tsx"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(componentsDir, "Header.tsx"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(componentsDir, "Footer.tsx"))).toBe(
+      true,
+    );
+  });
+
+  it("generates Layout, Header, Footer with auth", async () => {
+    const config = { ...baseConfig, auth: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const componentsDir = path.join(tmpDir, "frontend", "src", "components");
+    expect(await fs.pathExists(path.join(componentsDir, "Layout.tsx"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(componentsDir, "Header.tsx"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(componentsDir, "Footer.tsx"))).toBe(
+      true,
+    );
+  });
+
+  it("Header does not contain auth button when auth is false", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const header = await fs.readFile(
+      path.join(tmpDir, "frontend", "src", "components", "Header.tsx"),
+      "utf-8",
+    );
+    expect(header).not.toContain("useAuth");
+    expect(header).not.toContain("Sign out");
+  });
+
+  it("Header contains auth button when auth is true", async () => {
+    const config = { ...baseConfig, auth: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const header = await fs.readFile(
+      path.join(tmpDir, "frontend", "src", "components", "Header.tsx"),
+      "utf-8",
+    );
+    expect(header).toContain("useAuth");
+    expect(header).toContain("Sign out");
+  });
+
+  it("Footer contains project name in copyright", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const footer = await fs.readFile(
+      path.join(tmpDir, "frontend", "src", "components", "Footer.tsx"),
+      "utf-8",
+    );
+    expect(footer).toContain("test-project");
+  });
+
+  it("router references Layout", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const router = await fs.readFile(
+      path.join(tmpDir, "frontend", "src", "router", "index.tsx"),
+      "utf-8",
+    );
+    expect(router).toContain("Layout");
+  });
 });
