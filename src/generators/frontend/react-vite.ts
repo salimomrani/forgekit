@@ -29,8 +29,8 @@ class ReactViteGenerator extends BaseGenerator {
       deps["axios"] = `^${this.versions.axiosReact}`;
     }
     const devDeps: Record<string, string> = {
-      "@types/react": `^${this.versions.react}`,
-      "@types/react-dom": `^${this.versions.react}`,
+      "@types/react": `^${this.versions.react.split(".")[0]}.0.0`,
+      "@types/react-dom": `^${this.versions.react.split(".")[0]}.0.0`,
       "@vitejs/plugin-react": "^4.0.0",
       tailwindcss: `^${this.versions.tailwind}`,
       "@tailwindcss/vite": `^${this.versions.tailwind}`,
