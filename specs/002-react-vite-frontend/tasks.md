@@ -10,8 +10,8 @@
 
 Type system and version resolver — everything else depends on these.
 
-- [ ] T001 Extend `FrontendType = "angular" | "react-vite" | null` and replace `frontend: boolean` with `frontend: FrontendType` in `src/types.ts` (use `null` for consistency with `BackendType`)
-- [ ] T002 Add `react`, `reactRouter`, `vite`, `axiosReact` fields to `ResolvedVersions` interface, add npm fetches (conditional on `frontend === "react-vite"`), and add fallback values in `src/versions.ts`
+- [x] T001 Extend `FrontendType = "angular" | "react-vite" | null` and replace `frontend: boolean` with `frontend: FrontendType` in `src/types.ts` (use `null` for consistency with `BackendType`)
+- [x] T002 Add `react`, `reactRouter`, `vite`, `axiosReact` fields to `ResolvedVersions` interface, add npm fetches (conditional on `frontend === "react-vite"`), and add fallback values in `src/versions.ts`
 
 ---
 
@@ -19,16 +19,16 @@ Type system and version resolver — everything else depends on these.
 
 All templates are independent files — parallelizable. Required before ReactViteGenerator can render.
 
-- [ ] T003 [P] Create `src/templates/frontend/react-vite/vite.config.ts.hbs` (Vite 6 + `@vitejs/plugin-react` + `@tailwindcss/vite`, dev port 4200)
-- [ ] T004 [P] Create `src/templates/frontend/react-vite/tsconfig.json.hbs` (strict, ES2022, bundler module resolution, JSX react-jsx)
-- [ ] T005 [P] Create `src/templates/frontend/react-vite/tailwind.config.ts.hbs` (Tailwind v4, content glob `./src/**/*.{ts,tsx}`)
-- [ ] T006 [P] Create `src/templates/frontend/react-vite/index.html.hbs` (entry point, `<div id="root">`, title `{{name}}`)
-- [ ] T007 [P] Create `src/templates/frontend/react-vite/gitignore.hbs` (node_modules, dist, .env*)
-- [ ] T008 [P] Create `src/templates/frontend/react-vite/src/main.tsx.hbs` (ReactDOM.createRoot, RouterProvider)
-- [ ] T009 [P] Create `src/templates/frontend/react-vite/src/App.tsx.hbs` (functional component, Tailwind welcome page)
-- [ ] T010 [P] Create `src/templates/frontend/react-vite/src/index.css.hbs` (@import "tailwindcss")
-- [ ] T011 [P] Create `src/templates/frontend/react-vite/src/router/index.tsx.hbs` (createBrowserRouter, root route → App — no conditionals, pure static content)
-- [ ] T011b [P] Create `src/templates/frontend/react-vite/src/router/index-auth.tsx.hbs` (createBrowserRouter, root route wrapped in ProtectedRoute — no conditionals, pure static content)
+- [x] T003 [P] Create `src/templates/frontend/react-vite/vite.config.ts.hbs` (Vite 6 + `@vitejs/plugin-react` + `@tailwindcss/vite`, dev port 4200)
+- [x] T004 [P] Create `src/templates/frontend/react-vite/tsconfig.json.hbs` (strict, ES2022, bundler module resolution, JSX react-jsx)
+- [x] T005 [P] Create `src/templates/frontend/react-vite/tailwind.config.ts.hbs` (Tailwind v4, content glob `./src/**/*.{ts,tsx}`)
+- [x] T006 [P] Create `src/templates/frontend/react-vite/index.html.hbs` (entry point, `<div id="root">`, title `{{name}}`)
+- [x] T007 [P] Create `src/templates/frontend/react-vite/gitignore.hbs` (node_modules, dist, .env*)
+- [x] T008 [P] Create `src/templates/frontend/react-vite/src/main.tsx.hbs` (ReactDOM.createRoot, RouterProvider)
+- [x] T009 [P] Create `src/templates/frontend/react-vite/src/App.tsx.hbs` (functional component, Tailwind welcome page)
+- [x] T010 [P] Create `src/templates/frontend/react-vite/src/index.css.hbs` (@import "tailwindcss")
+- [x] T011 [P] Create `src/templates/frontend/react-vite/src/router/index.tsx.hbs` (createBrowserRouter, root route → App — no conditionals, pure static content)
+- [x] T011b [P] Create `src/templates/frontend/react-vite/src/router/index-auth.tsx.hbs` (createBrowserRouter, root route wrapped in ProtectedRoute — no conditionals, pure static content)
 
 ---
 
@@ -42,10 +42,10 @@ All templates are independent files — parallelizable. Required before ReactVit
 - `npm run build` produces `dist/` without error
 - No Angular files present
 
-- [ ] T012 [US2] Create `src/generators/frontend/react-vite.ts` with `ReactViteGenerator` class: `buildPackageJson()` + `generate()` rendering all base templates from Phase 2 via `Promise.all()`
-- [ ] T013 [US2] Update `src/generators/frontend/index.ts`: rename Angular export to `generateAngularFrontend`, add `generateReactViteFrontend`, update `generateFrontend` to dispatch based on `config.frontend`
-- [ ] T014 [US2] Update `src/prompts/project.ts`: replace `confirm("Inclure le frontend Angular ?")` with `select<FrontendType>` (Angular / React Vite / None); gate PrimeNG and NgRx questions inside `if (frontendChoice === "angular")`; auto-set `uiFramework = "tailwind"` when `"react-vite"`
-- [ ] T015 [US2] Update `src/commands/new.ts`: add `--react` / `--no-react` flags, update `frontend` default handling from boolean to `FrontendType`, update success message next-steps for React (`npm run dev` instead of `ng serve`)
+- [x] T012 [US2] Create `src/generators/frontend/react-vite.ts` with `ReactViteGenerator` class: `buildPackageJson()` + `generate()` rendering all base templates from Phase 2 via `Promise.all()`
+- [x] T013 [US2] Update `src/generators/frontend/index.ts`: rename Angular export to `generateAngularFrontend`, add `generateReactViteFrontend`, update `generateFrontend` to dispatch based on `config.frontend`
+- [x] T014 [US2] Update `src/prompts/project.ts`: replace `confirm("Inclure le frontend Angular ?")` with `select<FrontendType>` (Angular / React Vite / None); gate PrimeNG and NgRx questions inside `if (frontendChoice === "angular")`; auto-set `uiFramework = "tailwind"` when `"react-vite"`
+- [x] T015 [US2] Update `src/commands/new.ts`: add `--react` / `--no-react` flags, update `frontend` default handling from boolean to `FrontendType`, update success message next-steps for React (`npm run dev` instead of `ng serve`)
 
 ---
 
@@ -59,11 +59,11 @@ All templates are independent files — parallelizable. Required before ReactVit
 - Generated `frontend/src/lib/http.ts` exports axios instance with Bearer interceptor
 - Router wraps root route in `ProtectedRoute`
 
-- [ ] T016 [P] [US3] Create `src/templates/frontend/react-vite/src/hooks/useAuth.ts.hbs` (useState token from localStorage, login/logout functions)
-- [ ] T017 [P] [US3] Create `src/templates/frontend/react-vite/src/components/ProtectedRoute.tsx.hbs` (useAuth, Navigate to `/` if not authenticated — no login page scaffolded)
-- [ ] T018 [P] [US3] Create `src/templates/frontend/react-vite/src/lib/http.ts.hbs` (axios.create with baseURL from VITE_API_URL, request interceptor adds Authorization Bearer header)
-- [ ] T019 [US3] Update `ReactViteGenerator.generate()` in `src/generators/frontend/react-vite.ts`: select `router/index-auth.tsx.hbs` when `config.auth === true`, `router/index.tsx.hbs` otherwise — no template conditionals
-- [ ] T020 [US3] Update `ReactViteGenerator.generate()` in `src/generators/frontend/react-vite.ts`: when `config.auth === true`, render auth templates (T016–T018) in a second `Promise.all()`, creating `hooks/`, `components/`, `lib/` directories
+- [x] T016 [P] [US3] Create `src/templates/frontend/react-vite/src/hooks/useAuth.ts.hbs` (useState token from localStorage, login/logout functions)
+- [x] T017 [P] [US3] Create `src/templates/frontend/react-vite/src/components/ProtectedRoute.tsx.hbs` (useAuth, Navigate to `/` if not authenticated — no login page scaffolded)
+- [x] T018 [P] [US3] Create `src/templates/frontend/react-vite/src/lib/http.ts.hbs` (axios.create with baseURL from VITE_API_URL, request interceptor adds Authorization Bearer header)
+- [x] T019 [US3] Update `ReactViteGenerator.generate()` in `src/generators/frontend/react-vite.ts`: select `router/index-auth.tsx.hbs` when `config.auth === true`, `router/index.tsx.hbs` otherwise — no template conditionals
+- [x] T020 [US3] Update `ReactViteGenerator.generate()` in `src/generators/frontend/react-vite.ts`: when `config.auth === true`, render auth templates (T016–T018) in a second `Promise.all()`, creating `hooks/`, `components/`, `lib/` directories
 
 ---
 
@@ -76,20 +76,20 @@ All templates are independent files — parallelizable. Required before ReactVit
 - Generated `.github/workflows/ci.yml` contains React lint + build job when `frontend === "react-vite"`
 - `docker-compose.yml` includes nginx service when `frontend !== false`
 
-- [ ] T021 [US4] Update `src/generators/claude-code/index.ts`: add derived `reactVite = config.frontend === "react-vite"` to template data; add React-specific allowed commands (`Bash(npm run dev)`, `Bash(npm run build)`, `Bash(npm run lint)`) when `reactVite`; pass `reactVite` and `angular` booleans to template data
-- [ ] T022 [P] [US4] Update `src/templates/claude-code/CLAUDE.md.hbs`: rename `{{#if frontend}}` to `{{#if hasFrontend}}`; add `{{#if reactVite}}` block with React architecture, conventions reference to `applying-react-conventions`, and dev commands
-- [ ] T023 [P] [US4] Update `src/templates/claude-code/rules/frontend.md.hbs`: add `{{#if reactVite}}` block referencing React conventions; gate Angular-specific content inside `{{#if angular}}`
-- [ ] T024 [P] [US5] Update `src/templates/ci/ci.yml.hbs`: add `{{#if reactVite}}` frontend job running `npm ci`, `npm run lint`, `npm run build` in `working-directory: frontend`
-- [ ] T025 [US6] Verify `src/templates/docker/docker-compose.yml.hbs`: confirm nginx service gate uses `hasFrontend` (or equivalent boolean that covers both `"angular"` and `"react-vite"`); update generator data if needed
+- [x] T021 [US4] Update `src/generators/claude-code/index.ts`: add derived `reactVite = config.frontend === "react-vite"` to template data; add React-specific allowed commands (`Bash(npm run dev)`, `Bash(npm run build)`, `Bash(npm run lint)`) when `reactVite`; pass `reactVite` and `angular` booleans to template data
+- [x] T022 [P] [US4] Update `src/templates/claude-code/CLAUDE.md.hbs`: rename `{{#if frontend}}` to `{{#if hasFrontend}}`; add `{{#if reactVite}}` block with React architecture, conventions reference to `applying-react-conventions`, and dev commands
+- [x] T023 [P] [US4] Update `src/templates/claude-code/rules/frontend.md.hbs`: add `{{#if reactVite}}` block referencing React conventions; gate Angular-specific content inside `{{#if angular}}`
+- [x] T024 [P] [US5] Update `src/templates/ci/ci.yml.hbs`: add `{{#if reactVite}}` frontend job running `npm ci`, `npm run lint`, `npm run build` in `working-directory: frontend`
+- [x] T025 [US6] Verify `src/templates/docker/docker-compose.yml.hbs`: confirm nginx service gate uses `hasFrontend` (or equivalent boolean that covers both `"angular"` and `"react-vite"`); update generator data if needed
 
 ---
 
 ## Phase 6 — Polish & Tests
 
-- [ ] T026 Update all Vitest fixture objects in `src/generators/**/__tests__/` that declare `frontend: boolean` to use `FrontendType` (declare all required fields per constitution §7)
-- [ ] T027 [P] Add unit test for `ReactViteGenerator` in `src/generators/frontend/__tests__/react-vite.test.ts`: verify base files are written; verify auth files written when `auth: true`; verify auth files absent when `auth: false`
-- [ ] T028 [P] Add unit test for `generateFrontend` router in `src/generators/frontend/__tests__/index.test.ts`: verify Angular generator called for `"angular"` (US1 regression), React generator called for `"react-vite"`, neither called for `null` and no files created (US7)
-- [ ] T029 Run `npm test` and `npm run typecheck` and `npm run lint` — all must pass before PR
+- [x] T026 Update all Vitest fixture objects in `src/generators/**/__tests__/` that declare `frontend: boolean` to use `FrontendType` (declare all required fields per constitution §7)
+- [x] T027 [P] Add unit test for `ReactViteGenerator` in `src/generators/frontend/__tests__/react-vite.test.ts`: verify base files are written; verify auth files written when `auth: true`; verify auth files absent when `auth: false`
+- [x] T028 [P] Add unit test for `generateFrontend` router in `src/generators/frontend/__tests__/index.test.ts`: verify Angular generator called for `"angular"` (US1 regression), React generator called for `"react-vite"`, neither called for `null` and no files created (US7)
+- [x] T029 Run `npm test` and `npm run typecheck` and `npm run lint` — all must pass before PR
 
 ---
 
