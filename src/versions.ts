@@ -21,6 +21,10 @@ export interface ResolvedVersions {
   reactRouter: string;
   vite: string;
   axiosReact: string;
+  // Dev tooling
+  husky: string;
+  lintStaged: string;
+  prettier: string;
 }
 
 const FALLBACK_VERSIONS: ResolvedVersions = {
@@ -41,6 +45,9 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   reactRouter: "7.5.0",
   vite: "7.0.0",
   axiosReact: "1.8.0",
+  husky: "9.1.0",
+  lintStaged: "15.5.0",
+  prettier: "3.5.0",
 };
 
 async function fetchNpmVersion(packageName: string): Promise<string | null> {
@@ -136,6 +143,20 @@ export async function resolveVersions(opts: {
       }),
       fetchNpmVersion("tailwindcss").then((v) => {
         if (v) versions.tailwind = v;
+      }),
+    );
+  }
+
+  if (opts.frontend !== null) {
+    tasks.push(
+      fetchNpmVersion("husky").then((v) => {
+        if (v) versions.husky = v;
+      }),
+      fetchNpmVersion("lint-staged").then((v) => {
+        if (v) versions.lintStaged = v;
+      }),
+      fetchNpmVersion("prettier").then((v) => {
+        if (v) versions.prettier = v;
       }),
     );
   }

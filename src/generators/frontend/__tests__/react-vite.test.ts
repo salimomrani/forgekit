@@ -16,6 +16,7 @@ const baseConfig: ProjectConfig = {
   openapi: false,
   auth: false,
   mapstruct: false,
+  prettier: false,
   uiFramework: "tailwind",
   primeNGPreset: "Aura",
   ngrx: false,
@@ -44,6 +45,9 @@ const baseVersions: ResolvedVersions = {
   reactRouter: "7.5.0",
   vite: "6.3.0",
   axiosReact: "1.8.0",
+  husky: "9.1.0",
+  lintStaged: "15.5.0",
+  prettier: "3.5.0",
 };
 
 describe("ReactViteGenerator", () => {
@@ -255,5 +259,44 @@ describe("ReactViteGenerator", () => {
       "utf-8",
     );
     expect(router).toContain("Layout");
+  });
+
+  it("does not generate prettier files when prettier is false", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const frontendDir = path.join(tmpDir, "frontend");
+    expect(await fs.pathExists(path.join(frontendDir, ".prettierrc"))).toBe(
+      false,
+    );
+    expect(
+      await fs.pathExists(path.join(frontendDir, ".husky", "pre-commit")),
+    ).toBe(false);
+    const pkg = await fs.readJson(path.join(frontendDir, "package.json"));
+    expect(pkg.scripts?.prepare).toBeUndefined();
+    expect(pkg["lint-staged"]).toBeUndefined();
+  });
+
+  it("generates prettier files when prettier is true", async () => {
+    const config = { ...baseConfig, prettier: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const frontendDir = path.join(tmpDir, "frontend");
+    expect(await fs.pathExists(path.join(frontendDir, ".prettierrc"))).toBe(
+      true,
+    );
+    expect(
+      await fs.pathExists(path.join(frontendDir, ".husky", "pre-commit")),
+    ).toBe(true);
+  });
+
+  it("package.json includes prepare and lint-staged when prettier is true", async () => {
+    const config = { ...baseConfig, prettier: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.scripts.prepare).toBe("husky");
+    expect(pkg["lint-staged"]).toBeDefined();
+    expect(pkg.devDependencies["husky"]).toBeDefined();
+    expect(pkg.devDependencies["lint-staged"]).toBeDefined();
+    expect(pkg.devDependencies["prettier"]).toBeDefined();
   });
 });

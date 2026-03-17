@@ -37,19 +37,34 @@ class ReactViteGenerator extends BaseGenerator {
       typescript: "~5.8.0",
       vite: `^${this.versions.vite}`,
     };
-    return {
+    if (this.config.prettier) {
+      devDeps["husky"] = `^${this.versions.husky}`;
+      devDeps["lint-staged"] = `^${this.versions.lintStaged}`;
+      devDeps["prettier"] = `^${this.versions.prettier}`;
+    }
+
+    const scripts: Record<string, string> = {
+      dev: "vite",
+      build: "tsc -b && vite build",
+      lint: "tsc --noEmit",
+      preview: "vite preview",
+    };
+    if (this.config.prettier) {
+      scripts["prepare"] = "husky";
+    }
+
+    const pkg: Record<string, unknown> = {
       name: `${this.projectName}-frontend`,
       version: "0.0.0",
       private: true,
-      scripts: {
-        dev: "vite",
-        build: "tsc -b && vite build",
-        lint: "tsc --noEmit",
-        preview: "vite preview",
-      },
+      scripts,
       dependencies: deps,
       devDependencies: devDeps,
     };
+    if (this.config.prettier) {
+      pkg["lint-staged"] = { "*.{ts,tsx,css,json}": "prettier --write" };
+    }
+    return pkg;
   }
 
   async generate(): Promise<void> {
@@ -139,6 +154,22 @@ class ReactViteGenerator extends BaseGenerator {
         data,
       ),
     ]);
+
+    if (this.config.prettier) {
+      await this.ensureDirs([path.join(frontendDir, ".husky")]);
+      await Promise.all([
+        renderAndWrite(
+          "shared/prettier/prettierrc.hbs",
+          path.join(frontendDir, ".prettierrc"),
+          data,
+        ),
+        renderAndWrite(
+          "shared/prettier/pre-commit.hbs",
+          path.join(frontendDir, ".husky", "pre-commit"),
+          data,
+        ),
+      ]);
+    }
 
     if (this.config.auth) {
       await this.ensureDirs([

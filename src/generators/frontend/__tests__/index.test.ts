@@ -16,6 +16,7 @@ const baseConfig: ProjectConfig = {
   openapi: false,
   auth: false,
   mapstruct: false,
+  prettier: false,
   uiFramework: "tailwind",
   primeNGPreset: "Aura",
   ngrx: false,
@@ -44,6 +45,9 @@ const baseVersions: ResolvedVersions = {
   reactRouter: "7.5.0",
   vite: "6.3.0",
   axiosReact: "1.8.0",
+  husky: "9.1.0",
+  lintStaged: "15.5.0",
+  prettier: "3.5.0",
 };
 
 describe("generateFrontend router", () => {
@@ -87,5 +91,53 @@ describe("generateFrontend router", () => {
     const config = { ...baseConfig, frontend: null };
     await generateFrontend(tmpDir, config, baseVersions);
     expect(await fs.pathExists(path.join(tmpDir, "frontend"))).toBe(false);
+  });
+
+  it("Angular: does not generate prettier files when prettier is false", async () => {
+    const config = { ...baseConfig, frontend: "angular" as const };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const frontendDir = path.join(tmpDir, "frontend");
+    expect(await fs.pathExists(path.join(frontendDir, ".prettierrc"))).toBe(
+      false,
+    );
+    expect(
+      await fs.pathExists(path.join(frontendDir, ".husky", "pre-commit")),
+    ).toBe(false);
+    const pkg = await fs.readJson(path.join(frontendDir, "package.json"));
+    expect(pkg.scripts?.prepare).toBeUndefined();
+    expect(pkg["lint-staged"]).toBeUndefined();
+  });
+
+  it("Angular: generates prettier files when prettier is true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      prettier: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const frontendDir = path.join(tmpDir, "frontend");
+    expect(await fs.pathExists(path.join(frontendDir, ".prettierrc"))).toBe(
+      true,
+    );
+    expect(
+      await fs.pathExists(path.join(frontendDir, ".husky", "pre-commit")),
+    ).toBe(true);
+  });
+
+  it("Angular: package.json includes prepare and lint-staged when prettier is true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      prettier: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.scripts.prepare).toBe("husky");
+    expect(pkg["lint-staged"]).toBeDefined();
+    expect(pkg.devDependencies["husky"]).toBeDefined();
+    expect(pkg.devDependencies["lint-staged"]).toBeDefined();
+    expect(pkg.devDependencies["prettier"]).toBeDefined();
   });
 });
