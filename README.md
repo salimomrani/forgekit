@@ -24,11 +24,11 @@ One command creates an entire project wired together:
 | Layer | Options |
 |---|---|
 | **Backend** | Spring Boot 3 (Java 21) · FastAPI (Python 3.12) · none |
-| **Frontend** | Angular 19 (standalone, OnPush, lazy routes) · none |
+| **Frontend** | Angular 19 (standalone, OnPush, lazy routes) · React 19 (Vite + Tailwind CSS v4) · none |
 | **UI** | PrimeNG (Aura / Lara / Nora) · Tailwind CSS v4 · none |
 | **Database** | PostgreSQL 17 via Docker Compose |
-| **State** | NgRx SignalStore (optional) |
-| **Auth** | Spring Security + JWT + Angular interceptors/guards (optional) |
+| **State** | NgRx SignalStore (optional, Angular only) |
+| **Auth** | Spring Security + JWT + Angular interceptors/guards (optional) · React `useAuth` hook + `ProtectedRoute` + axios interceptor (optional) |
 | **CI/CD** | GitHub Actions |
 | **AI tooling** | Claude Code config (hooks, hookify guards, skills, CLAUDE.md) |
 | **Spec workflow** | Speckit integration (spec → plan → tasks → TDD) |
@@ -119,12 +119,13 @@ The wizard guides you through all options with sensible defaults:
 ? Project name: (my-app)
 ? Description: (My application)
 ? Backend: (Spring Boot (Java 21) | FastAPI (Python) | None)
-? Include Angular frontend? (Yes)
+? Frontend: (Angular (standalone, OnPush) | React (Vite + Tailwind) | Aucun)
 ? Group ID: (com.example)                          ← Spring Boot only
 ? Backend features: (Flyway ✓  OpenAPI ✓  JWT ✗  MapStruct ✓)
-? UI framework: (PrimeNG)
-? PrimeNG preset: (Aura)
-? Include NgRx SignalStore? (No)
+? UI framework: (PrimeNG)                          ← Angular only
+? PrimeNG preset: (Aura)                           ← Angular + PrimeNG only
+? Include NgRx SignalStore? (No)                   ← Angular only
+? Include auth scaffold? (No)                      ← Angular or React
 ? Infrastructure: (Docker ✓  CI/CD ✓  Claude Code ✓  Speckit ✓  Git ✓)
 ```
 
@@ -134,16 +135,19 @@ The wizard guides you through all options with sensible defaults:
 
 ```bash
 # Spring Boot + Angular
-forgekit new my-app --spring-boot --group com.example --frontend --docker --claude-code
+forgekit new my-app --spring-boot --group com.example --angular --docker --claude-code
 
-# FastAPI + Angular
-forgekit new my-app --fastapi --frontend --docker --claude-code
+# Spring Boot + React (Vite + Tailwind)
+forgekit new my-app --spring-boot --group com.example --react --docker --claude-code
+
+# FastAPI + React with auth
+forgekit new my-app --fastapi --react --auth --docker --claude-code
 
 # FastAPI backend only (no frontend, no Docker)
-forgekit new my-api --fastapi --no-frontend --no-docker
+forgekit new my-api --fastapi --no-docker
 
-# Spring Boot with auth
-forgekit new my-app --spring-boot --auth --frontend --docker
+# Spring Boot + Angular with auth
+forgekit new my-app --spring-boot --auth --angular --docker
 ```
 
 ### All available flags
@@ -152,16 +156,17 @@ forgekit new my-app --spring-boot --auth --frontend --docker
 |---|---|
 | `--spring-boot` | Spring Boot backend (Java 21) |
 | `--fastapi` | FastAPI backend (Python 3.12) |
-| `--frontend` / `--no-frontend` | Include/exclude Angular frontend |
+| `--angular` | Angular frontend (standalone, OnPush) |
+| `--react` | React frontend (Vite + Tailwind CSS v4) |
 | `--group <id>` | Java Group ID (e.g. `com.example`) — Spring Boot only |
 | `--description <desc>` | Project description |
-| `--auth` | Include Spring Security + Angular auth interceptors/guards |
+| `--auth` | Auth scaffold — Angular interceptors/guards or React `useAuth` + axios |
 | `--flyway` / `--no-flyway` | SQL migrations with Flyway |
 | `--openapi` / `--no-openapi` | OpenAPI / Swagger UI |
 | `--mapstruct` / `--no-mapstruct` | MapStruct bean mappers |
-| `--ngrx` / `--no-ngrx` | NgRx SignalStore |
-| `--ui <framework>` | UI framework: `primeng` \| `tailwind` \| `none` |
-| `--preset <preset>` | PrimeNG preset: `Aura` \| `Lara` \| `Nora` |
+| `--ngrx` / `--no-ngrx` | NgRx SignalStore (Angular only) |
+| `--ui <framework>` | UI framework: `primeng` \| `tailwind` \| `none` (Angular only) |
+| `--preset <preset>` | PrimeNG preset: `Aura` \| `Lara` \| `Nora` (Angular only) |
 | `--docker` / `--no-docker` | Docker Compose (PostgreSQL + pgAdmin) |
 | `--ci` / `--no-ci` | GitHub Actions CI workflow |
 | `--claude-code` / `--no-claude-code` | Claude Code config |
@@ -173,8 +178,8 @@ forgekit new my-app --spring-boot --auth --frontend --docker
 
 ```
 my-project/
-├── backend/                 # Spring Boot 3 / Java 21  — or —  FastAPI / Python 3.12
-├── frontend/                # Angular / PrimeNG (or Tailwind)
+├── backend/                 # Spring Boot / Java 21  — or —  FastAPI / Python 3.12
+├── frontend/                # Angular / PrimeNG (or Tailwind)  — or —  React / Vite / Tailwind
 ├── docker-compose.yml       # PostgreSQL 17 + pgAdmin (+ api service for FastAPI)
 ├── .github/workflows/       # GitHub Actions CI
 ├── CLAUDE.md                # AI workflow conventions, TDD rules, constitution ref
@@ -287,6 +292,35 @@ npm start   # port 4200
 
 ---
 
+## Frontend — React (Vite + Tailwind)
+
+**Stack:** React 19, Vite 7, Tailwind CSS v4, React Router v7 (declarative).
+
+```
+frontend/src/
+├── main.tsx               # Entry point
+├── App.tsx                # Root component
+├── index.css              # Tailwind @import
+├── router/
+│   └── index.tsx          # Routes (BrowserRouter + lazy-ready)
+├── hooks/                 # (--auth) useAuth hook
+├── components/            # (--auth) ProtectedRoute component
+└── lib/                   # (--auth) axios instance with JWT interceptor
+```
+
+**With `--auth`:** generates `useAuth.ts`, `ProtectedRoute.tsx`, and `lib/http.ts` (axios instance that reads the token from `localStorage` and attaches it as `Authorization: Bearer …` on every request).
+
+**Start the frontend:**
+```bash
+cd frontend
+npm install
+npm run dev     # port 5173
+npm run build   # production build
+npm run lint    # TypeScript check (tsc --noEmit)
+```
+
+---
+
 ## Docker Compose
 
 ```bash
@@ -323,6 +357,7 @@ my-project/
     ├── hookify.warn-todo-fixme.local.md
     └── skills/
         ├── applying-angular-conventions/SKILL.md    # if Angular frontend
+        ├── applying-react-conventions/SKILL.md      # if React frontend
         ├── applying-python-conventions/SKILL.md     # if FastAPI backend
         └── applying-java-conventions/SKILL.md       # if Spring Boot backend
 ```
@@ -391,7 +426,8 @@ The `session-start.sh` hook detects if the constitution is empty and prompts Cla
 
 ForgeKit resolves the latest stable versions from npm and Maven Central at generation time:
 
-- **npm:** Angular, PrimeNG, @primeuix/themes, NgRx Signals, Tailwind CSS, RxJS, TypeScript, zone.js
+- **npm (Angular):** Angular, PrimeNG, @primeuix/themes, NgRx Signals, Tailwind CSS, RxJS, TypeScript, zone.js
+- **npm (React):** React, React Router, Vite (capped at v7 — `@vitejs/plugin-react@4.x` peer dep), axios, Tailwind CSS
 - **Maven:** Spring Boot, SpringDoc OpenAPI, MapStruct
 
 Fallback versions are used if resolution fails.
@@ -414,7 +450,8 @@ src/
 │   ├── base-generator.ts        # Abstract base class
 │   ├── backend/index.ts         # Spring Boot generator
 │   ├── fastapi/index.ts         # FastAPI generator
-│   ├── frontend/index.ts        # Angular generator
+│   ├── frontend/index.ts        # Frontend router (Angular or React)
+│   ├── frontend/react-vite.ts   # React / Vite generator
 │   ├── docker/index.ts          # Docker Compose generator
 │   ├── claude-code/index.ts     # Claude Code config generator
 │   ├── root/index.ts            # README + .gitignore
@@ -423,7 +460,8 @@ src/
 ├── templates/                   # Handlebars (.hbs) templates
 │   ├── backend/                 # 14 Spring Boot templates
 │   ├── fastapi/                 # 9 FastAPI templates
-│   ├── frontend/                # 22 Angular templates
+│   ├── frontend/angular/        # 22 Angular templates
+│   ├── frontend/react-vite/     # 13 React/Vite templates
 │   ├── docker/
 │   ├── claude-code/             # CLAUDE.md, settings.json, hooks, hookify
 │   ├── ci/
@@ -432,7 +470,7 @@ src/
 │   ├── template-engine.ts       # Handlebars compile + render
 │   ├── validation.ts            # Input validators
 │   └── system.ts                # CLI detection (claude, specify, docker)
-├── types.ts                     # BackendType, ProjectConfig
+├── types.ts                     # BackendType, FrontendType, ProjectConfig
 ├── versions.ts                  # Dynamic version resolution
 └── config.ts                    # Persistent config (~/.forgekit)
 ```
