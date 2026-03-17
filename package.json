@@ -12,6 +12,8 @@
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "test": "vitest run --coverage",
+    "test:unit": "vitest run --coverage --exclude 'src/__tests__/e2e*.test.ts'",
+    "test:e2e": "vitest run src/__tests__/e2e*.test.ts",
     "test:watch": "vitest",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
