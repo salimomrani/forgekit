@@ -1,6 +1,6 @@
 {
   "name": "@iconsulting-dev/forgekit",
-  "version": "1.11.3",
+  "version": "1.12.0",
   "description": "Full-stack scaffolding CLI — Spring Boot or FastAPI backend, Angular frontend, Docker, CI/CD, and Claude Code config in one command.",
   "homepage": "https://salimomrani.github.io/forgekit",
   "type": "module",
