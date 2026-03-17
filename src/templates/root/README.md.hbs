@@ -10,8 +10,11 @@
 {{#if fastapi}}
 - **Backend:** FastAPI / Python 3.12
 {{/if}}
-{{#if frontend}}
+{{#if angular}}
 - **Frontend:** Angular {{versions.angular}} / PrimeNG {{versions.primeng}}
+{{/if}}
+{{#if reactVite}}
+- **Frontend:** React {{versions.react}} / Vite / Tailwind CSS
 {{/if}}
 {{#if docker}}
 - **Infra:** Docker Compose (PostgreSQL 17 + pgAdmin)
@@ -38,9 +41,13 @@ cd backend && pip install -r requirements.txt
 uvicorn app.main:app --reload
 
 {{/if}}
-{{#if frontend}}
+{{#if angular}}
 # Démarrer le frontend (port 4200)
 cd frontend && npm install && ng serve
+{{/if}}
+{{#if reactVite}}
+# Démarrer le frontend (port 4200)
+cd frontend && npm install && npm run dev
 {{/if}}
 ```
 

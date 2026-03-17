@@ -167,6 +167,22 @@ describe("ClaudeCodeGenerator", () => {
     ).toBe(true);
   });
 
+  it("generates react skill when frontend is react-vite", async () => {
+    const config = { ...baseConfig, frontend: "react-vite" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
+    expect(
+      await fs.pathExists(
+        path.join(
+          tmpDir,
+          ".claude",
+          "skills",
+          "applying-react-conventions",
+          "SKILL.md",
+        ),
+      ),
+    ).toBe(true);
+  });
+
   it("generates python skill when fastapi backend", async () => {
     const config = { ...baseConfig, backendType: "fastapi" as const };
     await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
