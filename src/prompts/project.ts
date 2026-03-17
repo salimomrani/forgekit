@@ -144,13 +144,15 @@ export async function promptProjectConfig(
   let claudeCode = defaults.claudeCode ?? true;
   let speckit = defaults.speckit ?? true;
   let gitInit = defaults.gitInit ?? true;
+  let prettier = defaults.prettier ?? false;
 
   if (
     defaults.docker === undefined &&
     defaults.ci === undefined &&
     defaults.claudeCode === undefined &&
     defaults.speckit === undefined &&
-    defaults.gitInit === undefined
+    defaults.gitInit === undefined &&
+    defaults.prettier === undefined
   ) {
     const hasBackend = backendType !== null;
     const claudeDetected = isClaudeInstalled();
@@ -183,6 +185,12 @@ export async function promptProjectConfig(
           checked: specifyDetected,
         },
         { name: "Initialiser Git", value: "gitInit", checked: true },
+        {
+          name: "Prettier (pre-commit formatting)",
+          value: "prettier",
+          checked: false,
+          disabled: frontend === null ? "Nécessite un frontend" : false,
+        },
       ],
     });
     docker = infra.includes("docker");
@@ -190,6 +198,7 @@ export async function promptProjectConfig(
     claudeCode = infra.includes("claudeCode");
     speckit = infra.includes("speckit");
     gitInit = infra.includes("gitInit");
+    prettier = infra.includes("prettier");
   }
 
   return {
@@ -210,5 +219,6 @@ export async function promptProjectConfig(
     ci,
     claudeCode,
     gitInit,
+    prettier,
   };
 }

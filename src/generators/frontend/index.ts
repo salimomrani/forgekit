@@ -59,20 +59,37 @@ class FrontendGenerator extends BaseGenerator {
       devDeps["postcss"] = "^8.0.0";
     }
 
-    return {
+    if (this.config.prettier) {
+      devDeps["husky"] = `^${this.versions.husky}`;
+      devDeps["lint-staged"] = `^${this.versions.lintStaged}`;
+      devDeps["prettier"] = `^${this.versions.prettier}`;
+    }
+
+    const scripts: Record<string, string> = {
+      ng: "ng",
+      start: "ng serve",
+      build: "ng build",
+      watch: "ng build --watch --configuration development",
+      test: "ng test",
+    };
+    if (this.config.prettier) {
+      scripts["prepare"] = "husky";
+    }
+
+    const pkg: Record<string, unknown> = {
       name: `${this.projectName}-frontend`,
       version: "0.0.0",
-      scripts: {
-        ng: "ng",
-        start: "ng serve",
-        build: "ng build",
-        watch: "ng build --watch --configuration development",
-        test: "ng test",
-      },
       private: true,
+      scripts,
       dependencies: deps,
       devDependencies: devDeps,
     };
+    if (this.config.prettier) {
+      pkg["lint-staged"] = {
+        "*.{ts,html,css,scss,json}": "prettier --write",
+      };
+    }
+    return pkg;
   }
 
   async generate(): Promise<void> {
@@ -234,6 +251,22 @@ class FrontendGenerator extends BaseGenerator {
         path.join(appDir, "core/store/app.store.ts"),
         data,
       );
+    }
+
+    if (this.config.prettier) {
+      await this.ensureDirs([path.join(frontendDir, ".husky")]);
+      await Promise.all([
+        renderAndWrite(
+          "shared/prettier/prettierrc.hbs",
+          path.join(frontendDir, ".prettierrc"),
+          data,
+        ),
+        renderAndWrite(
+          "shared/prettier/pre-commit.hbs",
+          path.join(frontendDir, ".husky", "pre-commit"),
+          data,
+        ),
+      ]);
     }
   }
 }

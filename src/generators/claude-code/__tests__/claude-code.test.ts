@@ -20,6 +20,7 @@ const baseConfig: ProjectConfig = {
   openapi: false,
   auth: false,
   mapstruct: false,
+  prettier: false,
   uiFramework: "none",
   primeNGPreset: "Aura",
   ngrx: false,
@@ -48,6 +49,9 @@ const baseVersions: ResolvedVersions = {
   reactRouter: "7.5.0",
   vite: "6.3.0",
   axiosReact: "1.8.0",
+  husky: "9.1.0",
+  lintStaged: "15.5.0",
+  prettier: "3.5.0",
 };
 
 describe("ClaudeCodeGenerator", () => {
