@@ -15,7 +15,7 @@ const baseConfig: ProjectConfig = {
   groupId: "com.example",
   description: "Test",
   backendType: null,
-  frontend: false,
+  frontend: null,
   flyway: false,
   openapi: false,
   auth: false,
@@ -44,6 +44,10 @@ const baseVersions: ResolvedVersions = {
   zoneJs: "0.15.0",
   typescript: "5.6.0",
   tailwind: "4.0.0",
+  react: "19.0.0",
+  reactRouter: "7.5.0",
+  vite: "6.3.0",
+  axiosReact: "1.8.0",
 };
 
 describe("ClaudeCodeGenerator", () => {
@@ -74,6 +78,7 @@ describe("ClaudeCodeGenerator", () => {
       "applying-angular-conventions",
       "applying-python-conventions",
       "applying-java-conventions",
+      "applying-react-conventions",
     ]) {
       await fs.ensureDir(path.join(fakeSkillsDir, skill));
       await fs.writeFile(
@@ -147,7 +152,7 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("generates angular skill when frontend is enabled", async () => {
-    const config = { ...baseConfig, frontend: true };
+    const config = { ...baseConfig, frontend: "angular" as const };
     await generateClaudeCode(tmpDir, config, baseVersions, fakeSkillsDir);
     expect(
       await fs.pathExists(
@@ -267,7 +272,7 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("falls back to bundled skill when global skills dir does not exist", async () => {
-    const config = { ...baseConfig, frontend: true };
+    const config = { ...baseConfig, frontend: "angular" as const };
     await generateClaudeCode(
       tmpDir,
       config,
@@ -327,7 +332,7 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("generates .claude/rules/frontend.md when frontend is enabled", async () => {
-    const config = { ...baseConfig, frontend: true };
+    const config = { ...baseConfig, frontend: "angular" as const };
     await generateClaudeCode(tmpDir, config, baseVersions);
     const content = await fs.readFile(
       path.join(tmpDir, ".claude", "rules", "frontend.md"),
@@ -348,7 +353,7 @@ describe("ClaudeCodeGenerator", () => {
     const config = {
       ...baseConfig,
       backendType: "spring-boot" as const,
-      frontend: true,
+      frontend: "angular" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
     const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
@@ -359,7 +364,7 @@ describe("ClaudeCodeGenerator", () => {
     const config = {
       ...baseConfig,
       backendType: "fastapi" as const,
-      frontend: true,
+      frontend: "angular" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
     const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import type { BackendType } from "./types.js";
+import type { BackendType, FrontendType } from "./types.js";
 
 export interface ResolvedVersions {
   // Backend
@@ -17,6 +17,10 @@ export interface ResolvedVersions {
   zoneJs: string;
   typescript: string;
   tailwind: string;
+  react: string;
+  reactRouter: string;
+  vite: string;
+  axiosReact: string;
 }
 
 const FALLBACK_VERSIONS: ResolvedVersions = {
@@ -33,6 +37,10 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   zoneJs: "0.15.0",
   typescript: "5.9.0",
   tailwind: "4.0.0",
+  react: "19.0.0",
+  reactRouter: "7.5.0",
+  vite: "6.3.0",
+  axiosReact: "1.8.0",
 };
 
 async function fetchNpmVersion(packageName: string): Promise<string | null> {
@@ -69,7 +77,7 @@ async function fetchMavenVersion(
 
 export async function resolveVersions(opts: {
   backendType: BackendType;
-  frontend: boolean;
+  frontend: FrontendType;
 }): Promise<ResolvedVersions> {
   const versions = { ...FALLBACK_VERSIONS };
 
@@ -97,7 +105,7 @@ export async function resolveVersions(opts: {
     );
   }
 
-  if (opts.frontend) {
+  if (opts.frontend === "angular") {
     tasks.push(
       fetchNpmVersion("@angular/core").then((v) => {
         if (v) versions.angular = v;
@@ -125,6 +133,26 @@ export async function resolveVersions(opts: {
       }),
       fetchNpmVersion("typescript").then((v) => {
         if (v) versions.typescript = v;
+      }),
+      fetchNpmVersion("tailwindcss").then((v) => {
+        if (v) versions.tailwind = v;
+      }),
+    );
+  }
+
+  if (opts.frontend === "react-vite") {
+    tasks.push(
+      fetchNpmVersion("react").then((v) => {
+        if (v) versions.react = v;
+      }),
+      fetchNpmVersion("react-router").then((v) => {
+        if (v) versions.reactRouter = v;
+      }),
+      fetchNpmVersion("vite").then((v) => {
+        if (v) versions.vite = v;
+      }),
+      fetchNpmVersion("axios").then((v) => {
+        if (v) versions.axiosReact = v;
       }),
       fetchNpmVersion("tailwindcss").then((v) => {
         if (v) versions.tailwind = v;

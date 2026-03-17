@@ -1,0 +1,10 @@
+import { createBrowserRouter } from 'react-router'
+import { ProtectedRoute } from '../components/ProtectedRoute'
+import App from '../App'
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <ProtectedRoute><App /></ProtectedRoute>,
+  },
+])
