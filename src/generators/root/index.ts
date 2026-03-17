@@ -17,13 +17,20 @@ class RootGenerator extends BaseGenerator {
   }
 
   async generate(): Promise<void> {
+    const hasFrontend = this.config.frontend !== null;
+    const angular = this.config.frontend === "angular";
+    const reactVite = this.config.frontend === "react-vite";
+
     const data = {
       name: this.config.name,
       description: this.config.description,
       backend: this.config.backendType !== null,
       springBoot: this.config.backendType === "spring-boot",
       fastapi: this.config.backendType === "fastapi",
-      frontend: this.config.frontend,
+      frontend: hasFrontend,
+      hasFrontend,
+      angular,
+      reactVite,
       docker: this.config.docker,
       versions: this.versions,
     };

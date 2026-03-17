@@ -4,6 +4,7 @@ import { renderAndWrite } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
+import { generateReactViteFrontend } from "./react-vite.js";
 
 class FrontendGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
@@ -237,11 +238,23 @@ class FrontendGenerator extends BaseGenerator {
   }
 }
 
-export async function generateFrontend(
+async function generateAngularFrontend(
   projectDir: string,
   config: ProjectConfig,
   versions: ResolvedVersions,
 ): Promise<void> {
   const generator = new FrontendGenerator(projectDir, config, versions);
   await generator.generate();
+}
+
+export async function generateFrontend(
+  projectDir: string,
+  config: ProjectConfig,
+  versions: ResolvedVersions,
+): Promise<void> {
+  if (config.frontend === "angular") {
+    await generateAngularFrontend(projectDir, config, versions);
+  } else if (config.frontend === "react-vite") {
+    await generateReactViteFrontend(projectDir, config, versions);
+  }
 }

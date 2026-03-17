@@ -11,11 +11,18 @@ class CIGenerator extends BaseGenerator {
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
 
+    const hasFrontend = this.config.frontend !== null;
+    const angular = this.config.frontend === "angular";
+    const reactVite = this.config.frontend === "react-vite";
+
     await renderAndWrite("ci/ci.yml.hbs", path.join(workflowsDir, "ci.yml"), {
       backend: this.config.backendType !== null,
       springBoot,
       fastapi,
-      frontend: this.config.frontend,
+      frontend: hasFrontend,
+      hasFrontend,
+      angular,
+      reactVite,
     });
   }
 }

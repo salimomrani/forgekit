@@ -14,7 +14,7 @@ import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
 import { resolveVersions } from "../versions.js";
-import type { ProjectConfig, BackendType } from "../types.js";
+import type { ProjectConfig, BackendType, FrontendType } from "../types.js";
 
 export const newCommand = new Command("new")
   .description("Créer un nouveau projet full-stack")
@@ -25,6 +25,8 @@ export const newCommand = new Command("new")
   .option("--fastapi", "Inclure le backend FastAPI")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--no-frontend", "Exclure le frontend Angular")
+  .option("--react", "Inclure le frontend React (Vite + Tailwind)")
+  .option("--angular", "Inclure le frontend Angular (standalone, OnPush)")
   .option("--auth", "Inclure l'authentification")
   .option("--flyway", "Inclure Flyway (migrations SQL)")
   .option("--no-flyway", "Exclure Flyway")
@@ -57,8 +59,10 @@ export const newCommand = new Command("new")
       if (options.springBoot)
         defaults.backendType = "spring-boot" as BackendType;
       if (options.fastapi) defaults.backendType = "fastapi" as BackendType;
-      if (typeof options.frontend === "boolean")
-        defaults.frontend = options.frontend;
+      if (options.react) defaults.frontend = "react-vite" as FrontendType;
+      else if (options.angular || options.frontend === true)
+        defaults.frontend = "angular" as FrontendType;
+      else if (options.frontend === false) defaults.frontend = null;
       if (typeof options.auth === "boolean") defaults.auth = options.auth;
       if (typeof options.flyway === "boolean") defaults.flyway = options.flyway;
       if (typeof options.openapi === "boolean")
@@ -121,12 +125,20 @@ export const newCommand = new Command("new")
           );
         }
 
-        if (config.frontend) {
+        if (config.frontend === "angular") {
           process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
           await generateFrontend(projectDir, config, versions);
           console.log(
             chalk.green(
               `\r  ✔ Frontend Angular ${versions.angular} généré           `,
+            ),
+          );
+        } else if (config.frontend === "react-vite") {
+          process.stdout.write(chalk.yellow("  ⏳ Frontend React (Vite)..."));
+          await generateFrontend(projectDir, config, versions);
+          console.log(
+            chalk.green(
+              `\r  ✔ Frontend React ${versions.react} (Vite) généré       `,
             ),
           );
         }
@@ -186,8 +198,12 @@ export const newCommand = new Command("new")
           console.log(
             chalk.cyan("  cd backend && uvicorn app.main:app --reload"),
           );
-        if (config.frontend)
+        if (config.frontend === "angular")
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
+        if (config.frontend === "react-vite")
+          console.log(
+            chalk.cyan("  cd frontend && npm install && npm run dev"),
+          );
         console.log("");
       } catch (error) {
         console.log(

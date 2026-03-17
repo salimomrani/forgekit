@@ -8,6 +8,7 @@ import type {
   UIFramework,
   PrimeNGPreset,
   BackendType,
+  FrontendType,
 } from "../types.js";
 
 export async function promptProjectConfig(
@@ -46,12 +47,17 @@ export async function promptProjectConfig(
           default: "spring-boot",
         });
 
-  const frontend =
+  const frontend: FrontendType =
     defaults.frontend !== undefined
       ? defaults.frontend
-      : await confirm({
-          message: "Inclure le frontend Angular ?",
-          default: true,
+      : await select<FrontendType>({
+          message: "Frontend",
+          choices: [
+            { name: "Angular (standalone, OnPush)", value: "angular" },
+            { name: "React (Vite + Tailwind)", value: "react-vite" },
+            { name: "Aucun", value: null },
+          ],
+          default: "angular",
         });
 
   const groupId =
@@ -97,7 +103,7 @@ export async function promptProjectConfig(
   let primeNGPreset: PrimeNGPreset = defaults.primeNGPreset ?? "Aura";
   let ngrx = defaults.ngrx ?? false;
 
-  if (frontend) {
+  if (frontend === "angular") {
     if (defaults.uiFramework === undefined) {
       uiFramework = await select({
         message: "Framework UI",
@@ -128,6 +134,8 @@ export async function promptProjectConfig(
         default: false,
       });
     }
+  } else if (frontend === "react-vite") {
+    uiFramework = "tailwind";
   }
 
   // ── Section 5: Infrastructure ─────────────────────────────────────────────
@@ -158,7 +166,7 @@ export async function promptProjectConfig(
         {
           name: "GitHub Actions CI",
           value: "ci",
-          checked: hasBackend || frontend,
+          checked: hasBackend || frontend !== null,
         },
         {
           name: claudeDetected

@@ -46,9 +46,13 @@ class ClaudeCodeGenerator extends BaseGenerator {
     await fs.ensureDir(path.join(this.projectDir, ".specify", "memory"));
 
     const rulesDir = path.join(claudeDir, "rules");
-    if (backend || this.config.frontend) {
+    if (backend || this.config.frontend !== null) {
       await fs.ensureDir(rulesDir);
     }
+
+    const hasFrontend = this.config.frontend !== null;
+    const angular = this.config.frontend === "angular";
+    const reactVite = this.config.frontend === "react-vite";
 
     const data = {
       name: this.config.name,
@@ -56,7 +60,10 @@ class ClaudeCodeGenerator extends BaseGenerator {
       backend,
       springBoot,
       fastapi,
-      frontend: this.config.frontend,
+      hasFrontend,
+      angular,
+      reactVite,
+      frontend: hasFrontend,
       docker: this.config.docker,
       flyway: this.config.flyway,
       ngrx: this.config.ngrx,
@@ -128,7 +135,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
             ),
           ]
         : []),
-      ...(this.config.frontend
+      ...(this.config.frontend !== null
         ? [
             renderAndWrite(
               "claude-code/rules/frontend.md.hbs",
@@ -152,7 +159,14 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
   private async generateSkills(): Promise<void> {
     const skillsToGenerate: Array<{ name: string; condition: boolean }> = [
-      { name: "applying-angular-conventions", condition: this.config.frontend },
+      {
+        name: "applying-angular-conventions",
+        condition: this.config.frontend === "angular",
+      },
+      {
+        name: "applying-react-conventions",
+        condition: this.config.frontend === "react-vite",
+      },
       {
         name: "applying-python-conventions",
         condition: this.config.backendType === "fastapi",
@@ -218,12 +232,22 @@ class ClaudeCodeGenerator extends BaseGenerator {
       );
     }
 
-    if (this.config.frontend) {
+    if (this.config.frontend === "angular") {
       commands.push(
         "Bash(ng serve)",
         "Bash(ng build)",
         "Bash(ng test)",
         "Bash(ng generate)",
+        "Bash(npm install)",
+        "Bash(npm run)",
+      );
+    }
+
+    if (this.config.frontend === "react-vite") {
+      commands.push(
+        "Bash(npm run dev)",
+        "Bash(npm run build)",
+        "Bash(npm run lint)",
         "Bash(npm install)",
         "Bash(npm run)",
       );
