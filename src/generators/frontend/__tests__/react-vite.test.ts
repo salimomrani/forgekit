@@ -169,4 +169,23 @@ describe("ReactViteGenerator", () => {
     );
     expect(pkg.dependencies["axios"]).toBeDefined();
   });
+
+  it("pins @types/react to major version only", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["@types/react"]).toMatch(/^\^\d+\.0\.0$/);
+    expect(pkg.devDependencies["@types/react-dom"]).toMatch(/^\^\d+\.0\.0$/);
+  });
+
+  it("caps vite below v8", async () => {
+    const versions = { ...baseVersions, vite: "7.99.0" };
+    await generateReactViteFrontend(tmpDir, baseConfig, versions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    const viteVersion = pkg.devDependencies["vite"].replace("^", "");
+    expect(viteVersion.startsWith("8.")).toBe(false);
+  });
 });
