@@ -1,10 +1,16 @@
 import { createBrowserRouter } from 'react-router'
+import { Layout } from '../components/Layout'
 import { ProtectedRoute } from '../components/ProtectedRoute'
 import App from '../App'
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <ProtectedRoute><App /></ProtectedRoute>,
+    element: <Layout />,
+    children: [
+      {
+        path: '/',
+        element: <ProtectedRoute><App /></ProtectedRoute>,
+      },
+    ],
   },
 ])

@@ -56,13 +56,15 @@ class ReactViteGenerator extends BaseGenerator {
     const frontendDir = path.join(this.projectDir, "frontend");
     const srcDir = path.join(frontendDir, "src");
 
-    const dirs = [path.join(srcDir, "router")];
+    const dirs = [path.join(srcDir, "router"), path.join(srcDir, "components")];
     await this.ensureDirs(dirs);
 
     const data = {
       name: this.config.name,
       projectName: this.projectName,
       versions: this.versions,
+      auth: this.config.auth,
+      year: new Date().getFullYear(),
     };
 
     // Select correct router template based on config.auth
@@ -119,6 +121,21 @@ class ReactViteGenerator extends BaseGenerator {
       renderAndWrite(
         routerTemplate,
         path.join(srcDir, "router", "index.tsx"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/react-vite/src/components/Header.tsx.hbs",
+        path.join(srcDir, "components", "Header.tsx"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/react-vite/src/components/Footer.tsx.hbs",
+        path.join(srcDir, "components", "Footer.tsx"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/react-vite/src/components/Layout.tsx.hbs",
+        path.join(srcDir, "components", "Layout.tsx"),
         data,
       ),
     ]);

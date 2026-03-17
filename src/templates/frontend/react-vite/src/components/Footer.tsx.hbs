@@ -1,0 +1,22 @@
+export function Footer() {
+  return (
+    <footer className="border-t border-stone-200 bg-white">
+      <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
+        <span className="text-xs text-stone-400">
+          © {{year}} {{name}}
+        </span>
+        <nav className="flex items-center gap-5">
+          <a href="#" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">
+            Docs
+          </a>
+          <a href="#" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">
+            GitHub
+          </a>
+          <a href="#" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">
+            Privacy
+          </a>
+        </nav>
+      </div>
+    </footer>
+  )
+}
