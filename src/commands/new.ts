@@ -14,7 +14,104 @@ import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
 import { resolveVersions } from "../versions.js";
+import type { ResolvedVersions } from "../versions.js";
 import type { ProjectConfig, BackendType, FrontendType } from "../types.js";
+
+export async function generateProject(
+  projectDir: string,
+  config: ProjectConfig,
+  versions: ResolvedVersions,
+  opts?: { globalSkillsBase?: string; globalCommandsBase?: string },
+): Promise<void> {
+  try {
+    if (config.backendType === "spring-boot") {
+      process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
+      await generateBackend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
+        ),
+      );
+    }
+
+    if (config.backendType === "fastapi") {
+      process.stdout.write(chalk.yellow("  ⏳ Backend FastAPI..."));
+      await generateFastAPIBackend(projectDir, config);
+      console.log(chalk.green("\r  ✔ Backend FastAPI généré               "));
+    }
+
+    if (config.frontend === "angular") {
+      process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
+      await generateFrontend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Frontend Angular ${versions.angular} généré           `,
+        ),
+      );
+    } else if (config.frontend === "react-vite") {
+      process.stdout.write(chalk.yellow("  ⏳ Frontend React (Vite)..."));
+      await generateFrontend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Frontend React ${versions.react} (Vite) généré       `,
+        ),
+      );
+    }
+
+    if (config.docker) {
+      process.stdout.write(chalk.yellow("  ⏳ Docker Compose..."));
+      await generateDocker(projectDir, config);
+      console.log(chalk.green("\r  ✔ Docker Compose généré             "));
+    }
+
+    if (config.ci) {
+      process.stdout.write(chalk.yellow("  ⏳ GitHub Actions CI..."));
+      await generateCI(projectDir, config);
+      console.log(chalk.green("\r  ✔ GitHub Actions CI configuré       "));
+    }
+
+    if (config.claudeCode) {
+      process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
+      const { speckitWorkflowCopied } = await generateClaudeCode(
+        projectDir,
+        config,
+        versions,
+        opts?.globalSkillsBase,
+        opts?.globalCommandsBase,
+      );
+      console.log(chalk.green("\r  ✔ Claude Code configuré             "));
+      if (!speckitWorkflowCopied) {
+        console.log(
+          chalk.yellow(
+            "    ℹ  speckit.workflow.md absent — installez speckit puis copiez-le dans ~/.claude/commands/",
+          ),
+        );
+      }
+    }
+
+    if (config.speckit) {
+      process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
+      initSpecify(projectDir);
+      console.log(chalk.green("\r  ✔ Speckit initialisé                "));
+    }
+
+    await generateRoot(projectDir, config, versions);
+
+    if (config.gitInit) {
+      process.stdout.write(chalk.yellow("  ⏳ Git..."));
+      await initGit(projectDir);
+      console.log(chalk.green("\r  ✔ Git initialisé + premier commit   "));
+    }
+  } catch (error) {
+    if (await fs.pathExists(projectDir)) {
+      await fs.remove(projectDir);
+      console.log(
+        chalk.gray(`  Dossier "${config.name}" supprimé (rollback).`),
+      );
+    }
+    throw error;
+  }
+}
 
 export const newCommand = new Command("new")
   .description("Créer un nouveau projet full-stack")
@@ -107,84 +204,7 @@ export const newCommand = new Command("new")
           frontend: config.frontend,
         });
 
-        if (config.backendType === "spring-boot") {
-          process.stdout.write(chalk.yellow("  ⏳ Backend Spring Boot..."));
-          await generateBackend(projectDir, config, versions);
-          console.log(
-            chalk.green(
-              `\r  ✔ Backend Spring Boot ${versions.springBoot} généré       `,
-            ),
-          );
-        }
-
-        if (config.backendType === "fastapi") {
-          process.stdout.write(chalk.yellow("  ⏳ Backend FastAPI..."));
-          await generateFastAPIBackend(projectDir, config);
-          console.log(
-            chalk.green("\r  ✔ Backend FastAPI généré               "),
-          );
-        }
-
-        if (config.frontend === "angular") {
-          process.stdout.write(chalk.yellow("  ⏳ Frontend Angular..."));
-          await generateFrontend(projectDir, config, versions);
-          console.log(
-            chalk.green(
-              `\r  ✔ Frontend Angular ${versions.angular} généré           `,
-            ),
-          );
-        } else if (config.frontend === "react-vite") {
-          process.stdout.write(chalk.yellow("  ⏳ Frontend React (Vite)..."));
-          await generateFrontend(projectDir, config, versions);
-          console.log(
-            chalk.green(
-              `\r  ✔ Frontend React ${versions.react} (Vite) généré       `,
-            ),
-          );
-        }
-
-        if (config.docker) {
-          process.stdout.write(chalk.yellow("  ⏳ Docker Compose..."));
-          await generateDocker(projectDir, config);
-          console.log(chalk.green("\r  ✔ Docker Compose généré             "));
-        }
-
-        if (config.ci) {
-          process.stdout.write(chalk.yellow("  ⏳ GitHub Actions CI..."));
-          await generateCI(projectDir, config);
-          console.log(chalk.green("\r  ✔ GitHub Actions CI configuré       "));
-        }
-
-        if (config.claudeCode) {
-          process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
-          const { speckitWorkflowCopied } = await generateClaudeCode(
-            projectDir,
-            config,
-            versions,
-          );
-          console.log(chalk.green("\r  ✔ Claude Code configuré             "));
-          if (!speckitWorkflowCopied) {
-            console.log(
-              chalk.yellow(
-                "    ℹ  speckit.workflow.md absent — installez speckit puis copiez-le dans ~/.claude/commands/",
-              ),
-            );
-          }
-        }
-
-        if (config.speckit) {
-          process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
-          initSpecify(projectDir);
-          console.log(chalk.green("\r  ✔ Speckit initialisé                "));
-        }
-
-        await generateRoot(projectDir, config, versions);
-
-        if (config.gitInit) {
-          process.stdout.write(chalk.yellow("  ⏳ Git..."));
-          await initGit(projectDir);
-          console.log(chalk.green("\r  ✔ Git initialisé + premier commit   "));
-        }
+        await generateProject(projectDir, config, versions);
 
         await saveConfig({ groupId: config.groupId });
 
@@ -211,15 +231,6 @@ export const newCommand = new Command("new")
             `\n✖ Erreur lors de la génération : ${error instanceof Error ? error.message : error}`,
           ),
         );
-
-        // Rollback: remove the partially created project directory
-        if (await fs.pathExists(projectDir)) {
-          await fs.remove(projectDir);
-          console.log(
-            chalk.gray(`  Dossier "${config.name}" supprimé (rollback).`),
-          );
-        }
-
         process.exit(1);
       }
     },
