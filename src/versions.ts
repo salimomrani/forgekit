@@ -39,7 +39,7 @@ const FALLBACK_VERSIONS: ResolvedVersions = {
   tailwind: "4.0.0",
   react: "19.0.0",
   reactRouter: "7.5.0",
-  vite: "6.3.0",
+  vite: "7.0.0",
   axiosReact: "1.8.0",
 };
 
@@ -149,7 +149,8 @@ export async function resolveVersions(opts: {
         if (v) versions.reactRouter = v;
       }),
       fetchNpmVersion("vite").then((v) => {
-        if (v) versions.vite = v;
+        // Cap at v7 — @vitejs/plugin-react@4.x doesn't support vite 8 yet
+        if (v && !v.startsWith("8.")) versions.vite = v;
       }),
       fetchNpmVersion("axios").then((v) => {
         if (v) versions.axiosReact = v;
