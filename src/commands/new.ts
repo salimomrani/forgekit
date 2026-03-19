@@ -141,6 +141,8 @@ export const newCommand = new Command("new")
   .option("--no-ci", "Exclure GitHub Actions CI")
   .option("--claude-code", "Inclure config Claude Code")
   .option("--no-claude-code", "Exclure config Claude Code")
+  .option("--prettier", "Inclure Prettier + Husky + lint-staged")
+  .option("--no-prettier", "Exclure Prettier")
   .option("--no-git", "Ne pas initialiser Git")
   .action(
     async (name: string | undefined, options: Record<string, unknown>, cmd) => {
@@ -167,6 +169,8 @@ export const newCommand = new Command("new")
       if (typeof options.mapstruct === "boolean")
         defaults.mapstruct = options.mapstruct;
       if (typeof options.ngrx === "boolean") defaults.ngrx = options.ngrx;
+      if (typeof options.prettier === "boolean")
+        defaults.prettier = options.prettier;
       if (options.ui)
         defaults.uiFramework = options.ui as ProjectConfig["uiFramework"];
       if (options.preset)
