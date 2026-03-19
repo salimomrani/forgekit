@@ -50,10 +50,26 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   prettier: "3.5.0",
 };
 
-async function fetchNpmVersion(packageName: string): Promise<string | null> {
+const FETCH_TIMEOUT_MS = 8_000;
+
+async function fetchWithTimeout(url: string): Promise<Response | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(`https://registry.npmjs.org/${packageName}/latest`);
-    if (!res.ok) return null;
+    return await fetch(url, { signal: controller.signal });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fetchNpmVersion(packageName: string): Promise<string | null> {
+  const res = await fetchWithTimeout(
+    `https://registry.npmjs.org/${packageName}/latest`,
+  );
+  if (!res?.ok) return null;
+  try {
     const data = (await res.json()) as { version: string };
     return data.version;
   } catch {
@@ -65,10 +81,10 @@ async function fetchMavenVersion(
   groupId: string,
   artifactId: string,
 ): Promise<string | null> {
+  const url = `https://search.maven.org/solrsearch/select?q=g:${groupId}+AND+a:${artifactId}&rows=1&wt=json`;
+  const res = await fetchWithTimeout(url);
+  if (!res?.ok) return null;
   try {
-    const url = `https://search.maven.org/solrsearch/select?q=g:${groupId}+AND+a:${artifactId}&rows=1&wt=json`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
     const data = (await res.json()) as {
       response: { docs: { latestVersion: string }[] };
     };
@@ -87,8 +103,16 @@ export async function resolveVersions(opts: {
   frontend: FrontendType;
 }): Promise<ResolvedVersions> {
   const versions = { ...FALLBACK_VERSIONS };
+  let anyResolved = false;
 
   process.stdout.write(chalk.gray("  Résolution des dernières versions..."));
+
+  const set = (key: keyof ResolvedVersions) => (v: string | null) => {
+    if (v) {
+      versions[key] = v;
+      anyResolved = true;
+    }
+  };
 
   const tasks: Promise<void>[] = [];
 
@@ -97,94 +121,65 @@ export async function resolveVersions(opts: {
       fetchMavenVersion(
         "org.springframework.boot",
         "spring-boot-starter-parent",
-      ).then((v) => {
-        if (v) versions.springBoot = v;
-      }),
+      ).then(set("springBoot")),
       fetchMavenVersion(
         "org.springdoc",
         "springdoc-openapi-starter-webmvc-ui",
-      ).then((v) => {
-        if (v) versions.springDoc = v;
-      }),
-      fetchMavenVersion("org.mapstruct", "mapstruct").then((v) => {
-        if (v) versions.mapstruct = v;
-      }),
+      ).then(set("springDoc")),
+      fetchMavenVersion("org.mapstruct", "mapstruct").then(set("mapstruct")),
     );
   }
 
   if (opts.frontend === "angular") {
     tasks.push(
-      fetchNpmVersion("@angular/core").then((v) => {
-        if (v) versions.angular = v;
-      }),
-      fetchNpmVersion("primeng").then((v) => {
-        if (v) versions.primeng = v;
-      }),
-      fetchNpmVersion("@primeuix/themes").then((v) => {
-        if (v) versions.primeuixThemes = v;
-      }),
-      fetchNpmVersion("primeicons").then((v) => {
-        if (v) versions.primeicons = v;
-      }),
-      fetchNpmVersion("primeflex").then((v) => {
-        if (v) versions.primeflex = v;
-      }),
-      fetchNpmVersion("@ngrx/signals").then((v) => {
-        if (v) versions.ngrxSignals = v;
-      }),
-      fetchNpmVersion("rxjs").then((v) => {
-        if (v) versions.rxjs = v;
-      }),
-      fetchNpmVersion("zone.js").then((v) => {
-        if (v) versions.zoneJs = v;
-      }),
-      fetchNpmVersion("typescript").then((v) => {
-        if (v) versions.typescript = v;
-      }),
-      fetchNpmVersion("tailwindcss").then((v) => {
-        if (v) versions.tailwind = v;
-      }),
+      fetchNpmVersion("@angular/core").then(set("angular")),
+      fetchNpmVersion("primeng").then(set("primeng")),
+      fetchNpmVersion("@primeuix/themes").then(set("primeuixThemes")),
+      fetchNpmVersion("primeicons").then(set("primeicons")),
+      fetchNpmVersion("primeflex").then(set("primeflex")),
+      fetchNpmVersion("@ngrx/signals").then(set("ngrxSignals")),
+      fetchNpmVersion("rxjs").then(set("rxjs")),
+      fetchNpmVersion("zone.js").then(set("zoneJs")),
+      fetchNpmVersion("typescript").then(set("typescript")),
+      fetchNpmVersion("tailwindcss").then(set("tailwind")),
     );
   }
 
   if (opts.frontend !== null) {
     tasks.push(
-      fetchNpmVersion("husky").then((v) => {
-        if (v) versions.husky = v;
-      }),
-      fetchNpmVersion("lint-staged").then((v) => {
-        if (v) versions.lintStaged = v;
-      }),
-      fetchNpmVersion("prettier").then((v) => {
-        if (v) versions.prettier = v;
-      }),
+      fetchNpmVersion("husky").then(set("husky")),
+      fetchNpmVersion("lint-staged").then(set("lintStaged")),
+      fetchNpmVersion("prettier").then(set("prettier")),
     );
   }
 
   if (opts.frontend === "react-vite") {
     tasks.push(
-      fetchNpmVersion("react").then((v) => {
-        if (v) versions.react = v;
-      }),
-      fetchNpmVersion("react-router").then((v) => {
-        if (v) versions.reactRouter = v;
-      }),
+      fetchNpmVersion("react").then(set("react")),
+      fetchNpmVersion("react-router").then(set("reactRouter")),
       fetchNpmVersion("vite").then((v) => {
         // Cap at v7 — @vitejs/plugin-react@4.x doesn't support vite 8 yet
-        if (v && !v.startsWith("8.")) versions.vite = v;
+        if (v && !v.startsWith("8.")) {
+          versions.vite = v;
+          anyResolved = true;
+        }
       }),
-      fetchNpmVersion("axios").then((v) => {
-        if (v) versions.axiosReact = v;
-      }),
-      fetchNpmVersion("tailwindcss").then((v) => {
-        if (v) versions.tailwind = v;
-      }),
+      fetchNpmVersion("axios").then(set("axiosReact")),
+      fetchNpmVersion("tailwindcss").then(set("tailwind")),
     );
   }
 
   await Promise.all(tasks);
 
-  console.log(chalk.green("\r  ✔ Versions résolues                  "));
+  if (tasks.length > 0 && !anyResolved) {
+    console.warn(
+      chalk.yellow(
+        "\r  ⚠ Using fallback versions (network unavailable)         ",
+      ),
+    );
+  } else {
+    console.log(chalk.green("\r  ✔ Versions résolues                  "));
+  }
 
   return versions;
 }
