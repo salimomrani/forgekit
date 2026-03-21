@@ -31,3 +31,11 @@ export interface ProjectConfig {
 export interface SavedConfig {
   groupId?: string;
 }
+
+export interface ForgeKitManifest {
+  forgekit: {
+    version: string;
+    generatedAt: string;
+  };
+  config: ProjectConfig;
+}
