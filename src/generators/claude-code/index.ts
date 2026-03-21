@@ -39,6 +39,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
 
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
+    const laravel = this.config.backendType === "laravel";
     const backend = this.config.backendType !== null;
 
     const hooksDir = path.join(claudeDir, "hooks");
@@ -60,6 +61,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       backend,
       springBoot,
       fastapi,
+      laravel,
       hasFrontend,
       angular,
       reactVite,
@@ -175,6 +177,10 @@ class ClaudeCodeGenerator extends BaseGenerator {
         name: "applying-java-conventions",
         condition: this.config.backendType === "spring-boot",
       },
+      {
+        name: "applying-php-laravel-conventions",
+        condition: this.config.backendType === "laravel",
+      },
     ];
 
     for (const { name, condition } of skillsToGenerate) {
@@ -229,6 +235,17 @@ class ClaudeCodeGenerator extends BaseGenerator {
         "Bash(pytest)",
         "Bash(pip install)",
         "Bash(pip freeze)",
+      );
+    }
+
+    if (this.config.backendType === "laravel") {
+      commands.push(
+        "Bash(php artisan serve)",
+        "Bash(php artisan test)",
+        "Bash(php artisan migrate)",
+        "Bash(composer install)",
+        "Bash(composer require)",
+        "Bash(./vendor/bin/pint)",
       );
     }
 
