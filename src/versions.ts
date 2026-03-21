@@ -35,9 +35,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   springBoot: "4.0.2",
   springDoc: "3.0.1",
   mapstruct: "1.6.3",
-  laravel: "12.0.0",
-  sanctum: "4.0.0",
-  scramble: "0.12.0",
+  laravel: "13.1.1",
+  sanctum: "4.3.1",
+  scramble: "0.13.16",
   angular: "21.0.0",
   primeng: "21.1.1",
   primeuixThemes: "2.0.3",
@@ -119,8 +119,18 @@ async function fetchPackagistVersion(
     };
     const versions = data.packages?.[`${vendor}/${pkg}`];
     if (!Array.isArray(versions)) return null;
-    const stable = versions.find((v) => /^\d+\.\d+\.\d+$/.test(v.version));
-    return stable?.version ?? null;
+    const stableVersions = versions
+      .map((v) => v.version.replace(/^v/, ""))
+      .filter((v) => /^\d+\.\d+\.\d+$/.test(v))
+      .sort((a, b) => {
+        const pa = a.split(".").map(Number);
+        const pb = b.split(".").map(Number);
+        for (let i = 0; i < 3; i++) {
+          if (pa[i] !== pb[i]) return pb[i] - pa[i];
+        }
+        return 0;
+      });
+    return stableVersions[0] ?? null;
   } catch {
     return null;
   }

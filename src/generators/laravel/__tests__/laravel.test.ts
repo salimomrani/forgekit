@@ -31,9 +31,9 @@ const baseVersions: ResolvedVersions = {
   springBoot: "4.0.2",
   springDoc: "3.0.1",
   mapstruct: "1.6.3",
-  laravel: "12.0.0",
-  sanctum: "4.0.0",
-  scramble: "0.12.0",
+  laravel: "13.1.1",
+  sanctum: "4.3.1",
+  scramble: "0.13.16",
   angular: "21.0.0",
   primeng: "21.1.1",
   primeuixThemes: "2.0.3",
@@ -74,7 +74,8 @@ describe("LaravelGenerator", () => {
       "app/Http/Resources",
       "app/Models",
       "app/Providers",
-      "bootstrap",
+      "bootstrap/cache",
+      "public",
       "config",
       "database/factories",
       "database/migrations",
@@ -104,6 +105,9 @@ describe("LaravelGenerator", () => {
       "artisan",
       "composer.json",
       "bootstrap/app.php",
+      "bootstrap/providers.php",
+      "public/index.php",
+      "app/Http/Controllers/Controller.php",
       "config/app.php",
       "config/database.php",
       "config/cors.php",
@@ -157,7 +161,7 @@ describe("LaravelGenerator", () => {
       path.join(tmpDir, "backend/composer.json"),
       "utf-8",
     );
-    expect(composerJson).toContain('"laravel/framework": "^12.0.0"');
+    expect(composerJson).toContain('"laravel/framework": "^13.1.1"');
     expect(composerJson).not.toContain("sanctum");
     expect(composerJson).not.toContain("scramble");
   });
@@ -172,7 +176,7 @@ describe("LaravelGenerator", () => {
       path.join(backendDir, "composer.json"),
       "utf-8",
     );
-    expect(composerJson).toContain('"laravel/sanctum": "^4.0.0"');
+    expect(composerJson).toContain('"laravel/sanctum": "^4.3.1"');
 
     expect(
       await fs.pathExists(path.join(backendDir, "config/sanctum.php")),
@@ -212,7 +216,7 @@ describe("LaravelGenerator", () => {
       path.join(backendDir, "composer.json"),
       "utf-8",
     );
-    expect(composerJson).toContain('"dedoc/scramble": "^0.12.0"');
+    expect(composerJson).toContain('"dedoc/scramble": "^0.13.16"');
 
     expect(
       await fs.pathExists(path.join(backendDir, "config/scramble.php")),

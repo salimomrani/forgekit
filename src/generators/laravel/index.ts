@@ -33,7 +33,8 @@ class LaravelGenerator extends BaseGenerator {
       path.join(httpDir, "Resources"),
       path.join(appDir, "Models"),
       path.join(appDir, "Providers"),
-      path.join(backendDir, "bootstrap"),
+      path.join(backendDir, "bootstrap/cache"),
+      path.join(backendDir, "public"),
       configDir,
       path.join(databaseDir, "factories"),
       path.join(databaseDir, "migrations"),
@@ -71,6 +72,21 @@ class LaravelGenerator extends BaseGenerator {
       renderAndWrite(
         "laravel/bootstrap-app.php.hbs",
         path.join(backendDir, "bootstrap/app.php"),
+        data,
+      ),
+      renderAndWrite(
+        "laravel/bootstrap-providers.php.hbs",
+        path.join(backendDir, "bootstrap/providers.php"),
+        data,
+      ),
+      renderAndWrite(
+        "laravel/public-index.php.hbs",
+        path.join(backendDir, "public/index.php"),
+        data,
+      ),
+      renderAndWrite(
+        "laravel/Controller.php.hbs",
+        path.join(httpDir, "Controllers/Controller.php"),
         data,
       ),
       renderAndWrite(
