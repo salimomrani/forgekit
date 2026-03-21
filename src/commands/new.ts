@@ -15,6 +15,7 @@ import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
 import { resolveVersions } from "../versions.js";
 import type { ResolvedVersions } from "../versions.js";
+import { writeManifest } from "../utils/forgekit-json.js";
 import type { ProjectConfig, BackendType, FrontendType } from "../types.js";
 
 export async function generateProject(
@@ -211,6 +212,7 @@ export const newCommand = new Command("new")
         await generateProject(projectDir, config, versions);
 
         await saveConfig({ groupId: config.groupId });
+        await writeManifest(projectDir, config);
 
         console.log(chalk.bold.green(`\n🚀 Projet "${config.name}" prêt !\n`));
         console.log(chalk.white("Pour démarrer :"));
