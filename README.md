@@ -131,6 +131,19 @@ The wizard guides you through all options with sensible defaults:
 
 > Options requiring external CLIs are auto-checked/unchecked based on what's installed.
 
+### Add a layer to an existing project
+
+```bash
+forgekit add react              # Add React frontend to an existing backend project
+forgekit add spring-boot        # Add Spring Boot backend
+forgekit add docker             # Add Docker Compose
+forgekit add angular --ui tailwind --auth   # Add Angular with options
+```
+
+Available layers: `spring-boot`, `fastapi`, `angular`, `react`, `docker`, `ci`, `claude-code`, `speckit`, `prettier`.
+
+ForgeKit detects the existing project via `forgekit.json` (or filesystem fallback for pre-v1.16 projects), asks layer-specific sub-questions, generates in a temp directory, and moves files on success. Dependent layers (Docker, CI, Claude Code) are auto-regenerated when adding a backend or frontend.
+
 ### Direct flags
 
 ```bash
@@ -171,6 +184,7 @@ forgekit new my-app --spring-boot --auth --angular --docker
 | `--ci` / `--no-ci` | GitHub Actions CI workflow |
 | `--claude-code` / `--no-claude-code` | Claude Code config |
 | `--no-git` | Skip Git initialization |
+| `--prettier` / `--no-prettier` | Prettier + Husky + lint-staged (requires frontend) |
 
 ---
 
@@ -185,6 +199,7 @@ my-project/
 ├── CLAUDE.md                # AI workflow conventions, TDD rules, constitution ref
 ├── .claude/                 # Hooks, hookify guards, skills, settings.json
 ├── .specify/memory/         # Architectural constitution
+├── forgekit.json               # Project manifest (tracks generated layers)
 ├── .gitignore
 └── README.md
 ```
@@ -438,14 +453,18 @@ Fallback versions are used if resolution fails.
 
 ForgeKit saves your preferences in `~/.forgekit/config.json` (Group ID, etc.) and reuses them automatically on the next run.
 
+Each generated project also contains a `forgekit.json` manifest that tracks which layers and options were used. This enables `forgekit add` to detect the existing config without filesystem guessing.
+
 ---
 
 ## Architecture
 
 ```
 src/
-├── commands/new.ts              # Main command (try/catch + rollback on failure)
-├── prompts/project.ts           # Interactive wizard
+├── commands/new.ts              # `forgekit new` command
+├── commands/add.ts              # `forgekit add` command
+├── prompts/project.ts           # Interactive wizard (new)
+├── prompts/add.ts               # Layer-specific prompts (add)
 ├── generators/
 │   ├── base-generator.ts        # Abstract base class
 │   ├── backend/index.ts         # Spring Boot generator
@@ -469,7 +488,9 @@ src/
 ├── utils/
 │   ├── template-engine.ts       # Handlebars compile + render
 │   ├── validation.ts            # Input validators
-│   └── system.ts                # CLI detection (claude, specify, docker)
+│   ├── system.ts                # CLI detection (claude, specify, docker)
+│   ├── detect-project.ts        # Project detection (manifest + filesystem fallback)
+│   └── forgekit-json.ts         # Read/write forgekit.json manifest
 ├── types.ts                     # BackendType, FrontendType, ProjectConfig
 ├── versions.ts                  # Dynamic version resolution
 └── config.ts                    # Persistent config (~/.forgekit)
