@@ -10,6 +10,7 @@ class CIGenerator extends BaseGenerator {
 
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
+    const laravel = this.config.backendType === "laravel";
 
     const hasFrontend = this.config.frontend !== null;
     const angular = this.config.frontend === "angular";
@@ -19,6 +20,7 @@ class CIGenerator extends BaseGenerator {
       backend: this.config.backendType !== null,
       springBoot,
       fastapi,
+      laravel,
       frontend: hasFrontend,
       hasFrontend,
       angular,

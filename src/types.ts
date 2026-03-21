@@ -1,6 +1,6 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
-export type BackendType = "spring-boot" | "fastapi" | null;
+export type BackendType = "spring-boot" | "fastapi" | "laravel" | null;
 export type FrontendType = "angular" | "react-vite" | null;
 
 export interface ProjectConfig {
@@ -10,7 +10,7 @@ export interface ProjectConfig {
   // Stack
   backendType: BackendType;
   frontend: FrontendType;
-  // Backend features (Spring Boot only)
+  // Backend features (Spring Boot + Laravel)
   flyway: boolean;
   openapi: boolean;
   auth: boolean;

@@ -79,6 +79,34 @@ jobs:
         run: pytest
 {{/if}}
 
+{{#if laravel}}
+  backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_pgsql
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Test
+        run: php artisan test
+
+      - name: Lint
+        run: ./vendor/bin/pint --test
+{{/if}}
+
 {{#if angular}}
   frontend:
     needs: changes

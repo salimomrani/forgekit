@@ -8,11 +8,12 @@ class DockerGenerator extends BaseGenerator {
     const dbName = this.config.name.toLowerCase().replace(/[^a-z0-9]/g, "_");
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
+    const laravel = this.config.backendType === "laravel";
 
     await renderAndWrite(
       "docker/docker-compose.yml.hbs",
       path.join(this.projectDir, "docker-compose.yml"),
-      { dbName, name: this.config.name, springBoot, fastapi },
+      { dbName, name: this.config.name, springBoot, fastapi, laravel },
     );
   }
 }
