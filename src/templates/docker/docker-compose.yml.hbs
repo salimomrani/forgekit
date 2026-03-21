@@ -40,6 +40,25 @@ services:
     environment:
       DEBUG: "false"
 {{/if}}
+{{#if laravel}}
+
+  api:
+    build: ./backend
+    container_name: {{name}}_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: {{dbName}}
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+{{/if}}
 
 volumes:
   postgres_data:

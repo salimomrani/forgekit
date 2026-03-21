@@ -42,6 +42,7 @@ export async function promptProjectConfig(
           choices: [
             { name: "Spring Boot (Java 21)", value: "spring-boot" },
             { name: "FastAPI (Python)", value: "fastapi" },
+            { name: "Laravel (PHP 8.3)", value: "laravel" },
             { name: "Aucun", value: null },
           ],
           default: "spring-boot",
@@ -96,6 +97,30 @@ export async function promptProjectConfig(
     openapi = backendFeatures.includes("openapi");
     auth = backendFeatures.includes("auth");
     mapstruct = backendFeatures.includes("mapstruct");
+  }
+
+  if (
+    backendType === "laravel" &&
+    defaults.auth === undefined &&
+    defaults.openapi === undefined
+  ) {
+    const laravelFeatures = await checkbox({
+      message: "Fonctionnalités Laravel",
+      choices: [
+        {
+          name: "Sanctum (API authentication)",
+          value: "auth",
+          checked: false,
+        },
+        {
+          name: "Scramble (OpenAPI documentation)",
+          value: "openapi",
+          checked: false,
+        },
+      ],
+    });
+    auth = laravelFeatures.includes("auth");
+    openapi = laravelFeatures.includes("openapi");
   }
 
   // ── Section 4: Frontend features ──────────────────────────────────────────

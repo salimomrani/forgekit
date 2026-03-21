@@ -14,6 +14,9 @@ export async function promptAddLayerConfig(
   if (layer === "fastapi") {
     return promptAuth(defaults);
   }
+  if (layer === "laravel") {
+    return promptLaravel(defaults);
+  }
   if (layer === "angular") {
     return promptAngular(defaults);
   }
@@ -113,6 +116,35 @@ async function promptAngular(
 
   const authResult = await promptAuth(defaults);
   return { uiFramework, primeNGPreset, ngrx, ...authResult };
+}
+
+async function promptLaravel(
+  defaults: Partial<ProjectConfig>,
+): Promise<Partial<ProjectConfig>> {
+  let auth = defaults.auth ?? false;
+  let openapi = defaults.openapi ?? false;
+
+  if (defaults.auth === undefined && defaults.openapi === undefined) {
+    const features = await checkbox({
+      message: "Fonctionnalités Laravel",
+      choices: [
+        {
+          name: "Sanctum (API authentication)",
+          value: "auth",
+          checked: false,
+        },
+        {
+          name: "Scramble (OpenAPI documentation)",
+          value: "openapi",
+          checked: false,
+        },
+      ],
+    });
+    auth = features.includes("auth");
+    openapi = features.includes("openapi");
+  }
+
+  return { auth, openapi };
 }
 
 async function promptAuth(

@@ -1,0 +1,12 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HealthController;
+
+Route::get('/health', [HealthController::class, 'index']);
+
+{{#if auth}}
+Route::middleware('auth:sanctum')->get('/user', function (\Illuminate\Http\Request $request) {
+    return $request->user();
+});
+{{/if}}

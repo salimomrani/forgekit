@@ -25,6 +25,12 @@ const SENTINEL_MAP: Array<{
     },
   },
   {
+    files: ["backend/artisan"],
+    apply: (c) => {
+      c.backendType = "laravel";
+    },
+  },
+  {
     files: ["frontend/angular.json"],
     apply: (c) => {
       c.frontend = "angular";

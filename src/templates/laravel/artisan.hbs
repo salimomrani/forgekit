@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Foundation\Application;
+
+define('LARAVEL_START', microtime(true));
+
+require __DIR__.'/vendor/autoload.php';
+
+$status = (require __DIR__.'/bootstrap/app.php')
+    ->handleCommand(new \Symfony\Component\Console\Input\ArgvInput);
+
+exit($status);

@@ -10,6 +10,7 @@ import { generateDocker } from "../generators/docker/index.js";
 import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
+import { generateLaravelBackend } from "../generators/laravel/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
@@ -39,6 +40,16 @@ export async function generateProject(
       process.stdout.write(chalk.yellow("  ⏳ Backend FastAPI..."));
       await generateFastAPIBackend(projectDir, config);
       console.log(chalk.green("\r  ✔ Backend FastAPI généré               "));
+    }
+
+    if (config.backendType === "laravel") {
+      process.stdout.write(chalk.yellow("  ⏳ Backend Laravel..."));
+      await generateLaravelBackend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Backend Laravel ${versions.laravel} généré           `,
+        ),
+      );
     }
 
     if (config.frontend === "angular") {
@@ -121,6 +132,7 @@ export const newCommand = new Command("new")
   .option("--description <desc>", "Description du projet")
   .option("--spring-boot", "Inclure le backend Spring Boot")
   .option("--fastapi", "Inclure le backend FastAPI")
+  .option("--laravel", "Inclure le backend Laravel (PHP 8.3)")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--no-frontend", "Exclure le frontend Angular")
   .option("--react", "Inclure le frontend React (Vite + Tailwind)")
@@ -159,6 +171,7 @@ export const newCommand = new Command("new")
       if (options.springBoot)
         defaults.backendType = "spring-boot" as BackendType;
       if (options.fastapi) defaults.backendType = "fastapi" as BackendType;
+      if (options.laravel) defaults.backendType = "laravel" as BackendType;
       if (options.react) defaults.frontend = "react-vite" as FrontendType;
       else if (options.angular || options.frontend === true)
         defaults.frontend = "angular" as FrontendType;
@@ -223,6 +236,10 @@ export const newCommand = new Command("new")
         if (config.backendType === "fastapi")
           console.log(
             chalk.cyan("  cd backend && uvicorn app.main:app --reload"),
+          );
+        if (config.backendType === "laravel")
+          console.log(
+            chalk.cyan("  cd backend && composer install && php artisan serve"),
           );
         if (config.frontend === "angular")
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));

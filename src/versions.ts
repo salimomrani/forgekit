@@ -2,10 +2,14 @@ import chalk from "chalk";
 import type { BackendType, FrontendType } from "./types.js";
 
 export interface ResolvedVersions {
-  // Backend
+  // Backend — Spring Boot
   springBoot: string;
   springDoc: string;
   mapstruct: string;
+  // Backend — Laravel
+  laravel: string;
+  sanctum: string;
+  scramble: string;
   // Frontend
   angular: string;
   primeng: string;
@@ -31,6 +35,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   springBoot: "4.0.2",
   springDoc: "3.0.1",
   mapstruct: "1.6.3",
+  laravel: "12.0.0",
+  sanctum: "4.0.0",
+  scramble: "0.12.0",
   angular: "21.0.0",
   primeng: "21.1.1",
   primeuixThemes: "2.0.3",
@@ -98,6 +105,27 @@ async function fetchMavenVersion(
   }
 }
 
+async function fetchPackagistVersion(
+  vendor: string,
+  pkg: string,
+): Promise<string | null> {
+  const res = await fetchWithTimeout(
+    `https://repo.packagist.org/p2/${vendor}/${pkg}.json`,
+  );
+  if (!res?.ok) return null;
+  try {
+    const data = (await res.json()) as {
+      packages: Record<string, { version: string }[]>;
+    };
+    const versions = data.packages?.[`${vendor}/${pkg}`];
+    if (!Array.isArray(versions)) return null;
+    const stable = versions.find((v) => /^\d+\.\d+\.\d+$/.test(v.version));
+    return stable?.version ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function resolveVersions(opts: {
   backendType: BackendType;
   frontend: FrontendType;
@@ -127,6 +155,14 @@ export async function resolveVersions(opts: {
         "springdoc-openapi-starter-webmvc-ui",
       ).then(set("springDoc")),
       fetchMavenVersion("org.mapstruct", "mapstruct").then(set("mapstruct")),
+    );
+  }
+
+  if (opts.backendType === "laravel") {
+    tasks.push(
+      fetchPackagistVersion("laravel", "framework").then(set("laravel")),
+      fetchPackagistVersion("laravel", "sanctum").then(set("sanctum")),
+      fetchPackagistVersion("dedoc", "scramble").then(set("scramble")),
     );
   }
 
