@@ -19,7 +19,6 @@
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(.specify/scripts/bash/*)",
-      "Bash(git commit*)",
       "Skill(commit-commands:commit)",
       "Skill(commit-commands:commit:*)",
       "Skill(commit-commands:commit-push-pr)",
