@@ -9,8 +9,11 @@
         "dedoc/scramble": "^{{versions.scramble}}"{{/if}}
     },
     "require-dev": {
-        "laravel/pint": "^1.0",
-        "phpunit/phpunit": "^11.0"
+        "fakerphp/faker": "^1.23",
+        "laravel/pint": "^1.27",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6",
+        "phpunit/phpunit": "^12.5"
     },
     "autoload": {
         "psr-4": {
@@ -26,9 +29,22 @@
     },
     "scripts": {
         "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
-        "test": "php artisan test",
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
+        ],
         "lint": "vendor/bin/pint --test",
         "format": "vendor/bin/pint"
     },
