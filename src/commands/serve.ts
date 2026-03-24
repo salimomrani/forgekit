@@ -14,6 +14,17 @@ interface ServeOptions {
   skipInstall?: boolean;
 }
 
+interface PackageJson {
+  scripts?: Record<string, string>;
+  config?: Record<string, unknown>;
+}
+
+interface ServiceConfig {
+  startCmd: string[];
+  port: number;
+  healthPath: string;
+}
+
 async function waitForHealth(url: string, timeout = 30000): Promise<boolean> {
   const start = Date.now();
   while (Date.now() - start < timeout) {
@@ -35,6 +46,70 @@ async function waitForHealth(url: string, timeout = 30000): Promise<boolean> {
   return false;
 }
 
+function discoverBackendService(
+  backendDir: string,
+  type: string,
+): ServiceConfig | null {
+  if (type === "spring-boot") {
+    return {
+      startCmd: ["./mvnw", "spring-boot:run"],
+      port: 8080,
+      healthPath: "/actuator/health",
+    };
+  }
+
+  if (type === "laravel") {
+    return {
+      startCmd: ["php", "artisan", "serve"],
+      port: 8000,
+      healthPath: "/api/health",
+    };
+  }
+
+  if (type === "fastapi") {
+    const hasVenv = fs.existsSync(path.join(backendDir, ".venv"));
+    const uvicorn = hasVenv
+      ? path.join(backendDir, ".venv/bin/uvicorn")
+      : "uvicorn";
+    return {
+      startCmd: [uvicorn, "app.main:app", "--reload"],
+      port: 8000,
+      healthPath: "/health",
+    };
+  }
+
+  return null;
+}
+
+function discoverFrontendService(frontendDir: string): ServiceConfig | null {
+  const packageJsonPath = path.join(frontendDir, "package.json");
+
+  if (!fs.existsSync(packageJsonPath)) return null;
+
+  const pkg: PackageJson = JSON.parse(
+    fs.readFileSync(packageJsonPath, "utf-8"),
+  );
+  const scripts = pkg.scripts || {};
+
+  let startScript: string | undefined;
+  if (scripts.dev) startScript = "dev";
+  else if (scripts.serve) startScript = "serve";
+  else if (scripts.start) startScript = "start";
+
+  if (!startScript) return null;
+
+  const port =
+    (pkg.config?.port as number) ||
+    (scripts[startScript]?.includes("4200") ? 4200 : 5173) ||
+    5173;
+
+  return {
+    startCmd: ["npm", "run", startScript],
+    port,
+    healthPath: "",
+  };
+}
+
 async function startDocker(projectPath: string): Promise<boolean> {
   console.log(chalk.blue("  → Démarrage Docker Compose..."));
   try {
@@ -51,7 +126,7 @@ async function startBackend(
   backendType: "spring-boot" | "fastapi" | "laravel",
   projectPath: string,
   skipInstall: boolean,
-): Promise<boolean> {
+): Promise<{ success: boolean; port: number }> {
   const backendDir = path.join(projectPath, "backend");
 
   console.log(chalk.blue(`  → Démarrage backend ${backendType}...`));
@@ -69,34 +144,30 @@ async function startBackend(
       }
     }
 
-    if (backendType === "spring-boot") {
-      await execa("./mvnw", ["spring-boot:run"], {
-        cwd: backendDir,
-        detached: true,
-        stdio: "ignore",
-      });
-    } else if (backendType === "fastapi") {
-      const python = (await fs.pathExists(path.join(backendDir, ".venv")))
-        ? path.join(backendDir, ".venv/bin/uvicorn")
-        : "uvicorn";
-      spawn(python, ["app.main:app", "--reload"], {
-        cwd: backendDir,
-        detached: true,
-        stdio: "ignore",
-      });
-    } else if (backendType === "laravel") {
-      spawn("php", ["artisan", "serve"], {
-        cwd: backendDir,
-        detached: true,
-        stdio: "ignore",
-      });
+    const service = discoverBackendService(backendDir, backendType);
+    if (!service) {
+      console.log(chalk.red(`  ✗ Configuration backend introuvable`));
+      return { success: false, port: 8000 };
     }
 
-    const port = 8000;
-    return await waitForHealth(`http://127.0.0.1:${port}/health`);
+    spawn(service.startCmd[0], service.startCmd.slice(1), {
+      cwd: backendDir,
+      detached: true,
+      stdio: "ignore",
+    });
+
+    const healthy = await waitForHealth(
+      `http://127.0.0.1:${service.port}${service.healthPath}`,
+    );
+
+    if (!healthy) {
+      console.log(chalk.yellow(`  ⚠ Backend démarré mais /health non respond`));
+    }
+
+    return { success: true, port: service.port };
   } catch (error) {
     console.log(chalk.red(`  ✗ Backend ${backendType} échoué: ${error}`));
-    return false;
+    return { success: false, port: 8000 };
   }
 }
 
@@ -104,7 +175,7 @@ async function startFrontend(
   frontendType: "angular" | "react-vite",
   projectPath: string,
   skipInstall: boolean,
-): Promise<boolean> {
+): Promise<{ success: boolean; port: number }> {
   const frontendDir = path.join(projectPath, "frontend");
 
   console.log(chalk.blue(`  → Démarrage frontend ${frontendType}...`));
@@ -114,15 +185,28 @@ async function startFrontend(
       await execa("npm", ["install"], { cwd: frontendDir });
     }
 
-    const cmd = frontendType === "angular" ? "ng" : "npm";
-    const args = frontendType === "angular" ? ["serve"] : ["run", "dev"];
-    spawn(cmd, args, { cwd: frontendDir, detached: true, stdio: "ignore" });
+    const service = discoverFrontendService(frontendDir);
+    if (!service) {
+      console.log(chalk.red(`  ✗ Configuration frontend introuvable`));
+      return { success: false, port: 5173 };
+    }
 
-    const port = frontendType === "angular" ? 4200 : 5173;
-    return await waitForHealth(`http://127.0.0.1:${port}`);
+    spawn(service.startCmd[0], service.startCmd.slice(1), {
+      cwd: frontendDir,
+      detached: true,
+      stdio: "ignore",
+    });
+
+    const healthy = await waitForHealth(`http://127.0.0.1:${service.port}`);
+
+    if (!healthy) {
+      console.log(chalk.yellow(`  ⚠ Frontend démarré mais non accessible`));
+    }
+
+    return { success: true, port: service.port };
   } catch (error) {
     console.log(chalk.red(`  ✗ Frontend ${frontendType} échoué: ${error}`));
-    return false;
+    return { success: false, port: 5173 };
   }
 }
 
@@ -195,14 +279,17 @@ export const serveCommand = new Command("serve")
       started.push("docker");
     }
 
+    let backendPort = 8000;
+    let frontendPort = 5173;
+
     // Start backend
     if (useBackend && stack.backendType) {
-      const success = await startBackend(
+      const result = await startBackend(
         stack.backendType,
         projectPath,
         opts.skipInstall ?? false,
       );
-      if (!success) {
+      if (!result.success) {
         console.log(
           chalk.red(`\n✖ Backend ${stack.backendType} échoué. Arrêt.`),
         );
@@ -212,33 +299,34 @@ export const serveCommand = new Command("serve")
         }
         process.exit(1);
       }
+      backendPort = result.port;
       started.push("backend");
     }
 
     // Start frontend
     if (useFrontend && stack.frontendType) {
-      const success = await startFrontend(
+      const result = await startFrontend(
         stack.frontendType,
         projectPath,
         opts.skipInstall ?? false,
       );
-      if (!success) {
+      if (!result.success) {
         console.log(
           chalk.red(`\n✖ Frontend ${stack.frontendType} échoué. Arrêt.`),
         );
         process.exit(1);
       }
+      frontendPort = result.port;
       started.push("frontend");
     }
 
     console.log(chalk.bold.green("\n🚀 Services démarrés:"));
     if (useDocker) console.log(chalk.cyan("  - Docker: compose is running"));
     if (useBackend) {
-      console.log(chalk.cyan(`  - Backend: http://localhost:8000`));
+      console.log(chalk.cyan(`  - Backend: http://localhost:${backendPort}`));
     }
     if (useFrontend) {
-      const port = stack.frontendType === "angular" ? 4200 : 5173;
-      console.log(chalk.cyan(`  - Frontend: http://localhost:${port}`));
+      console.log(chalk.cyan(`  - Frontend: http://localhost:${frontendPort}`));
     }
     console.log(
       chalk.gray(
