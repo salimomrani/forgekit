@@ -13,9 +13,27 @@ const program = new Command();
 program
   .name("forgekit")
   .description(
-    "CLI de scaffolding full-stack pour projets Spring Boot + Angular",
+    "CLI de scaffolding full-stack (Spring Boot, FastAPI, Laravel, Angular, React)",
   )
-  .version(version);
+  .version(version)
+  .addHelpText(
+    "after",
+    `
+Workflow:
+  1. forgekit new <name>    Créer un nouveau projet (wizard interactif)
+  2. forgekit add <layer>   Ajouter des layers supplémentaires
+
+Layers disponibles:
+  Backends    spring-boot | fastapi | laravel
+  Frontends   angular | react
+  Infra       docker | ci | claude-code | speckit | prettier
+
+Exemples:
+  $ forgekit new my-app
+  $ forgekit new my-api --spring-boot --no-frontend
+  $ forgekit add docker
+  $ forgekit add claude-code          (fonctionne sur n'importe quel projet)`,
+  );
 
 program.addCommand(newCommand);
 program.addCommand(addCommand);

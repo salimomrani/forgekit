@@ -14,4 +14,4 @@ Scripts: `npm test` | `npm run typecheck` | `npm run lint`
 
 ## Skill
 
-The `forgekit-conventions` skill (~/.claude/skills/forgekit-conventions/SKILL.md) contains project conventions, debugged patterns, and the key structure. It triggers automatically when working on ForgeKit.
+The `applying-forgekit-conventions` skill (~/.claude/skills/applying-forgekit-conventions/SKILL.md) contains project conventions, debugged patterns, and the key structure. It triggers automatically when working on ForgeKit.
