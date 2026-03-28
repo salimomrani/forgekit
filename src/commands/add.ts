@@ -157,7 +157,9 @@ async function regenerateDependentLayers(
 }
 
 export const addCommand = new Command("add")
-  .description("Ajouter un layer à un projet existant")
+  .description(
+    "Ajouter un layer à un projet existant (claude-code fonctionne sur n'importe quel projet)",
+  )
   .argument("<layer>", `Layer à ajouter : ${VALID_LAYERS.join(", ")}`)
   .option("--group <groupId>", "Group ID Java")
   .option("--auth", "Inclure l'authentification")
@@ -171,6 +173,41 @@ export const addCommand = new Command("add")
   .option("--no-ngrx", "Exclure NgRx SignalStore")
   .option("--ui <framework>", "Framework UI : primeng | tailwind | none")
   .option("--preset <preset>", "Preset PrimeNG : Aura | Lara | Nora")
+  .addHelpText(
+    "after",
+    `
+Layers:
+  spring-boot   Backend Java 21 + Spring Boot 3 (Maven)
+                  Options : --group, --flyway/--no-flyway, --openapi/--no-openapi,
+                            --auth, --mapstruct/--no-mapstruct
+
+  fastapi       Backend Python + FastAPI + SQLAlchemy
+                  Options : --auth
+
+  laravel       Backend PHP 8.3 + Laravel 12
+                  Options : --auth, --openapi/--no-openapi
+
+  angular       Frontend Angular (standalone, OnPush)
+                  Options : --ui (primeng|tailwind|none), --preset (Aura|Lara|Nora),
+                            --ngrx/--no-ngrx, --auth
+
+  react         Frontend React (Vite + Tailwind CSS)
+                  Options : --auth
+
+  docker        Docker Compose (PostgreSQL + pgAdmin)
+  ci            GitHub Actions CI (lint + test + build)
+  claude-code   Config Claude Code (.claude/, CLAUDE.md, skills, hooks)
+                  ★ Fonctionne sur n'importe quel projet (pas besoin de forgekit.json)
+  speckit       Templates Speckit (specify CLI)
+  prettier      Prettier + Husky + lint-staged (nécessite un frontend)
+
+Exemples:
+  $ forgekit add spring-boot
+  $ forgekit add spring-boot --no-flyway --openapi --group com.acme
+  $ forgekit add angular --ui tailwind --ngrx
+  $ forgekit add laravel --auth --openapi
+  $ forgekit add claude-code`,
+  )
   .action(async (layer: string, options: Record<string, unknown>) => {
     console.log(chalk.bold.hex("#FF6B35")("\n🔨 ForgeKit — Add layer\n"));
 
@@ -194,12 +231,38 @@ export const addCommand = new Command("add")
       existingConfig = result.config;
       detectionSource = result.source;
     } catch (error) {
-      console.log(
-        chalk.red(
-          error instanceof Error ? error.message : "Project detection failed.",
-        ),
-      );
-      process.exit(1);
+      if (layer !== "claude-code") {
+        console.log(
+          chalk.red(
+            error instanceof Error
+              ? error.message
+              : "Project detection failed.",
+          ),
+        );
+        process.exit(1);
+      }
+      // claude-code can be added to any project
+      existingConfig = {
+        name: path.basename(projectDir),
+        groupId: "com.example",
+        description: "",
+        backendType: null,
+        frontend: null,
+        flyway: false,
+        openapi: false,
+        auth: false,
+        mapstruct: false,
+        prettier: false,
+        uiFramework: "none",
+        primeNGPreset: "Aura",
+        ngrx: false,
+        docker: false,
+        ci: false,
+        claudeCode: false,
+        speckit: false,
+        gitInit: false,
+      };
+      detectionSource = "manifest";
     }
 
     // Filesystem fallback confirmation

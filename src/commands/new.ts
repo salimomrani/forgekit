@@ -157,6 +157,32 @@ export const newCommand = new Command("new")
   .option("--prettier", "Inclure Prettier + Husky + lint-staged")
   .option("--no-prettier", "Exclure Prettier")
   .option("--no-git", "Ne pas initialiser Git")
+  .addHelpText(
+    "after",
+    `
+Backends:
+  --spring-boot   Java 21 + Spring Boot 3 + Maven
+  --fastapi       Python + FastAPI + SQLAlchemy
+  --laravel       PHP 8.3 + Laravel 12
+
+Frontends:
+  --angular       Angular (standalone, OnPush)
+  --react         React (Vite + Tailwind CSS)
+
+Infrastructure:
+  --docker        Docker Compose (PostgreSQL + pgAdmin)   [défaut: oui si backend]
+  --ci            GitHub Actions CI                       [défaut: oui si stack]
+  --claude-code   Config Claude Code                      [défaut: si claude CLI détecté]
+  --prettier      Prettier + Husky + lint-staged          [défaut: non]
+  --no-git        Ne pas initialiser Git
+
+Exemples:
+  $ forgekit new my-app
+  $ forgekit new my-api --spring-boot --no-frontend --group com.acme
+  $ forgekit new my-app --laravel --react --auth --openapi
+  $ forgekit new my-app --fastapi --angular --ui tailwind --ngrx
+  $ forgekit new my-app --spring-boot --angular --no-flyway --no-docker`,
+  )
   .action(
     async (name: string | undefined, options: Record<string, unknown>, cmd) => {
       console.log(
