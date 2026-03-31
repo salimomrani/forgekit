@@ -4,38 +4,21 @@ import path from "node:path";
 import os from "node:os";
 import { generateProject } from "../commands/new.js";
 import { FALLBACK_VERSIONS } from "../versions.js";
-import type { ProjectConfig } from "../types.js";
+import { makeBaseConfig } from "./fixtures.js";
+
+function baseConfig(overrides: Parameters<typeof makeBaseConfig>[0] = {}) {
+  return makeBaseConfig({
+    name: "test-proj",
+    description: "E2E test",
+    ...overrides,
+  });
+}
 
 vi.mock("../generators/speckit.js", () => ({
   initSpecify: vi.fn(() => true),
 }));
 
 const BASE_VERSIONS = FALLBACK_VERSIONS;
-
-function baseConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
-  return {
-    name: "test-proj",
-    groupId: "com.example",
-    description: "E2E test",
-    backendType: null,
-    frontend: null,
-    flyway: false,
-    openapi: false,
-    auth: false,
-    mapstruct: false,
-    prettier: false,
-    eslint: false,
-    uiFramework: "none",
-    primeNGPreset: "Aura",
-    ngrx: false,
-    docker: false,
-    ci: false,
-    claudeCode: false,
-    speckit: false,
-    gitInit: false,
-    ...overrides,
-  };
-}
 
 describe("ForgeKit e2e — generation pipeline", () => {
   let tmpDir: string;
