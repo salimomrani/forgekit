@@ -170,6 +170,7 @@ export async function promptProjectConfig(
   let speckit = defaults.speckit ?? true;
   let gitInit = defaults.gitInit ?? true;
   let prettier = defaults.prettier ?? false;
+  let eslint = defaults.eslint ?? false;
 
   if (
     defaults.docker === undefined &&
@@ -177,7 +178,8 @@ export async function promptProjectConfig(
     defaults.claudeCode === undefined &&
     defaults.speckit === undefined &&
     defaults.gitInit === undefined &&
-    defaults.prettier === undefined
+    defaults.prettier === undefined &&
+    defaults.eslint === undefined
   ) {
     const hasBackend = backendType !== null;
     const claudeDetected = isClaudeInstalled();
@@ -216,6 +218,12 @@ export async function promptProjectConfig(
           checked: false,
           disabled: frontend === null ? "Nécessite un frontend" : false,
         },
+        {
+          name: "ESLint (flat config 9+, typescript-eslint)",
+          value: "eslint",
+          checked: false,
+          disabled: frontend === null ? "Nécessite un frontend" : false,
+        },
       ],
     });
     docker = infra.includes("docker");
@@ -224,6 +232,7 @@ export async function promptProjectConfig(
     speckit = infra.includes("speckit");
     gitInit = infra.includes("gitInit");
     prettier = infra.includes("prettier");
+    eslint = infra.includes("eslint");
   }
 
   return {
@@ -245,5 +254,6 @@ export async function promptProjectConfig(
     claudeCode,
     gitInit,
     prettier,
+    eslint,
   };
 }

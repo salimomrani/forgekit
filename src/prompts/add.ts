@@ -31,6 +31,14 @@ export async function promptAddLayerConfig(
     }
     return {};
   }
+  if (layer === "eslint") {
+    if (existingConfig.frontend === null) {
+      throw new Error(
+        "Cannot add eslint without a frontend. Add a frontend first.",
+      );
+    }
+    return {};
+  }
   return {};
 }
 

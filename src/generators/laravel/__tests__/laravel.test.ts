@@ -17,6 +17,7 @@ const baseConfig: ProjectConfig = {
   auth: false,
   mapstruct: false,
   prettier: false,
+  eslint: false,
   uiFramework: "none",
   primeNGPreset: "Aura",
   ngrx: false,
@@ -51,6 +52,9 @@ const baseVersions: ResolvedVersions = {
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
+  eslint: "9.20.0",
+  typescriptEslint: "8.29.0",
+  eslintConfigPrettier: "10.1.5",
 };
 
 describe("LaravelGenerator", () => {

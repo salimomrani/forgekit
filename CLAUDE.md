@@ -1,5 +1,9 @@
 # ForgeKit — Claude Code Instructions
 
+## Workflow Routing (Mandatory)
+
+- **Feature / Non-trivial change**: Utiliser systématiquement `/speckit.workflow`.
+
 ## Release
 
 Always use `/forgekit.release` to publish a new version.

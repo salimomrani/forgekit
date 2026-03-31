@@ -64,6 +64,11 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
     configValue: true,
     conflictGroup: null,
   },
+  eslint: {
+    configField: "eslint",
+    configValue: true,
+    conflictGroup: null,
+  },
 };
 
 const VALID_LAYERS = Object.keys(LAYER_CONFIG_MAP);
@@ -118,8 +123,8 @@ async function runLayerGenerator(
       initSpecify(projectDir);
       break;
     case "prettier":
-      // Prettier setup is handled by the frontend generator via config.prettier = true
-      // For add, we regenerate the frontend's prettier config files
+    case "eslint":
+      // Config files handled by the frontend generator via config flags
       await generateFrontend(projectDir, config, versions);
       break;
   }
@@ -253,6 +258,7 @@ Exemples:
         auth: false,
         mapstruct: false,
         prettier: false,
+        eslint: false,
         uiFramework: "none",
         primeNGPreset: "Aura",
         ngrx: false,
@@ -317,7 +323,10 @@ Exemples:
     try {
       layerConfig = await promptAddLayerConfig(layer, existingConfig, defaults);
     } catch (error) {
-      if (error instanceof Error && error.message.includes("prettier")) {
+      if (
+        error instanceof Error &&
+        (error.message.includes("prettier") || error.message.includes("eslint"))
+      ) {
         console.log(chalk.red(error.message));
         process.exit(1);
       }

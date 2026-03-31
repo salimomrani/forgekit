@@ -43,10 +43,19 @@ class ReactViteGenerator extends BaseGenerator {
       devDeps["prettier"] = `^${this.versions.prettier}`;
     }
 
+    if (this.config.eslint) {
+      devDeps["eslint"] = `^${this.versions.eslint}`;
+      devDeps["typescript-eslint"] = `^${this.versions.typescriptEslint}`;
+      if (this.config.prettier) {
+        devDeps["eslint-config-prettier"] =
+          `^${this.versions.eslintConfigPrettier}`;
+      }
+    }
+
     const scripts: Record<string, string> = {
       dev: "vite",
       build: "tsc -b && vite build",
-      lint: "tsc --noEmit",
+      lint: this.config.eslint ? "eslint ." : "tsc --noEmit",
       preview: "vite preview",
     };
     if (this.config.prettier) {
@@ -62,7 +71,13 @@ class ReactViteGenerator extends BaseGenerator {
       devDependencies: devDeps,
     };
     if (this.config.prettier) {
-      pkg["lint-staged"] = { "*.{ts,tsx,css,json}": "prettier --write" };
+      const tsStaged: string | string[] = this.config.eslint
+        ? ["eslint --fix", "prettier --write"]
+        : "prettier --write";
+      pkg["lint-staged"] = {
+        "*.{ts,tsx}": tsStaged,
+        "*.{css,json}": "prettier --write",
+      };
     }
     return pkg;
   }
@@ -80,6 +95,8 @@ class ReactViteGenerator extends BaseGenerator {
       versions: this.versions,
       auth: this.config.auth,
       year: new Date().getFullYear(),
+      eslintWithPrettier: this.config.eslint && this.config.prettier,
+      isAngular: false,
     };
 
     // Select correct router template based on config.auth
@@ -169,6 +186,14 @@ class ReactViteGenerator extends BaseGenerator {
           data,
         ),
       ]);
+    }
+
+    if (this.config.eslint) {
+      await renderAndWrite(
+        "shared/eslint/eslint.config.js.hbs",
+        path.join(frontendDir, "eslint.config.js"),
+        data,
+      );
     }
 
     if (this.config.auth) {

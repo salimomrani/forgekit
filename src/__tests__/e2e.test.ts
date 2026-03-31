@@ -24,6 +24,7 @@ function baseConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
     auth: false,
     mapstruct: false,
     prettier: false,
+    eslint: false,
     uiFramework: "none",
     primeNGPreset: "Aura",
     ngrx: false,

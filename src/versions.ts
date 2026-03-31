@@ -29,6 +29,9 @@ export interface ResolvedVersions {
   husky: string;
   lintStaged: string;
   prettier: string;
+  eslint: string;
+  typescriptEslint: string;
+  eslintConfigPrettier: string;
 }
 
 export const FALLBACK_VERSIONS: ResolvedVersions = {
@@ -55,6 +58,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
+  eslint: "9.20.0",
+  typescriptEslint: "8.29.0",
+  eslintConfigPrettier: "10.1.5",
 };
 
 const FETCH_TIMEOUT_MS = 8_000;
@@ -196,6 +202,11 @@ export async function resolveVersions(opts: {
       fetchNpmVersion("husky").then(set("husky")),
       fetchNpmVersion("lint-staged").then(set("lintStaged")),
       fetchNpmVersion("prettier").then(set("prettier")),
+      fetchNpmVersion("eslint").then(set("eslint")),
+      fetchNpmVersion("typescript-eslint").then(set("typescriptEslint")),
+      fetchNpmVersion("eslint-config-prettier").then(
+        set("eslintConfigPrettier"),
+      ),
     );
   }
 

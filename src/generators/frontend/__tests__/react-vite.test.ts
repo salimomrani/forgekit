@@ -17,6 +17,7 @@ const baseConfig: ProjectConfig = {
   auth: false,
   mapstruct: false,
   prettier: false,
+  eslint: false,
   uiFramework: "tailwind",
   primeNGPreset: "Aura",
   ngrx: false,
@@ -51,6 +52,9 @@ const baseVersions: ResolvedVersions = {
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
+  eslint: "9.20.0",
+  typescriptEslint: "8.29.0",
+  eslintConfigPrettier: "10.1.5",
 };
 
 describe("ReactViteGenerator", () => {
@@ -301,5 +305,77 @@ describe("ReactViteGenerator", () => {
     expect(pkg.devDependencies["husky"]).toBeDefined();
     expect(pkg.devDependencies["lint-staged"]).toBeDefined();
     expect(pkg.devDependencies["prettier"]).toBeDefined();
+  });
+
+  it("does not generate eslint.config.js when eslint is false", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "eslint.config.js")),
+    ).toBe(false);
+  });
+
+  it("generates eslint.config.js when eslint is true", async () => {
+    const config = { ...baseConfig, eslint: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "eslint.config.js")),
+    ).toBe(true);
+  });
+
+  it("package.json includes eslint devDeps when eslint is true", async () => {
+    const config = { ...baseConfig, eslint: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint"]).toBeDefined();
+    expect(pkg.devDependencies["typescript-eslint"]).toBeDefined();
+  });
+
+  it("lint script is eslint . when eslint is true", async () => {
+    const config = { ...baseConfig, eslint: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.scripts.lint).toBe("eslint .");
+  });
+
+  it("lint script is tsc --noEmit when eslint is false", async () => {
+    await generateReactViteFrontend(tmpDir, baseConfig, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.scripts.lint).toBe("tsc --noEmit");
+  });
+
+  it("includes eslint-config-prettier when both eslint and prettier are true", async () => {
+    const config = { ...baseConfig, eslint: true, prettier: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint-config-prettier"]).toBeDefined();
+  });
+
+  it("eslint-config-prettier absent when only eslint is true", async () => {
+    const config = { ...baseConfig, eslint: true, prettier: false };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint-config-prettier"]).toBeUndefined();
+  });
+
+  it("lint-staged runs eslint and prettier on TS/TSX files when both enabled", async () => {
+    const config = { ...baseConfig, eslint: true, prettier: true };
+    await generateReactViteFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    const tsStaged = pkg["lint-staged"]["*.{ts,tsx}"];
+    expect(Array.isArray(tsStaged)).toBe(true);
+    expect(tsStaged).toContain("eslint --fix");
+    expect(tsStaged).toContain("prettier --write");
   });
 });

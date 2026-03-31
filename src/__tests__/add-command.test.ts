@@ -26,6 +26,7 @@ function baseConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
     auth: false,
     mapstruct: false,
     prettier: false,
+    eslint: false,
     uiFramework: "none",
     primeNGPreset: "Aura",
     ngrx: false,
@@ -139,6 +140,15 @@ describe("forgekit add — integration", () => {
     const { promptAddLayerConfig } = await import("../prompts/add.js");
     await expect(promptAddLayerConfig("prettier", config, {})).rejects.toThrow(
       "Cannot add prettier without a frontend",
+    );
+  });
+
+  it("eslint requires frontend — validation works", async () => {
+    const config = baseConfig({ backendType: "spring-boot" });
+    expect(config.frontend).toBeNull();
+    const { promptAddLayerConfig } = await import("../prompts/add.js");
+    await expect(promptAddLayerConfig("eslint", config, {})).rejects.toThrow(
+      "Cannot add eslint without a frontend",
     );
   });
 
