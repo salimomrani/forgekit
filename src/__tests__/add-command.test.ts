@@ -6,7 +6,7 @@ import { generateProject } from "../commands/new.js";
 import { FALLBACK_VERSIONS } from "../versions.js";
 import { writeManifest } from "../utils/forgekit-json.js";
 import { detectProject } from "../utils/detect-project.js";
-import type { ForgeKitManifest } from "../types.js";
+import type { ForgeKitManifest, ProjectConfig } from "../types.js";
 import { makeBaseConfig } from "./fixtures.js";
 
 vi.mock("../generators/speckit.js", () => ({

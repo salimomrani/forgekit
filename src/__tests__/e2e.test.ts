@@ -4,6 +4,7 @@ import path from "node:path";
 import os from "node:os";
 import { generateProject } from "../commands/new.js";
 import { FALLBACK_VERSIONS } from "../versions.js";
+import type { ProjectConfig } from "../types.js";
 import { makeBaseConfig } from "./fixtures.js";
 
 function baseConfig(overrides: Parameters<typeof makeBaseConfig>[0] = {}) {
