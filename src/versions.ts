@@ -12,6 +12,7 @@ export interface ResolvedVersions {
   scramble: string;
   // Frontend
   angular: string;
+  angularBuild: string;
   primeng: string;
   primeuixThemes: string;
   primeicons: string;
@@ -42,6 +43,7 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   sanctum: "4.3.1",
   scramble: "0.13.16",
   angular: "21.0.0",
+  angularBuild: "21.0.0",
   primeng: "21.1.1",
   primeuixThemes: "2.0.3",
   primeicons: "7.0.0",
@@ -185,6 +187,7 @@ export async function resolveVersions(opts: {
   if (opts.frontend === "angular") {
     tasks.push(
       fetchNpmVersion("@angular/core").then(set("angular")),
+      fetchNpmVersion("@angular/build").then(set("angularBuild")),
       fetchNpmVersion("primeng").then(set("primeng")),
       fetchNpmVersion("@primeuix/themes").then(set("primeuixThemes")),
       fetchNpmVersion("primeicons").then(set("primeicons")),
