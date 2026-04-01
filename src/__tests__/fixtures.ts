@@ -36,6 +36,7 @@ export const BASE_VERSIONS: ResolvedVersions = {
   sanctum: "4.3.1",
   scramble: "0.13.16",
   angular: "21.0.0",
+  angularBuild: "21.0.0",
   primeng: "21.1.1",
   primeuixThemes: "2.0.3",
   primeicons: "7.0.0",

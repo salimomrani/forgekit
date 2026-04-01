@@ -47,7 +47,7 @@ class FrontendGenerator extends BaseGenerator {
     }
 
     const devDeps: Record<string, string> = {
-      "@angular/build": `^${this.versions.angular}`,
+      "@angular/build": `^${this.versions.angularBuild}`,
       "@angular/cli": `^${this.versions.angular}`,
       "@angular/compiler-cli": `^${this.versions.angular}`,
       typescript: `~${this.versions.typescript}`,
