@@ -6,37 +6,15 @@ import { generateProject } from "../commands/new.js";
 import { FALLBACK_VERSIONS } from "../versions.js";
 import { writeManifest } from "../utils/forgekit-json.js";
 import { detectProject } from "../utils/detect-project.js";
-import type { ProjectConfig, ForgeKitManifest } from "../types.js";
+import type { ForgeKitManifest, ProjectConfig } from "../types.js";
+import { makeBaseConfig } from "./fixtures.js";
 
 vi.mock("../generators/speckit.js", () => ({
   initSpecify: vi.fn(() => true),
 }));
 
 const BASE_VERSIONS = FALLBACK_VERSIONS;
-
-function baseConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
-  return {
-    name: "test-proj",
-    groupId: "com.example",
-    description: "E2E test",
-    backendType: null,
-    frontend: null,
-    flyway: false,
-    openapi: false,
-    auth: false,
-    mapstruct: false,
-    prettier: false,
-    uiFramework: "none",
-    primeNGPreset: "Aura",
-    ngrx: false,
-    docker: false,
-    ci: false,
-    claudeCode: false,
-    speckit: false,
-    gitInit: false,
-    ...overrides,
-  };
-}
+const baseConfig = makeBaseConfig;
 
 describe("forgekit add — integration", () => {
   let tmpDir: string;
@@ -139,6 +117,15 @@ describe("forgekit add — integration", () => {
     const { promptAddLayerConfig } = await import("../prompts/add.js");
     await expect(promptAddLayerConfig("prettier", config, {})).rejects.toThrow(
       "Cannot add prettier without a frontend",
+    );
+  });
+
+  it("eslint requires frontend — validation works", async () => {
+    const config = baseConfig({ backendType: "spring-boot" });
+    expect(config.frontend).toBeNull();
+    const { promptAddLayerConfig } = await import("../prompts/add.js");
+    await expect(promptAddLayerConfig("eslint", config, {})).rejects.toThrow(
+      "Cannot add eslint without a frontend",
     );
   });
 

@@ -17,6 +17,7 @@ export interface ProjectConfig {
   mapstruct: boolean;
   // Frontend
   prettier: boolean;
+  eslint: boolean;
   uiFramework: UIFramework;
   primeNGPreset: PrimeNGPreset;
   ngrx: boolean;

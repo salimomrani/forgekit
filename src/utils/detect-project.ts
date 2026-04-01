@@ -86,6 +86,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     auth: false,
     mapstruct: false,
     prettier: false,
+    eslint: false,
     uiFramework: "none",
     primeNGPreset: "Aura",
     ngrx: false,

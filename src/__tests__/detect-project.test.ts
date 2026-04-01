@@ -3,31 +3,8 @@ import fs from "fs-extra";
 import path from "node:path";
 import os from "node:os";
 import { detectProject } from "../utils/detect-project.js";
-import type { ForgeKitManifest, ProjectConfig } from "../types.js";
-
-function fullConfig(overrides: Partial<ProjectConfig> = {}): ProjectConfig {
-  return {
-    name: "test-project",
-    groupId: "com.example",
-    description: "",
-    backendType: null,
-    frontend: null,
-    flyway: false,
-    openapi: false,
-    auth: false,
-    mapstruct: false,
-    prettier: false,
-    uiFramework: "none",
-    primeNGPreset: "Aura",
-    ngrx: false,
-    docker: false,
-    ci: false,
-    claudeCode: false,
-    speckit: false,
-    gitInit: false,
-    ...overrides,
-  };
-}
+import type { ForgeKitManifest } from "../types.js";
+import { makeBaseConfig as fullConfig } from "./fixtures.js";
 
 describe("detectProject", () => {
   let tmpDir: string;

@@ -3,55 +3,10 @@ import fs from "fs-extra";
 import path from "node:path";
 import os from "node:os";
 import { generateFrontend } from "../index.js";
-import type { ProjectConfig } from "../../../types.js";
-import type { ResolvedVersions } from "../../../versions.js";
+import { makeBaseConfig, BASE_VERSIONS } from "../../../__tests__/fixtures.js";
 
-const baseConfig: ProjectConfig = {
-  name: "test-project",
-  groupId: "com.example",
-  description: "Test",
-  backendType: null,
-  frontend: null,
-  flyway: false,
-  openapi: false,
-  auth: false,
-  mapstruct: false,
-  prettier: false,
-  uiFramework: "tailwind",
-  primeNGPreset: "Aura",
-  ngrx: false,
-  docker: false,
-  ci: false,
-  claudeCode: false,
-  speckit: false,
-  gitInit: false,
-};
-
-const baseVersions: ResolvedVersions = {
-  springBoot: "4.0.0",
-  springDoc: "3.0.0",
-  mapstruct: "1.6.3",
-  laravel: "12.0.0",
-  sanctum: "4.0.0",
-  scramble: "0.12.0",
-  angular: "21.0.0",
-  primeng: "21.0.0",
-  primeuixThemes: "2.0.0",
-  primeicons: "7.0.0",
-  primeflex: "4.0.0",
-  ngrxSignals: "21.0.0",
-  rxjs: "7.8.0",
-  zoneJs: "0.15.0",
-  typescript: "5.8.0",
-  tailwind: "4.0.0",
-  react: "19.0.0",
-  reactRouter: "7.5.0",
-  vite: "6.3.0",
-  axiosReact: "1.8.0",
-  husky: "9.1.0",
-  lintStaged: "15.5.0",
-  prettier: "3.5.0",
-};
+const baseConfig = makeBaseConfig({ uiFramework: "tailwind" });
+const baseVersions = BASE_VERSIONS;
 
 describe("generateFrontend router", () => {
   let tmpDir: string;
@@ -142,5 +97,94 @@ describe("generateFrontend router", () => {
     expect(pkg.devDependencies["husky"]).toBeDefined();
     expect(pkg.devDependencies["lint-staged"]).toBeDefined();
     expect(pkg.devDependencies["prettier"]).toBeDefined();
+  });
+
+  it("Angular: does not generate eslint.config.js when eslint is false", async () => {
+    const config = { ...baseConfig, frontend: "angular" as const };
+    await generateFrontend(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "eslint.config.js")),
+    ).toBe(false);
+  });
+
+  it("Angular: generates eslint.config.js when eslint is true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      eslint: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "eslint.config.js")),
+    ).toBe(true);
+  });
+
+  it("Angular: package.json includes eslint devDeps and lint script when eslint is true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      eslint: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint"]).toBeDefined();
+    expect(pkg.devDependencies["typescript-eslint"]).toBeDefined();
+    expect(pkg.scripts.lint).toBe("eslint .");
+  });
+
+  it("Angular: no lint script when eslint is false", async () => {
+    const config = { ...baseConfig, frontend: "angular" as const };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.scripts.lint).toBeUndefined();
+  });
+
+  it("Angular: includes eslint-config-prettier when both eslint and prettier are true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      eslint: true,
+      prettier: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint-config-prettier"]).toBeDefined();
+  });
+
+  it("Angular: eslint-config-prettier absent when only eslint is true", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      eslint: true,
+      prettier: false,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    expect(pkg.devDependencies["eslint-config-prettier"]).toBeUndefined();
+  });
+
+  it("Angular: lint-staged runs eslint and prettier on TS files when both enabled", async () => {
+    const config = {
+      ...baseConfig,
+      frontend: "angular" as const,
+      eslint: true,
+      prettier: true,
+    };
+    await generateFrontend(tmpDir, config, baseVersions);
+    const pkg = await fs.readJson(
+      path.join(tmpDir, "frontend", "package.json"),
+    );
+    const tsStaged = pkg["lint-staged"]["*.ts"];
+    expect(Array.isArray(tsStaged)).toBe(true);
+    expect(tsStaged).toContain("eslint --fix");
+    expect(tsStaged).toContain("prettier --write");
   });
 });

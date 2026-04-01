@@ -1,0 +1,10 @@
+import tseslint from 'typescript-eslint';
+{{#if eslintWithPrettier}}
+import eslintConfigPrettier from 'eslint-config-prettier';
+{{/if}}
+
+export default tseslint.config(
+  { ignores: ['dist/'{{#if isAngular}}, '.angular/'{{/if}}] },
+  ...tseslint.configs.recommended,{{#if eslintWithPrettier}}
+  eslintConfigPrettier,{{/if}}
+);

@@ -65,6 +65,15 @@ class FrontendGenerator extends BaseGenerator {
       devDeps["prettier"] = `^${this.versions.prettier}`;
     }
 
+    if (this.config.eslint) {
+      devDeps["eslint"] = `^${this.versions.eslint}`;
+      devDeps["typescript-eslint"] = `^${this.versions.typescriptEslint}`;
+      if (this.config.prettier) {
+        devDeps["eslint-config-prettier"] =
+          `^${this.versions.eslintConfigPrettier}`;
+      }
+    }
+
     const scripts: Record<string, string> = {
       ng: "ng",
       start: "ng serve",
@@ -74,6 +83,9 @@ class FrontendGenerator extends BaseGenerator {
     };
     if (this.config.prettier) {
       scripts["prepare"] = "husky";
+    }
+    if (this.config.eslint) {
+      scripts["lint"] = "eslint .";
     }
 
     const pkg: Record<string, unknown> = {
@@ -85,8 +97,12 @@ class FrontendGenerator extends BaseGenerator {
       devDependencies: devDeps,
     };
     if (this.config.prettier) {
+      const tsStaged: string | string[] = this.config.eslint
+        ? ["eslint --fix", "prettier --write"]
+        : "prettier --write";
       pkg["lint-staged"] = {
-        "*.{ts,html,css,scss,json}": "prettier --write",
+        "*.ts": tsStaged,
+        "*.{html,css,scss,json}": "prettier --write",
       };
     }
     return pkg;
@@ -130,6 +146,8 @@ class FrontendGenerator extends BaseGenerator {
       uiNone: this.config.uiFramework === "none",
       primeNGPreset: this.config.primeNGPreset,
       versions: this.versions,
+      eslintWithPrettier: this.config.eslint && this.config.prettier,
+      isAngular: true,
     };
 
     await Promise.all([
@@ -267,6 +285,14 @@ class FrontendGenerator extends BaseGenerator {
           data,
         ),
       ]);
+    }
+
+    if (this.config.eslint) {
+      await renderAndWrite(
+        "shared/eslint/eslint.config.js.hbs",
+        path.join(frontendDir, "eslint.config.js"),
+        data,
+      );
     }
   }
 }
