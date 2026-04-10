@@ -40,6 +40,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
     const springBoot = this.config.backendType === "spring-boot";
     const fastapi = this.config.backendType === "fastapi";
     const laravel = this.config.backendType === "laravel";
+    const nextjs = this.config.backendType === "nextjs";
     const backend = this.config.backendType !== null;
 
     const hooksDir = path.join(claudeDir, "hooks");
@@ -62,6 +63,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       springBoot,
       fastapi,
       laravel,
+      nextjs,
       hasFrontend,
       angular,
       reactVite,
@@ -247,6 +249,22 @@ class ClaudeCodeGenerator extends BaseGenerator {
         "Bash(composer require)",
         "Bash(./vendor/bin/pint)",
       );
+    }
+
+    if (this.config.backendType === "nextjs") {
+      commands.push(
+        "Bash(npm run dev)",
+        "Bash(npm run build)",
+        "Bash(npm run lint)",
+        "Bash(npm install)",
+      );
+      if (this.config.prisma) {
+        commands.push(
+          "Bash(npx prisma migrate dev)",
+          "Bash(npx prisma generate)",
+          "Bash(npx prisma studio)",
+        );
+      }
     }
 
     if (this.config.frontend === "angular") {

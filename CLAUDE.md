@@ -1,36 +1,38 @@
-# ForgeKit — Claude Code Instructions
+# forgekit
 
-## Workflow Routing (Mandatory)
+CLI Node.js/TypeScript qui génère des projets Spring Boot + Angular ou FastAPI + Angular avec Docker, CI/CD et config Claude Code.
 
-- **Feature / Non-trivial change**: Utiliser systématiquement `/speckit.workflow`.
+## Tech Stack
 
-## Release
+- **Runtime**: Node.js >= 20, TypeScript ^5.9.3
+- **CLI libs**: Commander ^14, Inquirer ^8, Handlebars ^4, Chalk ^5, fs-extra ^11
+- **Test**: Vitest ^4 (unit + e2e)
 
-Always use `/forgekit.release` to publish a new version.
+## Commands
 
-- Never use `npm publish` directly
-- Never bump `package.json` manually — tag triggers the pipeline: `git tag vX.Y.Z && git push origin vX.Y.Z`
-- GitHub Actions handles: lint → test → build → npm → GitHub Release
+| Action | Command |
+|--------|---------|
+| Dev | `npm run dev` |
+| Build | `npm run build` |
+| Tests (all) | `npm test` |
+| Tests (unit) | `npm run test:unit` |
+| Tests (e2e) | `npm run test:e2e` |
+| Lint | `npm run lint` |
+| Release | `git tag vX.Y.Z && git push origin vX.Y.Z` |
 
-## Tests
+## Workflow Mode: speckit
 
-Scripts: `npm test` | `npm run typecheck` | `npm run lint`
+## Workflow Routing
 
-Test fixtures centralisées dans `src/__tests__/fixtures.ts` — utiliser `makeBaseConfig(overrides)` et `BASE_VERSIONS` dans tous les nouveaux tests, jamais inline.
+| Scenario | Action |
+|----------|--------|
+| Feature / non-trivial change | `/speckit.workflow` |
+| Small fix (< 5 lines, docs) | Direct edit, no spec |
+| Bug | `superpowers:systematic-debugging` |
 
-## Checklist — Nouveau champ `ProjectConfig`
+## Active Technologies
+- TypeScript 5.9 (ForgeKit), Node.js ≥ 20 + Commander, Inquirer, Handlebars, fs-extra, chalk (existing) (008-nextjs-backend)
+- PostgreSQL (generated docker-compose) (008-nextjs-backend)
 
-Quand on ajoute un champ booléen à `ProjectConfig` (ex: `eslint`, `prettier`) :
-
-1. `src/types.ts` — ajouter le champ
-2. `src/versions.ts` — si packages npm associés : `ResolvedVersions` + `FALLBACK_VERSIONS` + `resolveVersions()`
-3. Générateurs frontend — logique conditionnelle
-4. `src/prompts/project.ts` — checkbox + return
-5. `src/prompts/add.ts` — guard frontend si applicable
-6. **`src/commands/add.ts`** — `LAYER_CONFIG_MAP` **ET** `case` dans `runLayerGenerator` (souvent oublié)
-7. `src/__tests__/fixtures.ts` — ajouter le champ avec valeur par défaut `false`
-8. `src/__tests__/add-command.test.ts` — test du guard `promptAddLayerConfig`
-
-## Skill
-
-The `applying-forgekit-conventions` skill (~/.claude/skills/applying-forgekit-conventions/SKILL.md) contains project conventions, debugged patterns, and the key structure. It triggers automatically when working on ForgeKit.
+## Recent Changes
+- 008-nextjs-backend: Added TypeScript 5.9 (ForgeKit), Node.js ≥ 20 + Commander, Inquirer, Handlebars, fs-extra, chalk (existing)

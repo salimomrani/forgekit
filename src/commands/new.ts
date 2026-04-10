@@ -11,6 +11,7 @@ import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateLaravelBackend } from "../generators/laravel/index.js";
+import { generateNextJsBackend } from "../generators/nextjs/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
@@ -48,6 +49,16 @@ export async function generateProject(
       console.log(
         chalk.green(
           `\r  ✔ Backend Laravel ${versions.laravel} généré           `,
+        ),
+      );
+    }
+
+    if (config.backendType === "nextjs") {
+      process.stdout.write(chalk.yellow("  ⏳ Backend Next.js..."));
+      await generateNextJsBackend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Backend Next.js ${versions.next} généré              `,
         ),
       );
     }

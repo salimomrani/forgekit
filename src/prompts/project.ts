@@ -43,6 +43,7 @@ export async function promptProjectConfig(
             { name: "Spring Boot (Java 21)", value: "spring-boot" },
             { name: "FastAPI (Python)", value: "fastapi" },
             { name: "Laravel (PHP 8.3)", value: "laravel" },
+            { name: "Next.js (Node.js)", value: "nextjs" },
             { name: "Aucun", value: null },
           ],
           default: "spring-boot",
@@ -76,6 +77,7 @@ export async function promptProjectConfig(
   let openapi = defaults.openapi ?? true;
   let auth = defaults.auth ?? false;
   let mapstruct = defaults.mapstruct ?? true;
+  let prisma = defaults.prisma ?? false;
 
   if (
     backendType === "spring-boot" &&
@@ -121,6 +123,37 @@ export async function promptProjectConfig(
     });
     auth = laravelFeatures.includes("auth");
     openapi = laravelFeatures.includes("openapi");
+  }
+
+  if (
+    backendType === "nextjs" &&
+    defaults.auth === undefined &&
+    defaults.prisma === undefined &&
+    defaults.openapi === undefined
+  ) {
+    const nextjsFeatures = await checkbox({
+      message: "Fonctionnalités Next.js",
+      choices: [
+        {
+          name: "NextAuth.js v5 (authentification)",
+          value: "auth",
+          checked: false,
+        },
+        {
+          name: "Prisma ORM (PostgreSQL)",
+          value: "prisma",
+          checked: false,
+        },
+        {
+          name: "OpenAPI / Swagger UI (next-swagger-doc)",
+          value: "openapi",
+          checked: false,
+        },
+      ],
+    });
+    auth = nextjsFeatures.includes("auth");
+    prisma = nextjsFeatures.includes("prisma");
+    openapi = nextjsFeatures.includes("openapi");
   }
 
   // ── Section 4: Frontend features ──────────────────────────────────────────
@@ -245,6 +278,7 @@ export async function promptProjectConfig(
     openapi,
     auth,
     mapstruct,
+    prisma,
     uiFramework,
     primeNGPreset,
     ngrx,

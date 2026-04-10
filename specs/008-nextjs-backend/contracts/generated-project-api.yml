@@ -1,0 +1,97 @@
+openapi: 3.0.0
+info:
+  title: Generated Next.js API — Default Endpoints
+  description: |
+    API endpoints scaffolded by ForgeKit in the generated Next.js backend project.
+    These are the endpoints present in the generated `backend/` directory.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      description: Always-on endpoint to verify the API is running.
+      tags: [System]
+      responses:
+        "200":
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /api/auth/{...nextauth}:
+    get:
+      summary: NextAuth handler (GET)
+      description: |
+        Catch-all Auth.js v5 route handler. Handles signin, signout, session, and
+        OAuth callbacks. Only generated when `auth: true`.
+      tags: [Auth]
+      parameters:
+        - name: nextauth
+          in: path
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Auth response (varies by action)
+    post:
+      summary: NextAuth handler (POST)
+      description: Handles credential submissions and OAuth callbacks.
+      tags: [Auth]
+      parameters:
+        - name: nextauth
+          in: path
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Auth response (varies by action)
+
+  /api/openapi.json:
+    get:
+      summary: OpenAPI schema
+      description: |
+        Returns the full OpenAPI 3.0 schema for this API.
+        Only generated when `openapi: true`.
+      tags: [Docs]
+      responses:
+        "200":
+          description: OpenAPI specification object
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/docs:
+    get:
+      summary: Swagger UI
+      description: |
+        Renders the interactive Swagger UI documentation.
+        Only generated when `openapi: true`.
+      tags: [Docs]
+      responses:
+        "200":
+          description: HTML page with Swagger UI
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          example: ok

@@ -1,0 +1,7 @@
+{
+  "routing": "full-workflow",
+  "phase": "implementation",
+  "branch": "008-nextjs-backend",
+  "completed_steps": ["speckit.specify", "speckit.plan", "speckit.tasks", "speckit.analyze"],
+  "last_updated": "2026-04-11T00:00:00Z"
+}

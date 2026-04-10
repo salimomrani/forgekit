@@ -239,4 +239,71 @@ describe("ForgeKit e2e — generation pipeline", () => {
     );
     expect(ciYml).toContain("python");
   }, 15_000);
+
+  it("S7: Next.js backend only generates expected project structure", async () => {
+    const projectDir = await run(
+      baseConfig({
+        backendType: "nextjs",
+        frontend: null,
+      }),
+    );
+
+    const expectedFiles = [
+      "backend/package.json",
+      "backend/next.config.ts",
+      "backend/tsconfig.json",
+      "backend/.env.example",
+      "backend/Dockerfile",
+      "backend/app/api/health/route.ts",
+    ];
+
+    for (const file of expectedFiles) {
+      expect(
+        await fs.pathExists(path.join(projectDir, file)),
+        `Expected ${file} to exist`,
+      ).toBe(true);
+    }
+
+    const pkg = await fs.readJson(
+      path.join(projectDir, "backend/package.json"),
+    );
+    expect(pkg.dependencies).toHaveProperty("next");
+  }, 15_000);
+
+  it("S8: Next.js + Angular + Docker + CI generates expected project structure", async () => {
+    const projectDir = await run(
+      baseConfig({
+        backendType: "nextjs",
+        frontend: "angular",
+        docker: true,
+        ci: true,
+      }),
+    );
+
+    expect(
+      await fs.pathExists(path.join(projectDir, "backend/package.json")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "frontend/package.json")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "docker-compose.yml")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, ".github/workflows/ci.yml")),
+    ).toBe(true);
+
+    const dockerCompose = await fs.readFile(
+      path.join(projectDir, "docker-compose.yml"),
+      "utf-8",
+    );
+    expect(dockerCompose).toContain("api:");
+    expect(dockerCompose).toContain("postgres:");
+
+    const ciYml = await fs.readFile(
+      path.join(projectDir, ".github/workflows/ci.yml"),
+      "utf-8",
+    );
+    expect(ciYml).toContain("backend/package-lock.json");
+  }, 15_000);
 });
