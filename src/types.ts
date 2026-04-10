@@ -1,6 +1,11 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
-export type BackendType = "spring-boot" | "fastapi" | "laravel" | null;
+export type BackendType =
+  | "spring-boot"
+  | "fastapi"
+  | "laravel"
+  | "nextjs"
+  | null;
 export type FrontendType = "angular" | "react-vite" | null;
 
 export interface ProjectConfig {
@@ -15,6 +20,7 @@ export interface ProjectConfig {
   openapi: boolean;
   auth: boolean;
   mapstruct: boolean;
+  prisma: boolean;
   // Frontend
   prettier: boolean;
   eslint: boolean;

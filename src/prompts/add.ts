@@ -14,6 +14,9 @@ export async function promptAddLayerConfig(
   if (layer === "fastapi") {
     return promptAuth(defaults);
   }
+  if (layer === "nextjs") {
+    return promptNextJs(defaults);
+  }
   if (layer === "laravel") {
     return promptLaravel(defaults);
   }
@@ -153,6 +156,42 @@ async function promptLaravel(
   }
 
   return { auth, openapi };
+}
+
+async function promptNextJs(
+  defaults: Partial<ProjectConfig>,
+): Promise<Partial<ProjectConfig>> {
+  let auth = defaults.auth ?? false;
+  let prisma = defaults.prisma ?? false;
+  let openapi = defaults.openapi ?? false;
+
+  if (
+    defaults.auth === undefined &&
+    defaults.prisma === undefined &&
+    defaults.openapi === undefined
+  ) {
+    const features = await checkbox({
+      message: "Fonctionnalités Next.js",
+      choices: [
+        {
+          name: "NextAuth.js v5 (authentification)",
+          value: "auth",
+          checked: false,
+        },
+        { name: "Prisma ORM (PostgreSQL)", value: "prisma", checked: false },
+        {
+          name: "OpenAPI / Swagger UI (next-swagger-doc)",
+          value: "openapi",
+          checked: false,
+        },
+      ],
+    });
+    auth = features.includes("auth");
+    prisma = features.includes("prisma");
+    openapi = features.includes("openapi");
+  }
+
+  return { auth, prisma, openapi };
 }
 
 async function promptAuth(

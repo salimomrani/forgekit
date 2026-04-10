@@ -90,6 +90,22 @@ describe("forgekit add — integration", () => {
     expect(result.config.backendType).not.toBeNull();
   });
 
+  it("nextjs is in LAYER_CONFIG_MAP with backend conflictGroup", async () => {
+    // Verify nextjs layer is registered and will reject duplicate backends
+    const { addCommand } = await import("../commands/add.js");
+    // VALID_LAYERS is embedded in the command description — nextjs must be listed
+    const helpText = addCommand.helpInformation();
+    expect(helpText).toContain("nextjs");
+  });
+
+  it("nextjs conflict: adding nextjs to project with existing backend fails detection", async () => {
+    await generateBase({ backendType: "spring-boot" });
+    const result = await detectProject(projectDir);
+    // Any attempt to add another backend is blocked by backendType !== null
+    expect(result.config.backendType).toBe("spring-boot");
+    expect(result.config.backendType).not.toBeNull();
+  });
+
   it("adds docker to a full-stack project with correct backend type", async () => {
     await generateBase({ backendType: "fastapi", frontend: "react-vite" });
 

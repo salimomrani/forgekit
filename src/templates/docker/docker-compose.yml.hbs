@@ -59,6 +59,20 @@ services:
       postgres:
         condition: service_healthy
 {{/if}}
+{{#if nextjs}}
+
+  api:
+    build: ./backend
+    container_name: {{name}}_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/{{dbName}}?schema=public"
+    depends_on:
+      postgres:
+        condition: service_healthy
+{{/if}}
 
 volumes:
   postgres_data:

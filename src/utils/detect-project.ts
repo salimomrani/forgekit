@@ -31,6 +31,12 @@ const SENTINEL_MAP: Array<{
     },
   },
   {
+    files: ["backend/next.config.ts"],
+    apply: (c) => {
+      c.backendType = "nextjs";
+    },
+  },
+  {
     files: ["frontend/angular.json"],
     apply: (c) => {
       c.frontend = "angular";
@@ -85,6 +91,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     openapi: false,
     auth: false,
     mapstruct: false,
+    prisma: false,
     prettier: false,
     eslint: false,
     uiFramework: "none",

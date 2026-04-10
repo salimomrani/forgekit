@@ -26,6 +26,10 @@ export interface ResolvedVersions {
   reactRouter: string;
   vite: string;
   axiosReact: string;
+  // Backend — Next.js
+  next: string;
+  nextAuth: string;
+  prismaClient: string;
   // Dev tooling
   husky: string;
   lintStaged: string;
@@ -57,6 +61,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   reactRouter: "7.5.0",
   vite: "7.0.0",
   axiosReact: "1.8.0",
+  next: "15.3.0",
+  nextAuth: "5.0.0",
+  prismaClient: "6.6.0",
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
@@ -173,6 +180,14 @@ export async function resolveVersions(opts: {
         "springdoc-openapi-starter-webmvc-ui",
       ).then(set("springDoc")),
       fetchMavenVersion("org.mapstruct", "mapstruct").then(set("mapstruct")),
+    );
+  }
+
+  if (opts.backendType === "nextjs") {
+    tasks.push(
+      fetchNpmVersion("next").then(set("next")),
+      fetchNpmVersion("next-auth").then(set("nextAuth")),
+      fetchNpmVersion("prisma").then(set("prismaClient")),
     );
   }
 

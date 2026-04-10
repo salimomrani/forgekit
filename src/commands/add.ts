@@ -12,6 +12,7 @@ import { generateBackend } from "../generators/backend/index.js";
 import { generateFrontend } from "../generators/frontend/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateLaravelBackend } from "../generators/laravel/index.js";
+import { generateNextJsBackend } from "../generators/nextjs/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
@@ -39,6 +40,11 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
   laravel: {
     configField: "backendType",
     configValue: "laravel",
+    conflictGroup: "backend",
+  },
+  nextjs: {
+    configField: "backendType",
+    configValue: "nextjs",
     conflictGroup: "backend",
   },
   angular: {
@@ -106,6 +112,9 @@ async function runLayerGenerator(
     case "laravel":
       await generateLaravelBackend(projectDir, config, versions);
       break;
+    case "nextjs":
+      await generateNextJsBackend(projectDir, config, versions);
+      break;
     case "angular":
     case "react":
       await generateFrontend(projectDir, config, versions);
@@ -137,7 +146,10 @@ async function regenerateDependentLayers(
   versions: ResolvedVersions,
 ): Promise<void> {
   const isBackendLayer =
-    layer === "spring-boot" || layer === "fastapi" || layer === "laravel";
+    layer === "spring-boot" ||
+    layer === "fastapi" ||
+    layer === "laravel" ||
+    layer === "nextjs";
   const isFrontendLayer = layer === "angular" || layer === "react";
 
   if (!isBackendLayer && !isFrontendLayer) return;
@@ -257,6 +269,7 @@ Exemples:
         openapi: false,
         auth: false,
         mapstruct: false,
+        prisma: false,
         prettier: false,
         eslint: false,
         uiFramework: "none",
