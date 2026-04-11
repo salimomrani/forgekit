@@ -5,6 +5,7 @@ import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
 import { generateReactViteFrontend } from "./react-vite.js";
+import { generateVueFrontend } from "./vue.js";
 
 class FrontendGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
@@ -315,5 +316,7 @@ export async function generateFrontend(
     await generateAngularFrontend(projectDir, config, versions);
   } else if (config.frontend === "react-vite") {
     await generateReactViteFrontend(projectDir, config, versions);
+  } else if (config.frontend === "vue") {
+    await generateVueFrontend(projectDir, config, versions);
   }
 }

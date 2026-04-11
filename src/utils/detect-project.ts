@@ -43,9 +43,15 @@ const SENTINEL_MAP: Array<{
     },
   },
   {
+    files: ["frontend/src/App.vue"],
+    apply: (c) => {
+      c.frontend = "vue";
+    },
+  },
+  {
     files: ["frontend/vite.config.ts"],
     apply: (c) => {
-      c.frontend = "react-vite";
+      if (c.frontend === null) c.frontend = "react-vite";
     },
   },
   {

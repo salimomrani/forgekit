@@ -79,6 +79,14 @@ export async function generateProject(
           `\r  ✔ Frontend React ${versions.react} (Vite) généré       `,
         ),
       );
+    } else if (config.frontend === "vue") {
+      process.stdout.write(chalk.yellow("  ⏳ Frontend Vue.js (Vite)..."));
+      await generateFrontend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Frontend Vue.js ${versions.vue} (Vite) généré        `,
+        ),
+      );
     }
 
     if (config.docker) {
@@ -281,6 +289,10 @@ Exemples:
         if (config.frontend === "angular")
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
         if (config.frontend === "react-vite")
+          console.log(
+            chalk.cyan("  cd frontend && npm install && npm run dev"),
+          );
+        if (config.frontend === "vue")
           console.log(
             chalk.cyan("  cd frontend && npm install && npm run dev"),
           );

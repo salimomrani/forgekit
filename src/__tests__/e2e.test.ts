@@ -306,4 +306,62 @@ describe("ForgeKit e2e — generation pipeline", () => {
     );
     expect(ciYml).toContain("backend/package-lock.json");
   }, 15_000);
+
+  it("S9: Vue.js only — generates key files and package.json contains vue", async () => {
+    const projectDir = await run(
+      baseConfig({
+        frontend: "vue",
+        uiFramework: "tailwind",
+      }),
+    );
+
+    const frontendDir = path.join(projectDir, "frontend");
+    const srcDir = path.join(frontendDir, "src");
+
+    expect(await fs.pathExists(path.join(frontendDir, "package.json"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(frontendDir, "vite.config.ts"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(srcDir, "App.vue"))).toBe(true);
+    expect(await fs.pathExists(path.join(srcDir, "main.ts"))).toBe(true);
+    expect(await fs.pathExists(path.join(srcDir, "router", "index.ts"))).toBe(
+      true,
+    );
+    expect(
+      await fs.pathExists(path.join(srcDir, "components", "Layout.vue")),
+    ).toBe(true);
+
+    const pkg = await fs.readJson(path.join(frontendDir, "package.json"));
+    expect(pkg.dependencies["vue"]).toBeDefined();
+  }, 15_000);
+
+  it("S10: Vue.js + Spring Boot + Docker + CI — verifies frontend, ci.yml, docker-compose", async () => {
+    const projectDir = await run(
+      baseConfig({
+        backendType: "spring-boot",
+        frontend: "vue",
+        uiFramework: "tailwind",
+        docker: true,
+        ci: true,
+      }),
+    );
+
+    expect(
+      await fs.pathExists(path.join(projectDir, "frontend", "package.json")),
+    ).toBe(true);
+
+    const ciYml = await fs.readFile(
+      path.join(projectDir, ".github/workflows/ci.yml"),
+      "utf-8",
+    );
+    expect(ciYml).toContain("frontend/package-lock.json");
+
+    const dockerCompose = await fs.readFile(
+      path.join(projectDir, "docker-compose.yml"),
+      "utf-8",
+    );
+    expect(dockerCompose).toContain("postgres:");
+  }, 15_000);
 });

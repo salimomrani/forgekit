@@ -6,7 +6,7 @@ export type BackendType =
   | "laravel"
   | "nextjs"
   | null;
-export type FrontendType = "angular" | "react-vite" | null;
+export type FrontendType = "angular" | "react-vite" | "vue" | null;
 
 export interface ProjectConfig {
   name: string;

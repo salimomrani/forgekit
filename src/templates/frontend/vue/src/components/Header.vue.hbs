@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+{{#if auth}}
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+{{/if}}
+</script>
+
+<template>
+  <header class="bg-white border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-8">
+        <span class="font-mono text-sm font-bold tracking-tight text-stone-900">
+          {{name}}
+        </span>
+        <nav>
+          <RouterLink
+            to="/"
+            class="text-sm text-stone-500 hover:text-stone-900 transition-colors"
+          >
+            Home
+          </RouterLink>
+        </nav>
+      </div>
+{{#if auth}}
+      <div>
+        <button
+          v-if="authStore.isAuthenticated"
+          @click="authStore.logout()"
+          class="text-sm px-3 py-1.5 border border-stone-300 rounded text-stone-700 hover:border-stone-900 hover:text-stone-900 transition-colors"
+        >
+          Sign out
+        </button>
+        <a
+          v-else
+          href="#"
+          class="text-sm px-3 py-1.5 border border-stone-300 rounded text-stone-700 hover:border-stone-900 hover:text-stone-900 transition-colors"
+        >
+          Sign in
+        </a>
+      </div>
+{{/if}}
+    </div>
+  </header>
+</template>

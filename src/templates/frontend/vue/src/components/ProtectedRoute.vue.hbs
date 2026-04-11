@@ -1,0 +1,18 @@
+<script setup lang="ts">
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import { watchEffect } from 'vue'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+watchEffect(() => {
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
+  }
+})
+</script>
+
+<template>
+  <slot v-if="authStore.isAuthenticated" />
+</template>

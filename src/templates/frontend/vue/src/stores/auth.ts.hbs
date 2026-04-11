@@ -1,0 +1,22 @@
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref<string | null>(localStorage.getItem('token'))
+  const user = ref<{ name: string } | null>(null)
+
+  const isAuthenticated = computed(() => !!token.value)
+
+  function login(jwt: string) {
+    localStorage.setItem('token', jwt)
+    token.value = jwt
+  }
+
+  function logout() {
+    localStorage.removeItem('token')
+    token.value = null
+    user.value = null
+  }
+
+  return { token, user, isAuthenticated, login, logout }
+})

@@ -57,6 +57,7 @@ export async function promptProjectConfig(
           choices: [
             { name: "Angular (standalone, OnPush)", value: "angular" },
             { name: "React (Vite + Tailwind)", value: "react-vite" },
+            { name: "Vue.js (Vite + Tailwind)", value: "vue" },
             { name: "Aucun", value: null },
           ],
           default: "angular",
@@ -193,6 +194,8 @@ export async function promptProjectConfig(
       });
     }
   } else if (frontend === "react-vite") {
+    uiFramework = "tailwind";
+  } else if (frontend === "vue") {
     uiFramework = "tailwind";
   }
 

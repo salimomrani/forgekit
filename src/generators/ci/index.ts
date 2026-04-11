@@ -16,6 +16,7 @@ class CIGenerator extends BaseGenerator {
     const hasFrontend = this.config.frontend !== null;
     const angular = this.config.frontend === "angular";
     const reactVite = this.config.frontend === "react-vite";
+    const vue = this.config.frontend === "vue";
 
     await renderAndWrite("ci/ci.yml.hbs", path.join(workflowsDir, "ci.yml"), {
       backend: this.config.backendType !== null,
@@ -27,6 +28,7 @@ class CIGenerator extends BaseGenerator {
       hasFrontend,
       angular,
       reactVite,
+      vue,
     });
   }
 }

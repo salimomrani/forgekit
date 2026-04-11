@@ -33,6 +33,8 @@ CLI Node.js/TypeScript qui génère des projets Spring Boot + Angular ou FastAPI
 ## Active Technologies
 - TypeScript 5.9 (ForgeKit), Node.js ≥ 20 + Commander, Inquirer, Handlebars, fs-extra, chalk (existing) (008-nextjs-backend)
 - PostgreSQL (generated docker-compose) (008-nextjs-backend)
+- TypeScript 5.9 (ForgeKit CLI), Node.js ≥ 20 (009-vue-frontend)
+- N/A (CLI generator — no persistent data) (009-vue-frontend)
 
 ## Recent Changes
 - 008-nextjs-backend: Added TypeScript 5.9 (ForgeKit), Node.js ≥ 20 + Commander, Inquirer, Handlebars, fs-extra, chalk (existing)

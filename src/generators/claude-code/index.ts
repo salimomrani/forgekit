@@ -288,6 +288,16 @@ class ClaudeCodeGenerator extends BaseGenerator {
       );
     }
 
+    if (this.config.frontend === "vue") {
+      commands.push(
+        "Bash(npm run dev)",
+        "Bash(npm run build)",
+        "Bash(npm run lint)",
+        "Bash(npm install)",
+        "Bash(npm run)",
+      );
+    }
+
     if (this.config.docker) {
       commands.push(
         "Bash(docker compose up)",

@@ -57,6 +57,11 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
     configValue: "react-vite",
     conflictGroup: "frontend",
   },
+  vue: {
+    configField: "frontend",
+    configValue: "vue",
+    conflictGroup: "frontend",
+  },
   docker: { configField: "docker", configValue: true, conflictGroup: null },
   ci: { configField: "ci", configValue: true, conflictGroup: null },
   "claude-code": {
@@ -117,6 +122,7 @@ async function runLayerGenerator(
       break;
     case "angular":
     case "react":
+    case "vue":
       await generateFrontend(projectDir, config, versions);
       break;
     case "docker":
@@ -150,7 +156,8 @@ async function regenerateDependentLayers(
     layer === "fastapi" ||
     layer === "laravel" ||
     layer === "nextjs";
-  const isFrontendLayer = layer === "angular" || layer === "react";
+  const isFrontendLayer =
+    layer === "angular" || layer === "react" || layer === "vue";
 
   if (!isBackendLayer && !isFrontendLayer) return;
 
