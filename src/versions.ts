@@ -30,6 +30,10 @@ export interface ResolvedVersions {
   next: string;
   nextAuth: string;
   prismaClient: string;
+  // Frontend — Vue
+  vue: string;
+  pinia: string;
+  vueRouter: string;
   // Dev tooling
   husky: string;
   lintStaged: string;
@@ -64,6 +68,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   next: "15.3.0",
   nextAuth: "5.0.0",
   prismaClient: "6.6.0",
+  vue: "3.5.13",
+  pinia: "3.0.4",
+  vueRouter: "4.5.0",
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
@@ -225,6 +232,15 @@ export async function resolveVersions(opts: {
       fetchNpmVersion("eslint-config-prettier").then(
         set("eslintConfigPrettier"),
       ),
+    );
+  }
+
+  if (opts.frontend === "vue") {
+    tasks.push(
+      fetchNpmVersion("vue").then(set("vue")),
+      fetchNpmVersion("pinia").then(set("pinia")),
+      fetchNpmVersion("vue-router").then(set("vueRouter")),
+      fetchNpmVersion("tailwindcss").then(set("tailwind")),
     );
   }
 

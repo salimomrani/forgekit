@@ -18,7 +18,12 @@ import { initSpecify } from "../generators/speckit.js";
 import { resolveVersions } from "../versions.js";
 import type { ResolvedVersions } from "../versions.js";
 import { writeManifest } from "../utils/forgekit-json.js";
-import type { ProjectConfig, BackendType, FrontendType } from "../types.js";
+import type {
+  ProjectConfig,
+  BackendType,
+  FrontendType,
+  WorkflowMode,
+} from "../types.js";
 
 export async function generateProject(
   projectDir: string,
@@ -77,6 +82,14 @@ export async function generateProject(
       console.log(
         chalk.green(
           `\r  ✔ Frontend React ${versions.react} (Vite) généré       `,
+        ),
+      );
+    } else if (config.frontend === "vue") {
+      process.stdout.write(chalk.yellow("  ⏳ Frontend Vue.js (Vite)..."));
+      await generateFrontend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Frontend Vue.js ${versions.vue} (Vite) généré        `,
         ),
       );
     }
@@ -167,6 +180,7 @@ export const newCommand = new Command("new")
   .option("--no-claude-code", "Exclure config Claude Code")
   .option("--prettier", "Inclure Prettier + Husky + lint-staged")
   .option("--no-prettier", "Exclure Prettier")
+  .option("--workflow <mode>", "Mode workflow Claude : speckit | vibe | none")
   .option("--no-git", "Ne pas initialiser Git")
   .addHelpText(
     "after",
@@ -233,6 +247,8 @@ Exemples:
       if (isExplicit("docker")) defaults.docker = options.docker as boolean;
       if (isExplicit("claudeCode"))
         defaults.claudeCode = options.claudeCode as boolean;
+      if (options.workflow)
+        defaults.workflowMode = options.workflow as WorkflowMode;
       if (isExplicit("git")) defaults.gitInit = options.git as boolean;
 
       let config;
@@ -281,6 +297,10 @@ Exemples:
         if (config.frontend === "angular")
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));
         if (config.frontend === "react-vite")
+          console.log(
+            chalk.cyan("  cd frontend && npm install && npm run dev"),
+          );
+        if (config.frontend === "vue")
           console.log(
             chalk.cyan("  cd frontend && npm install && npm run dev"),
           );

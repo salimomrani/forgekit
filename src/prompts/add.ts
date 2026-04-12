@@ -26,6 +26,9 @@ export async function promptAddLayerConfig(
   if (layer === "react") {
     return promptAuth(defaults);
   }
+  if (layer === "vue") {
+    return promptVue(defaults);
+  }
   if (layer === "prettier") {
     if (existingConfig.frontend === null) {
       throw new Error(
@@ -207,4 +210,10 @@ async function promptAuth(
   }
 
   return { auth };
+}
+
+async function promptVue(
+  defaults: Partial<ProjectConfig>,
+): Promise<Partial<ProjectConfig>> {
+  return promptAuth(defaults);
 }

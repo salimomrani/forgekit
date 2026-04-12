@@ -1,12 +1,13 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
+export type WorkflowMode = "speckit" | "vibe" | "none";
 export type BackendType =
   | "spring-boot"
   | "fastapi"
   | "laravel"
   | "nextjs"
   | null;
-export type FrontendType = "angular" | "react-vite" | null;
+export type FrontendType = "angular" | "react-vite" | "vue" | null;
 
 export interface ProjectConfig {
   name: string;
@@ -32,6 +33,7 @@ export interface ProjectConfig {
   ci: boolean;
   claudeCode: boolean;
   speckit: boolean;
+  workflowMode: WorkflowMode;
   gitInit: boolean;
 }
 

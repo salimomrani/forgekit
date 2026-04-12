@@ -75,6 +75,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       versions: this.versions,
       allowedCommands,
       claudeDir: ".claude",
+      workflowSpeckit: this.config.workflowMode === "speckit",
+      workflowVibe: this.config.workflowMode === "vibe",
     };
 
     // Static hookify files (no templating needed)
@@ -279,6 +281,16 @@ class ClaudeCodeGenerator extends BaseGenerator {
     }
 
     if (this.config.frontend === "react-vite") {
+      commands.push(
+        "Bash(npm run dev)",
+        "Bash(npm run build)",
+        "Bash(npm run lint)",
+        "Bash(npm install)",
+        "Bash(npm run)",
+      );
+    }
+
+    if (this.config.frontend === "vue") {
       commands.push(
         "Bash(npm run dev)",
         "Bash(npm run build)",

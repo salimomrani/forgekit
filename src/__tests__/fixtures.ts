@@ -24,6 +24,7 @@ export function makeBaseConfig(
     ci: false,
     claudeCode: false,
     speckit: false,
+    workflowMode: "none",
     gitInit: false,
     ...overrides,
   };
@@ -54,6 +55,9 @@ export const BASE_VERSIONS: ResolvedVersions = {
   next: "15.3.0",
   nextAuth: "5.0.0",
   prismaClient: "6.6.0",
+  vue: "3.5.13",
+  pinia: "3.0.4",
+  vueRouter: "4.5.0",
   husky: "9.1.0",
   lintStaged: "15.5.0",
   prettier: "3.5.0",
