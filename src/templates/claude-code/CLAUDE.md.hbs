@@ -5,6 +5,17 @@
 {{#if workflowSpeckit}}
 ## Workflow Mode: speckit
 
+## Speckit Config
+tests: {{speckitTests}}
+tdd: {{speckitTdd}}
+test-types: {{speckitTestTypes}}
+code-review: {{speckitCodeReview}}
+security-review: {{speckitSecurityReview}}
+verification: {{speckitVerification}}
+plan-detail: {{speckitPlanDetail}}
+skip-clarify: {{speckitSkipClarify}}
+{{#if speckitFastMode}}fast-mode: true
+{{/if}}
 {{/if}}
 {{#if workflowVibe}}
 ## Workflow Mode: vibe

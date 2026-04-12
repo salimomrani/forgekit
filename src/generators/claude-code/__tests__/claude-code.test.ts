@@ -357,11 +357,86 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("CLAUDE.md contains '## Workflow Mode: speckit' when workflowMode is speckit", async () => {
-    const config = { ...baseConfig, workflowMode: "speckit" as const };
+    const config = {
+      ...baseConfig,
+      workflowMode: "speckit" as const,
+      speckitPreset: "balanced" as const,
+    };
     await generateClaudeCode(tmpDir, config, baseVersions);
     const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
     expect(content).toContain("## Workflow Mode: speckit");
     expect(content).not.toContain("## Workflow Mode: vibe");
+  });
+
+  it("CLAUDE.md contains ## Speckit Config block when workflowMode is speckit", async () => {
+    const config = {
+      ...baseConfig,
+      workflowMode: "speckit" as const,
+      speckitPreset: "balanced" as const,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Speckit Config");
+    expect(content).toContain("tests: true");
+    expect(content).toContain("tdd: false");
+    expect(content).toContain("code-review: true");
+    expect(content).toContain("verification: minimal");
+    expect(content).toContain("plan-detail: medium");
+    expect(content).not.toContain("fast-mode:");
+  });
+
+  it("CLAUDE.md Speckit Config — rigorous preset", async () => {
+    const config = {
+      ...baseConfig,
+      workflowMode: "speckit" as const,
+      speckitPreset: "rigorous" as const,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("tdd: true");
+    expect(content).toContain("verification: full");
+    expect(content).toContain("plan-detail: high");
+    expect(content).not.toContain("fast-mode:");
+  });
+
+  it("CLAUDE.md Speckit Config — fast preset (skip-clarify: true, no fast-mode line)", async () => {
+    const config = {
+      ...baseConfig,
+      workflowMode: "speckit" as const,
+      speckitPreset: "fast" as const,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("skip-clarify: true");
+    expect(content).toContain("code-review: false");
+    expect(content).not.toContain("fast-mode:");
+  });
+
+  it("CLAUDE.md Speckit Config — bare-metal preset", async () => {
+    const config = {
+      ...baseConfig,
+      workflowMode: "speckit" as const,
+      speckitPreset: "bare-metal" as const,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("tests: false");
+    expect(content).toContain("verification: skip");
+    expect(content).not.toContain("fast-mode:");
+  });
+
+  it("CLAUDE.md does not contain ## Speckit Config when workflowMode is vibe", async () => {
+    const config = { ...baseConfig, workflowMode: "vibe" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("## Speckit Config");
+  });
+
+  it("CLAUDE.md does not contain ## Speckit Config when workflowMode is none", async () => {
+    const config = { ...baseConfig, workflowMode: "none" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("## Speckit Config");
   });
 
   it("CLAUDE.md contains '## Workflow Mode: vibe' when workflowMode is vibe", async () => {
