@@ -10,6 +10,7 @@ import type {
   BackendType,
   FrontendType,
   WorkflowMode,
+  SpeckitPreset,
 } from "../types.js";
 
 export async function promptProjectConfig(
@@ -288,6 +289,32 @@ export async function promptProjectConfig(
     });
   }
 
+  let speckitPreset: SpeckitPreset | null = defaults.speckitPreset ?? null;
+  if (workflowMode === "speckit" && defaults.speckitPreset === undefined) {
+    speckitPreset = await select<SpeckitPreset>({
+      message: "Speckit preset",
+      choices: [
+        {
+          name: "balanced  — tests=oui, tdd=non, code-review=oui, verification=minimal",
+          value: "balanced",
+        },
+        {
+          name: "rigorous  — tests=oui, tdd=oui,  code-review=oui, verification=full",
+          value: "rigorous",
+        },
+        {
+          name: "fast      — tests=oui, tdd=non,  code-review=non, skip-clarify=oui",
+          value: "fast",
+        },
+        {
+          name: "bare-metal — tests=non, code-review=non, verification=skip",
+          value: "bare-metal",
+        },
+      ],
+      default: "balanced",
+    });
+  }
+
   return {
     name,
     groupId,
@@ -305,6 +332,7 @@ export async function promptProjectConfig(
     docker,
     speckit,
     workflowMode,
+    speckitPreset,
     ci,
     claudeCode,
     gitInit,

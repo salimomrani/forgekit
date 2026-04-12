@@ -108,6 +108,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     claudeCode: false,
     speckit: false,
     workflowMode: "none",
+    speckitPreset: null,
     gitInit: false,
   };
 }

@@ -25,6 +25,7 @@ export function makeBaseConfig(
     claudeCode: false,
     speckit: false,
     workflowMode: "none",
+    speckitPreset: null,
     gitInit: false,
     ...overrides,
   };

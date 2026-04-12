@@ -7,8 +7,67 @@ import {
   BUNDLED_SKILLS_DIR,
 } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
-import type { ProjectConfig } from "../../types.js";
+import type { ProjectConfig, SpeckitPreset } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
+
+interface SpeckitConfig {
+  tests: boolean;
+  tdd: boolean;
+  testTypes: string;
+  codeReview: boolean;
+  securityReview: string;
+  verification: string;
+  planDetail: string;
+  skipClarify: boolean;
+  fastMode: boolean;
+}
+
+const SPECKIT_PRESETS: Record<SpeckitPreset, SpeckitConfig> = {
+  rigorous: {
+    tests: true,
+    tdd: true,
+    testTypes: "unit",
+    codeReview: true,
+    securityReview: "auto",
+    verification: "full",
+    planDetail: "high",
+    skipClarify: false,
+    fastMode: false,
+  },
+  balanced: {
+    tests: true,
+    tdd: false,
+    testTypes: "unit",
+    codeReview: true,
+    securityReview: "auto",
+    verification: "minimal",
+    planDetail: "medium",
+    skipClarify: false,
+    fastMode: false,
+  },
+  fast: {
+    tests: true,
+    tdd: false,
+    testTypes: "unit",
+    codeReview: false,
+    securityReview: "auto",
+    verification: "minimal",
+    planDetail: "low",
+    skipClarify: true,
+    fastMode: false,
+  },
+  "bare-metal": {
+    tests: false,
+    tdd: false,
+    testTypes: "unit",
+    codeReview: false,
+    securityReview: "false",
+    verification: "skip",
+    planDetail: "low",
+    skipClarify: true,
+    fastMode: false,
+  },
+};
 
 class ClaudeCodeGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
@@ -77,6 +136,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       claudeDir: ".claude",
       workflowSpeckit: this.config.workflowMode === "speckit",
       workflowVibe: this.config.workflowMode === "vibe",
+      ...this.resolveSpeckitData(),
     };
 
     // Static hookify files (no templating needed)
@@ -217,6 +277,24 @@ class ClaudeCodeGenerator extends BaseGenerator {
     await fs.ensureDir(dest);
     await fs.copy(src, path.join(dest, "speckit.workflow.md"));
     return true;
+  }
+
+  private resolveSpeckitData(): Record<string, unknown> {
+    if (this.config.workflowMode !== "speckit") {
+      return {};
+    }
+    const cfg = SPECKIT_PRESETS[this.config.speckitPreset ?? "balanced"];
+    return {
+      speckitTests: cfg.tests,
+      speckitTdd: cfg.tdd,
+      speckitTestTypes: cfg.testTypes,
+      speckitCodeReview: cfg.codeReview,
+      speckitSecurityReview: cfg.securityReview,
+      speckitVerification: cfg.verification,
+      speckitPlanDetail: cfg.planDetail,
+      speckitSkipClarify: cfg.skipClarify,
+      speckitFastMode: cfg.fastMode,
+    };
   }
 
   private buildAllowedCommands(): string[] {

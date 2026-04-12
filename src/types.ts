@@ -1,6 +1,7 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
 export type WorkflowMode = "speckit" | "vibe" | "none";
+export type SpeckitPreset = "rigorous" | "balanced" | "fast" | "bare-metal";
 export type BackendType =
   | "spring-boot"
   | "fastapi"
@@ -34,6 +35,7 @@ export interface ProjectConfig {
   claudeCode: boolean;
   speckit: boolean;
   workflowMode: WorkflowMode;
+  speckitPreset: SpeckitPreset | null;
   gitInit: boolean;
 }
 
