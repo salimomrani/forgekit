@@ -356,6 +356,29 @@ describe("ClaudeCodeGenerator", () => {
     expect(content).not.toContain("Commit / PR");
   });
 
+  it("CLAUDE.md contains '## Workflow Mode: speckit' when workflowMode is speckit", async () => {
+    const config = { ...baseConfig, workflowMode: "speckit" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Workflow Mode: speckit");
+    expect(content).not.toContain("## Workflow Mode: vibe");
+  });
+
+  it("CLAUDE.md contains '## Workflow Mode: vibe' when workflowMode is vibe", async () => {
+    const config = { ...baseConfig, workflowMode: "vibe" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Workflow Mode: vibe");
+    expect(content).not.toContain("## Workflow Mode: speckit");
+  });
+
+  it("CLAUDE.md does not contain '## Workflow Mode' when workflowMode is none", async () => {
+    const config = { ...baseConfig, workflowMode: "none" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("## Workflow Mode");
+  });
+
   it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const content = await fs.readFile(

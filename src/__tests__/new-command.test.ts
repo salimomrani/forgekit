@@ -2,6 +2,16 @@ import { describe, it, expect } from "vitest";
 import { newCommand } from "../commands/new.js";
 
 describe("newCommand options (win 3)", () => {
+  it("exposes --workflow flag", () => {
+    const opt = newCommand.options.find((o) => o.long === "--workflow");
+    expect(opt).toBeDefined();
+  });
+
+  it("--workflow flag accepts a value", () => {
+    const opt = newCommand.options.find((o) => o.long === "--workflow");
+    expect(opt?.required).toBe(true);
+  });
+
   it("exposes --prettier flag", () => {
     const opt = newCommand.options.find((o) => o.long === "--prettier");
     expect(opt).toBeDefined();

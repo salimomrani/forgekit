@@ -286,6 +286,7 @@ Exemples:
         ci: false,
         claudeCode: false,
         speckit: false,
+        workflowMode: "none",
         gitInit: false,
       };
       detectionSource = "manifest";

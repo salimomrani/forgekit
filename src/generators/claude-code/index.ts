@@ -75,6 +75,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       versions: this.versions,
       allowedCommands,
       claudeDir: ".claude",
+      workflowSpeckit: this.config.workflowMode === "speckit",
+      workflowVibe: this.config.workflowMode === "vibe",
     };
 
     // Static hookify files (no templating needed)

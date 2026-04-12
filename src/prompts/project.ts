@@ -9,6 +9,7 @@ import type {
   PrimeNGPreset,
   BackendType,
   FrontendType,
+  WorkflowMode,
 } from "../types.js";
 
 export async function promptProjectConfig(
@@ -204,6 +205,7 @@ export async function promptProjectConfig(
   let ci = defaults.ci ?? true;
   let claudeCode = defaults.claudeCode ?? true;
   let speckit = defaults.speckit ?? true;
+  let workflowMode: WorkflowMode = defaults.workflowMode ?? "none";
   let gitInit = defaults.gitInit ?? true;
   let prettier = defaults.prettier ?? false;
   let eslint = defaults.eslint ?? false;
@@ -271,6 +273,21 @@ export async function promptProjectConfig(
     eslint = infra.includes("eslint");
   }
 
+  if (claudeCode && defaults.workflowMode === undefined) {
+    workflowMode = await select<WorkflowMode>({
+      message: "Workflow mode (Claude Code)",
+      choices: [
+        {
+          name: "speckit — spec → plan → tasks → impl → review → PR",
+          value: "speckit",
+        },
+        { name: "vibe   — itérations rapides, pas de spec", value: "vibe" },
+        { name: "aucun", value: "none" },
+      ],
+      default: "speckit",
+    });
+  }
+
   return {
     name,
     groupId,
@@ -287,6 +304,7 @@ export async function promptProjectConfig(
     ngrx,
     docker,
     speckit,
+    workflowMode,
     ci,
     claudeCode,
     gitInit,
