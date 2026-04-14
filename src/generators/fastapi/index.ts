@@ -38,6 +38,16 @@ class FastAPIGenerator extends BaseGenerator {
         data,
       ),
       renderAndWrite(
+        "fastapi/pytest.ini.hbs",
+        path.join(backendDir, "pytest.ini"),
+        data,
+      ),
+      renderAndWrite(
+        "fastapi/pyrightconfig.json.hbs",
+        path.join(backendDir, "pyrightconfig.json"),
+        data,
+      ),
+      renderAndWrite(
         "fastapi/gitignore.hbs",
         path.join(backendDir, ".gitignore"),
         data,

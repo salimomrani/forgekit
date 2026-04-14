@@ -46,6 +46,15 @@ class RootGenerator extends BaseGenerator {
         path.join(this.projectDir, ".gitignore"),
         data,
       ),
+      ...(this.config.backendType === "fastapi"
+        ? [
+            renderAndWrite(
+              "root/pyrightconfig.json.hbs",
+              path.join(this.projectDir, "pyrightconfig.json"),
+              data,
+            ),
+          ]
+        : []),
     ]);
   }
 }
