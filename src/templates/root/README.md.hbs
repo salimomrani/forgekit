@@ -34,8 +34,8 @@ cd backend && ./mvnw spring-boot:run
 
 {{/if}}
 {{#if fastapi}}
-# Installer les dépendances Python
-cd backend && pip install -r requirements.txt
+# Créer le venv et installer les dépendances Python
+cd backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 
 # Démarrer le backend (port 8000)
 uvicorn app.main:app --reload

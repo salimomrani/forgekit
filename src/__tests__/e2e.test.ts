@@ -123,6 +123,22 @@ describe("ForgeKit e2e — generation pipeline", () => {
       "utf-8",
     );
     expect(packageJson).toContain('"react"');
+
+    expect(
+      await fs.pathExists(path.join(projectDir, "backend/pyrightconfig.json")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "pyrightconfig.json")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "backend/pytest.ini")),
+    ).toBe(true);
+
+    const readme = await fs.readFile(
+      path.join(projectDir, "README.md"),
+      "utf-8",
+    );
+    expect(readme).toContain("python3 -m venv .venv");
   }, 15_000);
 
   it("S3: Spring Boot only (no frontend) generates expected project structure", async () => {

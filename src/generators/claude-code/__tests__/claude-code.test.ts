@@ -307,6 +307,8 @@ describe("ClaudeCodeGenerator", () => {
     );
     expect(content).toContain('paths: ["**/backend/**"]');
     expect(content).toContain("FastAPI");
+    expect(content).toContain("201");
+    expect(content).toContain(".venv/bin/pytest");
   });
 
   it("generates .claude/rules/frontend.md when frontend is enabled", async () => {
