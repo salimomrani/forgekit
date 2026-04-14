@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/session-start.sh",
+            "command": "/Users/salimomrani/code/_AI/forgekit/.claude/hooks/session-start.sh",
             "once": true
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/pre-bash.sh"
+            "command": "/Users/salimomrani/code/_AI/forgekit/.claude/hooks/pre-bash.sh"
           }
         ]
       }
