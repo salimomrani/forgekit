@@ -4,23 +4,41 @@
 
 {{#if workflowSpeckit}}
 ## Workflow Mode: speckit
-
-## Speckit Config
-tests: {{speckitTests}}
-tdd: {{speckitTdd}}
-test-types: {{speckitTestTypes}}
-code-review: {{speckitCodeReview}}
-security-review: {{speckitSecurityReview}}
-verification: {{speckitVerification}}
-plan-detail: {{speckitPlanDetail}}
-skip-clarify: {{speckitSkipClarify}}
-{{#if speckitFastMode}}fast-mode: true
-{{/if}}
 {{/if}}
 {{#if workflowVibe}}
 ## Workflow Mode: vibe
-
 {{/if}}
+
+## Git
+
+{{#if gitStrategyNoPr}}
+- Merge direct sur `master` — pas de PR requis.
+- Commit skill: `commit-commands:commit`
+{{else}}
+- PR obligatoire avant tout merge sur `master` — pas de push direct.
+- Commit skill: `commit-commands:commit-push-pr`
+{{/if}}
+
+## Claude Settings
+
+| Clé | Fichier | Valeur | Description |
+|-----|---------|--------|-------------|
+| `git.strategy` | `settings.json` | `{{gitStrategy}}` | Stratégie git — lue par `vibe.workflow` step 7 |
+{{#if workflowSpeckit}}
+| `speckit.tests` | `settings.json` | `{{speckitTests}}` | Génération de tests |
+| `speckit.tdd` | `settings.json` | `{{speckitTdd}}` | Mode RED→GREEN |
+| `speckit.test-types` | `settings.json` | `{{speckitTestTypes}}` | Types de tests |
+| `speckit.code-review` | `settings.json` | `{{speckitCodeReview}}` | Code review automatique |
+| `speckit.security-review` | `settings.json` | `{{speckitSecurityReview}}` | Security review |
+| `speckit.verification` | `settings.json` | `{{speckitVerification}}` | Niveau de vérification |
+| `speckit.plan-detail` | `settings.json` | `{{speckitPlanDetail}}` | Détail du plan |
+| `speckit.skip-clarify` | `settings.json` | `{{speckitSkipClarify}}` | Sauter sk.clarify |
+| `speckit.fast-mode` | `settings.json` | `{{speckitFastMode}}` | Fast mode |
+| `speckit.subagents` | `settings.json` | `true` | Utiliser subagent-driven-development |
+
+> `settings.local.json` overrides `settings.json` pour tous ces champs.
+{{/if}}
+
 ## Architecture Constitution
 
 Read `.specify/memory/constitution.md` before any architectural decision. It is auto-loaded at session start.

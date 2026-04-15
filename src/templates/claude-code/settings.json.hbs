@@ -1,4 +1,21 @@
 {
+  "git": {
+    "strategy": "{{gitStrategy}}"
+  },
+{{#if workflowSpeckit}}
+  "speckit": {
+    "tests": {{speckitTests}},
+    "tdd": {{speckitTdd}},
+    "test-types": "{{speckitTestTypes}}",
+    "code-review": {{speckitCodeReview}},
+    "security-review": "{{speckitSecurityReview}}",
+    "verification": "{{speckitVerification}}",
+    "plan-detail": "{{speckitPlanDetail}}",
+    "skip-clarify": {{speckitSkipClarify}},
+    "fast-mode": {{speckitFastMode}},
+    "subagents": true
+  },
+{{/if}}
   "permissions": {
     "deny": [
       "Read(./.env)",
