@@ -1,4 +1,19 @@
 {
+  "git": {
+    "strategy": "pr-required"
+  },
+  "speckit": {
+    "tests": true,
+    "tdd": false,
+    "test-types": "unit",
+    "code-review": true,
+    "security-review": "auto",
+    "verification": "minimal",
+    "plan-detail": "medium",
+    "skip-clarify": false,
+    "fast-mode": false,
+    "subagents": true
+  },
   "permissions": {
     "allow": [
       "Bash(node *)",
