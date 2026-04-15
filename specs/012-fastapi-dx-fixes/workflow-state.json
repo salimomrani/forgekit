@@ -1,7 +1,7 @@
 {
   "routing": "full-workflow",
   "phase": "complete",
-  "branch": "013-fastapi-dx-fixes",
+  "branch": "012-fastapi-dx-fixes",
   "completed_steps": ["specify", "plan", "tasks", "analyze", "implementation"],
   "skills_used": [
     "speckit.specify",

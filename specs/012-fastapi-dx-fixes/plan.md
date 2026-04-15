@@ -1,6 +1,6 @@
 # Implementation Plan: FastAPI DX Fixes
 
-**Branch**: `013-fastapi-dx-fixes` | **Date**: 2026-04-14 | **Spec**: [spec.md](spec.md)
+**Branch**: `012-fastapi-dx-fixes` | **Date**: 2026-04-14 | **Spec**: [spec.md](spec.md)
 
 ## Summary
 
@@ -36,7 +36,7 @@ Add 5 missing files/configs to ForgeKit's FastAPI generator and templates so gen
 ### Documentation (this feature)
 
 ```text
-specs/013-fastapi-dx-fixes/
+specs/012-fastapi-dx-fixes/
 ├── plan.md
 ├── spec.md
 ├── checklists/requirements.md

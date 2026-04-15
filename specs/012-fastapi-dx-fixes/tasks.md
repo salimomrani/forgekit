@@ -1,7 +1,7 @@
 # Tasks: FastAPI DX Fixes
 
-**Input**: Design documents from `/specs/013-fastapi-dx-fixes/`
-**Branch**: `013-fastapi-dx-fixes`
+**Input**: Design documents from `/specs/012-fastapi-dx-fixes/`
+**Branch**: `012-fastapi-dx-fixes`
 
 ## Format: `[ID] [P?] [Story] Description`
 
