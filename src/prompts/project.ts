@@ -45,6 +45,7 @@ export async function promptProjectConfig(
             { name: "Spring Boot (Java 21)", value: "spring-boot" },
             { name: "FastAPI (Python)", value: "fastapi" },
             { name: "Laravel (PHP 8.3)", value: "laravel" },
+            { name: "NestJS (Node.js/TypeScript)", value: "nestjs" },
             { name: "Next.js (Node.js)", value: "nextjs" },
             { name: "Aucun", value: null },
           ],
@@ -126,6 +127,37 @@ export async function promptProjectConfig(
     });
     auth = laravelFeatures.includes("auth");
     openapi = laravelFeatures.includes("openapi");
+  }
+
+  if (
+    backendType === "nestjs" &&
+    defaults.auth === undefined &&
+    defaults.prisma === undefined &&
+    defaults.openapi === undefined
+  ) {
+    const nestjsFeatures = await checkbox({
+      message: "Fonctionnalités NestJS",
+      choices: [
+        {
+          name: "JWT authentication (@nestjs/jwt)",
+          value: "auth",
+          checked: false,
+        },
+        {
+          name: "Prisma ORM (PostgreSQL)",
+          value: "prisma",
+          checked: false,
+        },
+        {
+          name: "OpenAPI / Swagger UI (@nestjs/swagger)",
+          value: "openapi",
+          checked: false,
+        },
+      ],
+    });
+    auth = nestjsFeatures.includes("auth");
+    prisma = nestjsFeatures.includes("prisma");
+    openapi = nestjsFeatures.includes("openapi");
   }
 
   if (
