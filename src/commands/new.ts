@@ -11,6 +11,7 @@ import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateLaravelBackend } from "../generators/laravel/index.js";
+import { generateNestJsBackend } from "../generators/nestjs/index.js";
 import { generateNextJsBackend } from "../generators/nextjs/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
@@ -64,6 +65,16 @@ export async function generateProject(
       console.log(
         chalk.green(
           `\r  ✔ Backend Next.js ${versions.next} généré              `,
+        ),
+      );
+    }
+
+    if (config.backendType === "nestjs") {
+      process.stdout.write(chalk.yellow("  ⏳ Backend NestJS..."));
+      await generateNestJsBackend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Backend NestJS ${versions.nestjs} généré              `,
         ),
       );
     }
@@ -157,6 +168,7 @@ export const newCommand = new Command("new")
   .option("--spring-boot", "Inclure le backend Spring Boot")
   .option("--fastapi", "Inclure le backend FastAPI")
   .option("--laravel", "Inclure le backend Laravel (PHP 8.3)")
+  .option("--nestjs", "Inclure le backend NestJS")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--no-frontend", "Exclure le frontend Angular")
   .option("--react", "Inclure le frontend React (Vite + Tailwind)")
@@ -189,6 +201,7 @@ Backends:
   --spring-boot   Java 21 + Spring Boot 3 + Maven
   --fastapi       Python + FastAPI + SQLAlchemy
   --laravel       PHP 8.3 + Laravel 12
+  --nestjs        Node.js + NestJS 11 + TypeScript
 
 Frontends:
   --angular       Angular (standalone, OnPush)
@@ -223,6 +236,7 @@ Exemples:
         defaults.backendType = "spring-boot" as BackendType;
       if (options.fastapi) defaults.backendType = "fastapi" as BackendType;
       if (options.laravel) defaults.backendType = "laravel" as BackendType;
+      if (options.nestjs) defaults.backendType = "nestjs" as BackendType;
       if (options.react) defaults.frontend = "react-vite" as FrontendType;
       else if (options.angular || options.frontend === true)
         defaults.frontend = "angular" as FrontendType;
@@ -293,6 +307,10 @@ Exemples:
         if (config.backendType === "laravel")
           console.log(
             chalk.cyan("  cd backend && composer install && php artisan serve"),
+          );
+        if (config.backendType === "nestjs")
+          console.log(
+            chalk.cyan("  cd backend && npm install && npm run start:dev"),
           );
         if (config.frontend === "angular")
           console.log(chalk.cyan("  cd frontend && npm install && ng serve"));

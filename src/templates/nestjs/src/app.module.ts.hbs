@@ -1,0 +1,17 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { HealthModule } from './health/health.module';{{#if prisma}}
+import { PrismaModule } from './prisma/prisma.module';{{/if}}{{#if auth}}
+import { AuthModule } from './auth/auth.module';{{/if}}
+
+@Module({
+  imports: [
+    HealthModule,{{#if prisma}}
+    PrismaModule,{{/if}}{{#if auth}}
+    AuthModule,{{/if}}
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}

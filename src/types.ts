@@ -7,6 +7,7 @@ export type BackendType =
   | "fastapi"
   | "laravel"
   | "nextjs"
+  | "nestjs"
   | null;
 export type FrontendType = "angular" | "react-vite" | "vue" | null;
 

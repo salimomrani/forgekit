@@ -1,0 +1,51 @@
+{
+  "name": "{{name}}",
+  "version": "0.0.1",
+  "description": "{{description}}",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
+  "dependencies": {
+    "@nestjs/common": "^{{versions.nestjs}}",
+    "@nestjs/core": "^{{versions.nestjs}}",
+    "@nestjs/platform-express": "^{{versions.nestjs}}",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0"{{#if auth}},
+    "@nestjs/jwt": "^{{versions.nestjsJwt}}",
+    "@nestjs/passport": "^{{versions.nestjs}}",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"{{/if}}{{#if prisma}},
+    "@prisma/client": "^{{versions.prismaClient}}"{{/if}}{{#if openapi}},
+    "@nestjs/swagger": "^{{versions.nestjsSwagger}}"{{/if}}
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^{{versions.nestjs}}",
+    "@nestjs/schematics": "^{{versions.nestjs}}",
+    "@nestjs/testing": "^{{versions.nestjs}}",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^22.0.0",{{#if auth}}
+    "@types/passport-jwt": "^4.0.0",{{/if}}
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "typescript": "^{{versions.typescript}}"{{#if prisma}},
+    "prisma": "^{{versions.prismaClient}}"{{/if}}
+  },
+  "jest": {
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": { "^.+\\.(t|j)s$": "ts-jest" },
+    "collectCoverageFrom": ["**/*.(t|j)s"],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}

@@ -30,6 +30,10 @@ export interface ResolvedVersions {
   next: string;
   nextAuth: string;
   prismaClient: string;
+  // Backend — NestJS
+  nestjs: string;
+  nestjsJwt: string;
+  nestjsSwagger: string;
   // Frontend — Vue
   vue: string;
   pinia: string;
@@ -68,6 +72,9 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   next: "15.3.0",
   nextAuth: "5.0.0",
   prismaClient: "6.6.0",
+  nestjs: "11.0.0",
+  nestjsJwt: "11.0.0",
+  nestjsSwagger: "11.2.0",
   vue: "3.5.13",
   pinia: "3.0.4",
   vueRouter: "4.5.0",
@@ -194,6 +201,15 @@ export async function resolveVersions(opts: {
     tasks.push(
       fetchNpmVersion("next").then(set("next")),
       fetchNpmVersion("next-auth").then(set("nextAuth")),
+      fetchNpmVersion("prisma").then(set("prismaClient")),
+    );
+  }
+
+  if (opts.backendType === "nestjs") {
+    tasks.push(
+      fetchNpmVersion("@nestjs/core").then(set("nestjs")),
+      fetchNpmVersion("@nestjs/jwt").then(set("nestjsJwt")),
+      fetchNpmVersion("@nestjs/swagger").then(set("nestjsSwagger")),
       fetchNpmVersion("prisma").then(set("prismaClient")),
     );
   }
