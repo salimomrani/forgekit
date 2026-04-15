@@ -1,6 +1,6 @@
 # Feature Specification: FastAPI DX Fixes
 
-**Feature Branch**: `013-fastapi-dx-fixes`  
+**Feature Branch**: `012-fastapi-dx-fixes`  
 **Created**: 2026-04-14  
 **Status**: Draft  
 **Input**: Fix ForgeKit CLI so generated FastAPI projects work out of the box without manual IDE/test setup

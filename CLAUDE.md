@@ -1,12 +1,12 @@
 # forgekit
 
-CLI Node.js/TypeScript qui génère des projets full-stack (Spring Boot, FastAPI, Angular, React, Vue, Docker, CI/CD, Claude Code config) en une commande.
+CLI de scaffolding full-stack — génère des projets Spring Boot / FastAPI + Angular avec Docker, CI/CD et config Claude Code.
 
 ## Tech Stack
 
 - **Runtime**: Node.js ≥ 20, TypeScript 5.9
-- **CLI libs**: commander, @inquirer/prompts, chalk, handlebars, fs-extra
 - **Test**: Vitest 4 + coverage-v8
+- **Lint/Format**: ESLint 10 + Prettier 3
 
 ## Commands
 
@@ -14,21 +14,18 @@ CLI Node.js/TypeScript qui génère des projets full-stack (Spring Boot, FastAPI
 |--------|---------|
 | Dev | `npm run dev` |
 | Build | `npm run build` |
-| Tests | `npm test` |
-| Tests unitaires | `npm run test:unit` |
-| Tests e2e | `npm run test:e2e` |
+| Tests (all) | `npm run test` |
+| Tests (unit) | `npm run test:unit` |
+| Tests (e2e) | `npm run test:e2e` |
+| Lint | `npm run lint` |
 | Typecheck | `npm run typecheck` |
-| Release | `git tag vX.Y.Z && git push origin vX.Y.Z` |
 
-## Workflow Mode: speckit
+## Release
 
-## Speckit Config
-tests: true
-tdd: false
-test-types: unit
-code-review: true
-security-review: auto
-verification: minimal
-plan-detail: medium
-skip-clarify: false
-subagents: true
+Tag + push only — GitHub Actions publie sur npm :
+```
+git tag vX.Y.Z && git push origin vX.Y.Z
+```
+Ou utiliser `/forgekit.release`.
+
+## Workflow Mode: vibe
