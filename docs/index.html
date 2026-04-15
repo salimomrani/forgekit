@@ -6,7 +6,7 @@
     <title>ForgeKit — Full-Stack Scaffolding CLI</title>
     <meta
       name="description"
-      content="Generate a production-ready full-stack project in seconds. Spring Boot or FastAPI backend, Angular frontend, Docker, CI/CD, and Claude Code config — one command."
+      content="Generate a production-ready full-stack project in seconds. Spring Boot, FastAPI, Laravel, NestJS, or Next.js backend, Angular frontend, Docker, CI/CD, and Claude Code config — one command."
     />
     <style>
       *,
@@ -517,7 +517,12 @@
               <span class="tag">Spring Boot 3</span>
               <span class="tag">Java 21</span><br />
               <span class="tag">FastAPI</span>
-              <span class="tag">Python 3.12</span>
+              <span class="tag">Python 3.12</span><br />
+              <span class="tag">NestJS 11</span>
+              <span class="tag">TypeScript</span><br />
+              <span class="tag">Laravel 12</span>
+              <span class="tag">PHP 8.3</span><br />
+              <span class="tag">Next.js 15</span>
             </div>
           </div>
           <div class="stack-card">
@@ -555,6 +560,7 @@
               <span class="tag">Flyway</span>
               <span class="tag">OpenAPI</span>
               <span class="tag">MapStruct</span>
+              <span class="tag">Prisma ORM</span>
               <span class="tag">NgRx SignalStore</span>
             </div>
           </div>
@@ -688,6 +694,20 @@
           </tr>
         </table>
 
+        <h3 style="margin-top: 24px">NestJS backend</h3>
+        <table>
+          <tr>
+            <th>Tool</th>
+            <th>Version</th>
+            <th>Install</th>
+          </tr>
+          <tr>
+            <td>Node.js</td>
+            <td>≥ 20</td>
+            <td>Already required — no extra install needed</td>
+          </tr>
+        </table>
+
         <h3 style="margin-top: 24px">Docker Compose</h3>
         <table>
           <tr>
@@ -769,6 +789,7 @@
           <div class="tab" onclick="switchTab(event, 'ex-fastapi')">
             FastAPI + Angular
           </div>
+          <div class="tab" onclick="switchTab(event, 'ex-nestjs')">NestJS</div>
           <div class="tab" onclick="switchTab(event, 'ex-api-only')">
             API only
           </div>
@@ -802,6 +823,24 @@
           <p>
             FastAPI backend with uvicorn + pytest, Angular frontend, Docker
             Compose with PostgreSQL and a FastAPI service container.
+          </p>
+        </div>
+
+        <div id="ex-nestjs" class="tab-content">
+          <pre><span class="c-muted"># NestJS + JWT auth + Prisma + OpenAPI</span>
+<span class="c-muted">$</span> forgekit new my-api \
+    --nestjs \
+    --auth \
+    --prisma \
+    --openapi \
+    --claude-code</pre>
+          <p>
+            NestJS 11 backend with TypeScript, JWT authentication
+            (<code>@nestjs/jwt</code>), Prisma ORM with PostgreSQL
+            (<code>@prisma/client</code>), Swagger UI
+            (<code>@nestjs/swagger</code>), multi-stage Dockerfile, and Claude
+            Code config. Start with
+            <code>cd backend && npm install && npm run start:dev</code>.
           </p>
         </div>
 
@@ -977,8 +1016,9 @@
           <tr>
             <td>npm</td>
             <td>
-              Angular, PrimeNG, @primeuix/themes, NgRx Signals, Tailwind CSS,
-              RxJS, TypeScript, zone.js
+              @nestjs/core, @nestjs/jwt, @nestjs/swagger, prisma, Next.js,
+              next-auth, Angular, PrimeNG, @primeuix/themes, NgRx Signals,
+              Tailwind CSS, RxJS, TypeScript, zone.js
             </td>
           </tr>
           <tr>
