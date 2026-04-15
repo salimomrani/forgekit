@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(node *)",
+      "Bash(npm run *)",
+      "Bash(npm install)",
+      "Bash(npx *)",
       "Bash(gh *)",
+      "Bash(git commit*)",
       "Bash(.specify/scripts/bash/*)",
       "Skill(commit-commands:commit)",
       "Skill(commit-commands:commit:*)",
@@ -18,7 +22,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/salimomrani/code/_AI/forgekit/.claude/hooks/session-start.sh",
+            "command": ".claude/hooks/session-start.sh",
             "once": true
           }
         ]
@@ -30,7 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/salimomrani/code/_AI/forgekit/.claude/hooks/pre-bash.sh"
+            "command": ".claude/hooks/pre-bash.sh"
           }
         ]
       }
