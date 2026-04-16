@@ -12,15 +12,8 @@
       "groupName": "non-major dependencies"
     },
     {
-      "description": "Auto-merge devDependencies minor/patch when CI passes",
-      "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "automergeType": "pr"
-    },
-    {
-      "description": "Never auto-merge production dependencies",
-      "matchDepTypes": ["dependencies"],
+      "description": "Never auto-merge — manual review required (no branch protection on master)",
+      "matchPackageNames": ["*"],
       "automerge": false
     },
     {
