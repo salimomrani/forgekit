@@ -66,6 +66,12 @@ description: "Task list for feature 014-renovate-auto-bump"
 
 ---
 
+## Phase 6: Follow-up fixes (post-merge)
+
+- [x] T009 Disable auto-merge globally in `renovate.json` (no branch protection on `master`) — replace per-devDep automerge rule with a single `"automerge": false` rule covering all packages. Update CLAUDE.md to document the decision and the path to re-enable.
+
+---
+
 ## Phase 5: Polish & Cross-Cutting
 
 - [x] T007 [P] Update `README.md` (if it documents CI/automation) or add a short `## Automated dependency updates` note in `CLAUDE.md` pointing to `renovate.json` and the marker-comment convention in `src/versions.ts`.
