@@ -1,0 +1,21 @@
+{
+  "routing": "full-workflow",
+  "phase": "complete",
+  "branch": "014-renovate-auto-bump",
+  "completed_steps": [
+    "specify",
+    "plan",
+    "tasks",
+    "T002",
+    "T003",
+    "T004",
+    "T005",
+    "T006",
+    "T007",
+    "T008",
+    "code-review",
+    "review-fixes"
+  ],
+  "skills_used": ["speckit.workflow", "sk:tasks", "requesting-code-review"],
+  "last_updated": "2026-04-16T13:42:00Z"
+}

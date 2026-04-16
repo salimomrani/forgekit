@@ -20,6 +20,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
+    "renovate:validate": "npx --yes --package renovate renovate-config-validator renovate.json",
     "release": "echo 'Use /forgekit.release — tag and push: git tag vX.Y.Z && git push origin vX.Y.Z'"
   },
   "keywords": [

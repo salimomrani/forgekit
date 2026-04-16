@@ -19,6 +19,7 @@ CLI de scaffolding full-stack — génère des projets Spring Boot/FastAPI + Ang
 | E2E tests | `npm run test:e2e` |
 | Lint | `npm run lint` |
 | Typecheck | `npm run typecheck` |
+| Validate Renovate config | `npm run renovate:validate` |
 | Release | `git tag vX.Y.Z && git push origin vX.Y.Z` |
 
 ## Workflow Mode: speckit
@@ -45,3 +46,13 @@ CLI de scaffolding full-stack — génère des projets Spring Boot/FastAPI + Ang
 | `speckit.subagents` | `settings.json` | `true` | Utiliser subagent-driven-development |
 
 > `settings.local.json` overrides `settings.json` pour tous ces champs.
+
+## Automated dependency updates
+
+Renovate (GitHub App) ouvre des PRs chaque lundi matin. Config : `renovate.json`.
+
+- `package.json` deps : minor/patch groupés, majors séparés. Auto-merge sur devDeps minor/patch si CI verte (`automergeType: "pr"`).
+- `FALLBACK_VERSIONS` (`src/versions.ts`) : bumpées via custom regex manager. Chaque constante porte un marker `// renovate: datasource=<npm|maven|packagist> depName=<pkg>`. Ne pas retirer le marker — le test `renovate-config.test.ts` échoue avec le nom de la clé manquante.
+- `next-auth` suit la dist-tag `beta` (v5 beta chain).
+- **Requis côté GitHub** : branch protection sur `master` avec les jobs `ci.yml` en required checks — sans ça l'auto-merge peut passer sans CI.
+- Valider la config : `npm run renovate:validate`.

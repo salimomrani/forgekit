@@ -48,42 +48,42 @@ export interface ResolvedVersions {
 }
 
 export const FALLBACK_VERSIONS: ResolvedVersions = {
-  springBoot: "4.0.2",
-  springDoc: "3.0.1",
-  mapstruct: "1.6.3",
-  laravel: "13.1.1",
-  sanctum: "4.3.1",
-  scramble: "0.13.16",
-  angular: "21.0.0",
-  angularBuild: "21.0.0",
-  primeng: "21.1.1",
-  primeuixThemes: "2.0.3",
-  primeicons: "7.0.0",
-  primeflex: "4.0.0",
-  ngrxSignals: "21.0.1",
-  rxjs: "7.8.0",
-  zoneJs: "0.15.0",
-  typescript: "5.9.0",
-  tailwind: "4.0.0",
-  react: "19.0.0",
-  reactRouter: "7.5.0",
-  vite: "7.0.0",
-  axiosReact: "1.8.0",
-  next: "15.3.0",
-  nextAuth: "5.0.0",
-  prismaClient: "6.6.0",
-  nestjs: "11.0.0",
-  nestjsJwt: "11.0.0",
-  nestjsSwagger: "11.2.0",
-  vue: "3.5.13",
-  pinia: "3.0.4",
-  vueRouter: "4.5.0",
-  husky: "9.1.0",
-  lintStaged: "15.5.0",
-  prettier: "3.5.0",
-  eslint: "9.20.0",
-  typescriptEslint: "8.29.0",
-  eslintConfigPrettier: "10.1.5",
+  springBoot: "4.0.2", // renovate: datasource=maven depName=org.springframework.boot:spring-boot-starter-parent
+  springDoc: "3.0.1", // renovate: datasource=maven depName=org.springdoc:springdoc-openapi-starter-webmvc-ui
+  mapstruct: "1.6.3", // renovate: datasource=maven depName=org.mapstruct:mapstruct
+  laravel: "13.1.1", // renovate: datasource=packagist depName=laravel/framework
+  sanctum: "4.3.1", // renovate: datasource=packagist depName=laravel/sanctum
+  scramble: "0.13.16", // renovate: datasource=packagist depName=dedoc/scramble
+  angular: "21.0.0", // renovate: datasource=npm depName=@angular/core
+  angularBuild: "21.0.0", // renovate: datasource=npm depName=@angular/build
+  primeng: "21.1.1", // renovate: datasource=npm depName=primeng
+  primeuixThemes: "2.0.3", // renovate: datasource=npm depName=@primeuix/themes
+  primeicons: "7.0.0", // renovate: datasource=npm depName=primeicons
+  primeflex: "4.0.0", // renovate: datasource=npm depName=primeflex
+  ngrxSignals: "21.0.1", // renovate: datasource=npm depName=@ngrx/signals
+  rxjs: "7.8.0", // renovate: datasource=npm depName=rxjs
+  zoneJs: "0.15.0", // renovate: datasource=npm depName=zone.js
+  typescript: "5.9.0", // renovate: datasource=npm depName=typescript
+  tailwind: "4.0.0", // renovate: datasource=npm depName=tailwindcss
+  react: "19.0.0", // renovate: datasource=npm depName=react
+  reactRouter: "7.5.0", // renovate: datasource=npm depName=react-router
+  vite: "7.0.0", // renovate: datasource=npm depName=vite
+  axiosReact: "1.8.0", // renovate: datasource=npm depName=axios
+  next: "15.3.0", // renovate: datasource=npm depName=next
+  nextAuth: "5.0.0-beta.31", // renovate: datasource=npm depName=next-auth
+  prismaClient: "6.6.0", // renovate: datasource=npm depName=prisma
+  nestjs: "11.0.0", // renovate: datasource=npm depName=@nestjs/core
+  nestjsJwt: "11.0.0", // renovate: datasource=npm depName=@nestjs/jwt
+  nestjsSwagger: "11.2.0", // renovate: datasource=npm depName=@nestjs/swagger
+  vue: "3.5.13", // renovate: datasource=npm depName=vue
+  pinia: "3.0.4", // renovate: datasource=npm depName=pinia
+  vueRouter: "4.5.0", // renovate: datasource=npm depName=vue-router
+  husky: "9.1.0", // renovate: datasource=npm depName=husky
+  lintStaged: "15.5.0", // renovate: datasource=npm depName=lint-staged
+  prettier: "3.5.0", // renovate: datasource=npm depName=prettier
+  eslint: "9.20.0", // renovate: datasource=npm depName=eslint
+  typescriptEslint: "8.29.0", // renovate: datasource=npm depName=typescript-eslint
+  eslintConfigPrettier: "10.1.5", // renovate: datasource=npm depName=eslint-config-prettier
 };
 
 const FETCH_TIMEOUT_MS = 8_000;
