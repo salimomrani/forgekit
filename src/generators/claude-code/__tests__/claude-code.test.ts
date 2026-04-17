@@ -474,7 +474,11 @@ describe("ClaudeCodeGenerator", () => {
   });
 
   it("vibe mode → settings.json git.strategy=no-pr and CLAUDE.md uses commit skill", async () => {
-    const config = { ...baseConfig, workflowMode: "vibe" as const };
+    const config = {
+      ...baseConfig,
+      workflowMode: "vibe" as const,
+      gitStrategy: "no-pr" as const,
+    };
     await generateClaudeCode(tmpDir, config, baseVersions);
     const settings = await fs.readJson(
       path.join(tmpDir, ".claude", "settings.json"),

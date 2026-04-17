@@ -138,9 +138,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       claudeDir: ".claude",
       workflowSpeckit: this.config.workflowMode === "speckit",
       workflowVibe: this.config.workflowMode === "vibe",
-      gitStrategy:
-        this.config.workflowMode === "vibe" ? "no-pr" : "pr-required",
-      gitStrategyNoPr: this.config.workflowMode === "vibe",
+      gitStrategy: this.config.gitStrategy,
+      gitStrategyNoPr: this.config.gitStrategy === "no-pr",
       hasParentSessionStart: parentHooks.has("SessionStart"),
       hasParentPreCompact: parentHooks.has("PreCompact"),
       ...this.resolveSpeckitData(),
