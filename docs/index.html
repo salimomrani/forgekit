@@ -449,6 +449,7 @@
           <a href="#quickstart">Quickstart</a>
           <a href="#prerequisites">Prerequisites</a>
           <a href="#examples">Examples</a>
+          <a href="#add">forgekit add</a>
           <a href="#claude-code">Claude Code</a>
           <a href="https://github.com/salimomrani/forgekit">GitHub</a>
           <a href="https://www.npmjs.com/package/@iconsulting-dev/forgekit"
@@ -531,7 +532,13 @@
               <span class="tag">Angular 19</span>
               <span class="tag">Standalone</span>
               <span class="tag">OnPush</span>
-              <span class="tag">Lazy routes</span>
+              <span class="tag">Lazy routes</span><br />
+              <span class="tag">React 19</span>
+              <span class="tag">Vite 7</span>
+              <span class="tag">Tailwind v4</span><br />
+              <span class="tag">Vue 3</span>
+              <span class="tag">Vite 7</span>
+              <span class="tag">Tailwind v4</span>
             </div>
           </div>
           <div class="stack-card">
@@ -694,6 +701,30 @@
           </tr>
         </table>
 
+        <h3 style="margin-top: 24px">Laravel backend</h3>
+        <table>
+          <tr>
+            <th>Tool</th>
+            <th>Version</th>
+            <th>Install</th>
+          </tr>
+          <tr>
+            <td>PHP</td>
+            <td>8.3+</td>
+            <td>
+              <a href="https://www.php.net">php.net</a> ·
+              <code>brew install php@8.3</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Composer</td>
+            <td>2.x</td>
+            <td>
+              <a href="https://getcomposer.org">getcomposer.org</a>
+            </td>
+          </tr>
+        </table>
+
         <h3 style="margin-top: 24px">NestJS backend</h3>
         <table>
           <tr>
@@ -787,9 +818,12 @@
             Spring Boot + Angular
           </div>
           <div class="tab" onclick="switchTab(event, 'ex-fastapi')">
-            FastAPI + Angular
+            FastAPI + React
           </div>
           <div class="tab" onclick="switchTab(event, 'ex-nestjs')">NestJS</div>
+          <div class="tab" onclick="switchTab(event, 'ex-laravel')">
+            Laravel
+          </div>
           <div class="tab" onclick="switchTab(event, 'ex-api-only')">
             API only
           </div>
@@ -803,7 +837,7 @@
 <span class="c-muted">$</span> forgekit new my-app \
     --spring-boot \
     --group com.example \
-    --frontend \
+    --angular \
     --docker \
     --claude-code</pre>
           <p>
@@ -814,15 +848,17 @@
         </div>
 
         <div id="ex-fastapi" class="tab-content">
-          <pre><span class="c-muted"># FastAPI + Angular + Docker</span>
+          <pre><span class="c-muted"># FastAPI + React (Vite + Tailwind) + auth + Docker</span>
 <span class="c-muted">$</span> forgekit new my-app \
     --fastapi \
-    --frontend \
+    --react \
+    --auth \
     --docker \
     --claude-code</pre>
           <p>
-            FastAPI backend with uvicorn + pytest, Angular frontend, Docker
-            Compose with PostgreSQL and a FastAPI service container.
+            FastAPI backend with uvicorn + pytest, React 19 frontend (Vite +
+            Tailwind CSS v4) with a <code>useAuth</code> hook and axios
+            interceptor, Docker Compose with PostgreSQL.
           </p>
         </div>
 
@@ -841,6 +877,21 @@
             (<code>@nestjs/swagger</code>), multi-stage Dockerfile, and Claude
             Code config. Start with
             <code>cd backend && npm install && npm run start:dev</code>.
+          </p>
+        </div>
+
+        <div id="ex-laravel" class="tab-content">
+          <pre><span class="c-muted"># Laravel + React + auth</span>
+<span class="c-muted">$</span> forgekit new my-app \
+    --laravel \
+    --react \
+    --auth \
+    --docker \
+    --claude-code</pre>
+          <p>
+            Laravel 12 API-only backend (PHP 8.3) with Sanctum authentication,
+            React 19 frontend with <code>useAuth</code> hook and axios
+            interceptor, Docker Compose with PostgreSQL.
           </p>
         </div>
 
@@ -866,7 +917,7 @@
     --flyway \
     --openapi \
     --mapstruct \
-    --frontend \
+    --angular \
     --ngrx \
     --ui primeng \
     --preset Aura \
@@ -880,6 +931,30 @@
             stack-specific skills.
           </p>
         </div>
+      </section>
+
+      <!-- forgekit add -->
+      <section id="add">
+        <h2>Add a layer to an existing project</h2>
+        <p>
+          Already have a backend? Add a frontend. Already have a project? Add
+          Docker, CI, or Claude Code config — without touching what's already
+          there. ForgeKit reads <code>forgekit.json</code> to detect the
+          existing setup and asks only the relevant questions.
+        </p>
+        <pre><span class="c-muted">$</span> forgekit add react            <span class="c-muted"># Add React frontend</span>
+<span class="c-muted">$</span> forgekit add vue              <span class="c-muted"># Add Vue.js frontend</span>
+<span class="c-muted">$</span> forgekit add angular          <span class="c-muted"># Add Angular frontend</span>
+<span class="c-muted">$</span> forgekit add nestjs --prisma  <span class="c-muted"># Add NestJS backend with Prisma</span>
+<span class="c-muted">$</span> forgekit add nextjs           <span class="c-muted"># Add Next.js fullstack</span>
+<span class="c-muted">$</span> forgekit add docker           <span class="c-muted"># Add Docker Compose</span>
+<span class="c-muted">$</span> forgekit add ci               <span class="c-muted"># Add GitHub Actions CI</span>
+<span class="c-muted">$</span> forgekit add claude-code      <span class="c-muted"># Add Claude Code config</span>
+<span class="c-muted">$</span> forgekit add prettier         <span class="c-muted"># Add Prettier + Husky + lint-staged</span></pre>
+        <p>
+          Dependent layers are auto-regenerated when needed — adding a frontend
+          to an existing backend also updates Docker Compose and CI configs.
+        </p>
       </section>
 
       <!-- Generated structure -->
@@ -897,12 +972,10 @@
 │           ├── GlobalExceptionHandler.java
 │           └── ApiError.java
 │
-├── <span class="c-blue">frontend/src/app/</span>                  <span class="c-muted"># Angular 19</span>
-│   ├── app.component.ts                  <span class="c-muted"># Standalone, OnPush</span>
-│   ├── app.routes.ts                     <span class="c-muted"># Lazy-loaded routes</span>
-│   ├── <span class="c-blue">layout/</span>                         <span class="c-muted"># Sidebar + topbar shell</span>
-│   ├── <span class="c-blue">core/</span>                           <span class="c-muted"># (--auth) interceptors, guard, service</span>
-│   └── <span class="c-blue">features/home/</span>
+├── <span class="c-blue">frontend/src/</span>                      <span class="c-muted"># Angular 19 · React 19 · Vue 3</span>
+│   ├── <span class="c-muted"># Angular: app.component.ts, app.routes.ts, layout/, features/</span>
+│   ├── <span class="c-muted"># React:   main.tsx, App.tsx, router/, hooks/, components/</span>
+│   └── <span class="c-muted"># Vue:     main.ts, App.vue, router/, stores/, components/</span>
 │
 ├── docker-compose.yml                    <span class="c-muted"># PostgreSQL 17 + pgAdmin</span>
 ├── <span class="c-blue">.github/workflows/ci.yml</span>             <span class="c-muted"># GitHub Actions</span>
@@ -915,7 +988,8 @@
 │   ├── hookify.block-force-push.local.md
 │   └── <span class="c-blue">skills/</span>                         <span class="c-muted"># Stack-specific AI skills</span>
 │
-└── <span class="c-blue">.specify/memory/constitution.md</span>      <span class="c-muted"># Architectural constitution</span></pre>
+├── <span class="c-blue">.specify/memory/constitution.md</span>      <span class="c-muted"># Architectural constitution</span>
+└── forgekit.json                         <span class="c-muted"># Layer manifest (used by forgekit add)</span></pre>
       </section>
 
       <!-- Claude Code -->
@@ -994,8 +1068,24 @@
             <td>applying-python-conventions</td>
           </tr>
           <tr>
+            <td>Laravel</td>
+            <td>applying-php-laravel-conventions</td>
+          </tr>
+          <tr>
+            <td>NestJS</td>
+            <td>applying-nestjs-conventions</td>
+          </tr>
+          <tr>
             <td>Angular frontend</td>
             <td>applying-angular-conventions</td>
+          </tr>
+          <tr>
+            <td>React frontend</td>
+            <td>applying-react-conventions</td>
+          </tr>
+          <tr>
+            <td>Vue frontend</td>
+            <td>applying-vue3-conventions</td>
           </tr>
         </table>
       </section>
