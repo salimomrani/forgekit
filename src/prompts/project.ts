@@ -10,6 +10,7 @@ import type {
   BackendType,
   FrontendType,
   WorkflowMode,
+  GitStrategy,
   SpeckitPreset,
 } from "../types.js";
 
@@ -61,6 +62,7 @@ export async function promptProjectConfig(
             { name: "Angular (standalone, OnPush)", value: "angular" },
             { name: "React (Vite + Tailwind)", value: "react-vite" },
             { name: "Vue.js (Vite + Tailwind)", value: "vue" },
+            { name: "Svelte (Vite + Tailwind)", value: "svelte" },
             { name: "Aucun", value: null },
           ],
           default: "angular",
@@ -231,6 +233,8 @@ export async function promptProjectConfig(
     uiFramework = "tailwind";
   } else if (frontend === "vue") {
     uiFramework = "tailwind";
+  } else if (frontend === "svelte") {
+    uiFramework = "tailwind";
   }
 
   // ── Section 5: Infrastructure ─────────────────────────────────────────────
@@ -321,6 +325,24 @@ export async function promptProjectConfig(
     });
   }
 
+  let gitStrategy: GitStrategy = defaults.gitStrategy ?? "pr-required";
+  if (workflowMode === "vibe" && defaults.gitStrategy === undefined) {
+    gitStrategy = await select<GitStrategy>({
+      message: "Stratégie git",
+      choices: [
+        {
+          name: "PR obligatoire (plus sûr)",
+          value: "pr-required",
+        },
+        {
+          name: "Push direct sur master (plus rapide)",
+          value: "no-pr",
+        },
+      ],
+      default: "pr-required",
+    });
+  }
+
   let speckitPreset: SpeckitPreset | null = defaults.speckitPreset ?? null;
   if (workflowMode === "speckit" && defaults.speckitPreset === undefined) {
     speckitPreset = await select<SpeckitPreset>({
@@ -364,6 +386,7 @@ export async function promptProjectConfig(
     docker,
     speckit,
     workflowMode,
+    gitStrategy,
     speckitPreset,
     ci,
     claudeCode,

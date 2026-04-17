@@ -62,6 +62,11 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
     configValue: "vue",
     conflictGroup: "frontend",
   },
+  svelte: {
+    configField: "frontend",
+    configValue: "svelte",
+    conflictGroup: "frontend",
+  },
   docker: { configField: "docker", configValue: true, conflictGroup: null },
   ci: { configField: "ci", configValue: true, conflictGroup: null },
   "claude-code": {
@@ -123,6 +128,7 @@ async function runLayerGenerator(
     case "angular":
     case "react":
     case "vue":
+    case "svelte":
       await generateFrontend(projectDir, config, versions);
       break;
     case "docker":
@@ -157,7 +163,10 @@ async function regenerateDependentLayers(
     layer === "laravel" ||
     layer === "nextjs";
   const isFrontendLayer =
-    layer === "angular" || layer === "react" || layer === "vue";
+    layer === "angular" ||
+    layer === "react" ||
+    layer === "vue" ||
+    layer === "svelte";
 
   if (!isBackendLayer && !isFrontendLayer) return;
 
@@ -216,6 +225,9 @@ Layers:
                             --ngrx/--no-ngrx, --auth
 
   react         Frontend React (Vite + Tailwind CSS)
+                  Options : --auth
+
+  svelte        Frontend Svelte (Vite + Tailwind CSS)
                   Options : --auth
 
   docker        Docker Compose (PostgreSQL + pgAdmin)
@@ -287,6 +299,7 @@ Exemples:
         claudeCode: false,
         speckit: false,
         workflowMode: "none",
+        gitStrategy: "pr-required",
         speckitPreset: null,
         gitInit: false,
       };

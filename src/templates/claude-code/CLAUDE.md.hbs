@@ -64,3 +64,31 @@ npm run build    # Production build
 npm run lint     # TypeScript check
 ```
 {{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Vite)
+
+- **Architecture:** `src/router/`, `src/stores/`, `src/components/`, `src/composables/`
+- **Conventions:** Composition API, typed stores, Tailwind-first styling
+
+### Commands
+```bash
+cd frontend
+npm run dev      # Start dev server (port 4200)
+npm run build    # Production build
+npm run lint     # TypeScript check
+```
+{{/if}}
+{{#if svelte}}
+## Frontend — Svelte {{versions.svelte}} (Vite)
+
+- **Architecture:** `src/components/`, `src/stores/`, `src/lib/`
+- **Conventions:** Small components, typed stores, Tailwind-first styling
+
+### Commands
+```bash
+cd frontend
+npm run dev      # Start dev server (port 4200)
+npm run build    # Production build
+npm run lint     # Svelte/TypeScript check
+```
+{{/if}}

@@ -1,0 +1,8 @@
+{
+  "routing": "fast-track",
+  "phase": "fast-track",
+  "branch": null,
+  "completed_steps": ["tasks"],
+  "skills_used": ["sk:tasks"],
+  "last_updated": "2026-04-17T15:50:00Z"
+}

@@ -16,6 +16,12 @@
 {{#if reactVite}}
 - **Frontend:** React {{versions.react}} / Vite / Tailwind CSS
 {{/if}}
+{{#if vue}}
+- **Frontend:** Vue {{versions.vue}} / Vite / Tailwind CSS
+{{/if}}
+{{#if svelte}}
+- **Frontend:** Svelte {{versions.svelte}} / Vite / Tailwind CSS
+{{/if}}
 {{#if docker}}
 - **Infra:** Docker Compose (PostgreSQL 17 + pgAdmin)
 {{/if}}
@@ -46,6 +52,14 @@ uvicorn app.main:app --reload
 cd frontend && npm install && ng serve
 {{/if}}
 {{#if reactVite}}
+# Démarrer le frontend (port 4200)
+cd frontend && npm install && npm run dev
+{{/if}}
+{{#if vue}}
+# Démarrer le frontend (port 4200)
+cd frontend && npm install && npm run dev
+{{/if}}
+{{#if svelte}}
 # Démarrer le frontend (port 4200)
 cd frontend && npm install && npm run dev
 {{/if}}

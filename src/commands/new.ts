@@ -103,6 +103,14 @@ export async function generateProject(
           `\r  ✔ Frontend Vue.js ${versions.vue} (Vite) généré        `,
         ),
       );
+    } else if (config.frontend === "svelte") {
+      process.stdout.write(chalk.yellow("  ⏳ Frontend Svelte (Vite)..."));
+      await generateFrontend(projectDir, config, versions);
+      console.log(
+        chalk.green(
+          `\r  ✔ Frontend Svelte ${versions.svelte} (Vite) généré       `,
+        ),
+      );
     }
 
     if (config.docker) {
@@ -172,6 +180,7 @@ export const newCommand = new Command("new")
   .option("--frontend", "Inclure le frontend Angular")
   .option("--no-frontend", "Exclure le frontend Angular")
   .option("--react", "Inclure le frontend React (Vite + Tailwind)")
+  .option("--svelte", "Inclure le frontend Svelte (Vite + Tailwind)")
   .option("--angular", "Inclure le frontend Angular (standalone, OnPush)")
   .option("--auth", "Inclure l'authentification")
   .option("--flyway", "Inclure Flyway (migrations SQL)")
@@ -206,6 +215,7 @@ Backends:
 Frontends:
   --angular       Angular (standalone, OnPush)
   --react         React (Vite + Tailwind CSS)
+  --svelte        Svelte (Vite + Tailwind CSS)
 
 Infrastructure:
   --docker        Docker Compose (PostgreSQL + pgAdmin)   [défaut: oui si backend]
@@ -218,6 +228,7 @@ Exemples:
   $ forgekit new my-app
   $ forgekit new my-api --spring-boot --no-frontend --group com.acme
   $ forgekit new my-app --laravel --react --auth --openapi
+  $ forgekit new my-app --fastapi --svelte --auth
   $ forgekit new my-app --fastapi --angular --ui tailwind --ngrx
   $ forgekit new my-app --spring-boot --angular --no-flyway --no-docker`,
   )
@@ -238,6 +249,7 @@ Exemples:
       if (options.laravel) defaults.backendType = "laravel" as BackendType;
       if (options.nestjs) defaults.backendType = "nestjs" as BackendType;
       if (options.react) defaults.frontend = "react-vite" as FrontendType;
+      else if (options.svelte) defaults.frontend = "svelte" as FrontendType;
       else if (options.angular || options.frontend === true)
         defaults.frontend = "angular" as FrontendType;
       else if (options.frontend === false) defaults.frontend = null;
@@ -319,6 +331,10 @@ Exemples:
             chalk.cyan("  cd frontend && npm install && npm run dev"),
           );
         if (config.frontend === "vue")
+          console.log(
+            chalk.cyan("  cd frontend && npm install && npm run dev"),
+          );
+        if (config.frontend === "svelte")
           console.log(
             chalk.cyan("  cd frontend && npm install && npm run dev"),
           );
