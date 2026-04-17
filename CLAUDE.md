@@ -20,14 +20,17 @@ CLI de scaffolding full-stack — génère des projets Spring Boot/FastAPI + Ang
 | Lint | `npm run lint` |
 | Typecheck | `npm run typecheck` |
 | Validate Renovate config | `npm run renovate:validate` |
-| Release | `git tag vX.Y.Z && git push origin vX.Y.Z` |
+| Merge PR | `/git.merge` |
+| Release | `/forgekit.release` |
 
 ## Workflow Mode: speckit
 
 ## Git
 
 - PR obligatoire avant tout merge sur `master` — pas de push direct.
-- Commit skill: `commit-commands:commit-push-pr`
+- Commit skill: `/commit-commands:commit-push-pr`
+- Merge skill: `/git.merge` — merge la PR, switch à master, pull latest
+- Release skill: `/forgekit.release` — crée le tag et pousse à origin
 
 ## Claude Settings
 
