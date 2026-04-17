@@ -287,6 +287,7 @@ Exemples:
         claudeCode: false,
         speckit: false,
         workflowMode: "none",
+        gitStrategy: "pr-required",
         speckitPreset: null,
         gitInit: false,
       };
