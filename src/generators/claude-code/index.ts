@@ -115,6 +115,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
     const angular = this.config.frontend === "angular";
     const reactVite = this.config.frontend === "react-vite";
 
+    const parentHooks = await this.readParentHooks();
+
     const data = {
       name: this.config.name,
       description: this.config.description,
@@ -139,6 +141,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       gitStrategy:
         this.config.workflowMode === "vibe" ? "no-pr" : "pr-required",
       gitStrategyNoPr: this.config.workflowMode === "vibe",
+      hasParentSessionStart: parentHooks.has("SessionStart"),
+      hasParentPreCompact: parentHooks.has("PreCompact"),
       ...this.resolveSpeckitData(),
     };
 
@@ -280,6 +284,26 @@ class ClaudeCodeGenerator extends BaseGenerator {
     await fs.ensureDir(dest);
     await fs.copy(src, path.join(dest, "speckit.workflow.md"));
     return true;
+  }
+
+  private async readParentHooks(): Promise<Set<string>> {
+    const parentSettingsPath = path.join(
+      os.homedir(),
+      ".claude",
+      "settings.json",
+    );
+    try {
+      if (await fs.pathExists(parentSettingsPath)) {
+        const content = await fs.readFile(parentSettingsPath, "utf-8");
+        const settings = JSON.parse(content);
+        if (settings.hooks && typeof settings.hooks === "object") {
+          return new Set(Object.keys(settings.hooks));
+        }
+      }
+    } catch {
+      // Silently ignore parse/read errors
+    }
+    return new Set();
   }
 
   private resolveSpeckitData(): Record<string, unknown> {
