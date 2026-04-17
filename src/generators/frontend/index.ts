@@ -5,7 +5,6 @@ import { BaseGenerator } from "../base-generator.js";
 import type { ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
 import { generateReactViteFrontend } from "./react-vite.js";
-import { generateSvelteFrontend } from "./svelte.js";
 import { generateVueFrontend } from "./vue.js";
 
 class FrontendGenerator extends BaseGenerator {
@@ -319,7 +318,5 @@ export async function generateFrontend(
     await generateReactViteFrontend(projectDir, config, versions);
   } else if (config.frontend === "vue") {
     await generateVueFrontend(projectDir, config, versions);
-  } else if (config.frontend === "svelte") {
-    await generateSvelteFrontend(projectDir, config, versions);
   }
 }
