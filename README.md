@@ -23,12 +23,13 @@ One command creates an entire project wired together:
 
 | Layer | Options |
 |---|---|
-| **Backend** | Spring Boot 3 (Java 21) · FastAPI (Python 3.12) · Laravel 12 (PHP 8.3) · none |
-| **Frontend** | Angular 19 (standalone, OnPush, lazy routes) · React 19 (Vite + Tailwind CSS v4) · none |
+| **Backend** | Spring Boot 3 (Java 21) · FastAPI (Python 3.12) · Laravel 12 (PHP 8.3) · NestJS (Node.js/TypeScript) · Next.js (Node.js fullstack) · none |
+| **Frontend** | Angular 19 (standalone, OnPush, lazy routes) · React 19 (Vite + Tailwind CSS v4) · Vue 3 (Vite + Tailwind CSS v4) · none |
 | **UI** | PrimeNG (Aura / Lara / Nora) · Tailwind CSS v4 · none |
 | **Database** | PostgreSQL 17 via Docker Compose |
+| **ORM** | Prisma (NestJS optional) |
 | **State** | NgRx SignalStore (optional, Angular only) |
-| **Auth** | Spring Security + JWT + Angular interceptors/guards (optional) · React `useAuth` hook + `ProtectedRoute` + axios interceptor (optional) · Laravel Sanctum (optional) |
+| **Auth** | Spring Security + JWT + Angular interceptors/guards (optional) · React `useAuth` hook + `ProtectedRoute` + axios interceptor (optional) · Vue composable + axios interceptor (optional) · NestJS JWT (optional) · Laravel Sanctum (optional) |
 | **CI/CD** | GitHub Actions |
 | **AI tooling** | Claude Code config (hooks, hookify guards, skills, CLAUDE.md) |
 | **Spec workflow** | Speckit integration (spec → plan → tasks → TDD) |
@@ -143,13 +144,15 @@ The wizard guides you through all options with sensible defaults:
 
 ```bash
 forgekit add react              # Add React frontend to an existing backend project
+forgekit add vue                # Add Vue.js frontend
 forgekit add spring-boot        # Add Spring Boot backend
+forgekit add nestjs --prisma    # Add NestJS backend with Prisma
 forgekit add docker             # Add Docker Compose
-forgekit add laravel             # Add Laravel backend
+forgekit add laravel            # Add Laravel backend
 forgekit add angular --ui tailwind --auth   # Add Angular with options
 ```
 
-Available layers: `spring-boot`, `fastapi`, `laravel`, `angular`, `react`, `docker`, `ci`, `claude-code`, `speckit`, `prettier`.
+Available layers: `spring-boot`, `fastapi`, `laravel`, `nestjs`, `nextjs`, `angular`, `react`, `vue`, `docker`, `ci`, `claude-code`, `speckit`, `prettier`.
 
 ForgeKit detects the existing project via `forgekit.json` (or filesystem fallback for pre-v1.16 projects), asks layer-specific sub-questions, generates in a temp directory, and moves files on success. Dependent layers (Docker, CI, Claude Code) are auto-regenerated when adding a backend or frontend.
 
@@ -164,6 +167,12 @@ forgekit new my-app --spring-boot --group com.example --react --docker --claude-
 
 # FastAPI + React with auth
 forgekit new my-app --fastapi --react --auth --docker --claude-code
+
+# NestJS + Vue with auth and Prisma
+forgekit new my-app --nestjs --vue --auth --prisma --docker --claude-code
+
+# Next.js fullstack with auth
+forgekit new my-app --nextjs --auth --docker --claude-code
 
 # Laravel + React with auth
 forgekit new my-app --laravel --react --auth --docker
@@ -182,8 +191,11 @@ forgekit new my-app --spring-boot --auth --angular --docker
 | `--spring-boot` | Spring Boot backend (Java 21) |
 | `--fastapi` | FastAPI backend (Python 3.12) |
 | `--laravel` | Laravel backend (PHP 8.3, API-only) |
+| `--nestjs` | NestJS backend (Node.js/TypeScript) |
+| `--nextjs` | Next.js fullstack (Node.js, API routes + frontend) |
 | `--angular` | Angular frontend (standalone, OnPush) |
 | `--react` | React frontend (Vite + Tailwind CSS v4) |
+| `--vue` | Vue.js frontend (Vite + Tailwind CSS v4) |
 | `--group <id>` | Java Group ID (e.g. `com.example`) — Spring Boot only |
 | `--description <desc>` | Project description |
 | `--auth` | Auth scaffold — Angular interceptors/guards or React `useAuth` + axios |
@@ -191,6 +203,7 @@ forgekit new my-app --spring-boot --auth --angular --docker
 | `--openapi` / `--no-openapi` | OpenAPI / Swagger UI |
 | `--mapstruct` / `--no-mapstruct` | MapStruct bean mappers |
 | `--ngrx` / `--no-ngrx` | NgRx SignalStore (Angular only) |
+| `--prisma` / `--no-prisma` | Prisma ORM (NestJS only) |
 | `--ui <framework>` | UI framework: `primeng` \| `tailwind` \| `none` (Angular only) |
 | `--preset <preset>` | PrimeNG preset: `Aura` \| `Lara` \| `Nora` (Angular only) |
 | `--docker` / `--no-docker` | Docker Compose (PostgreSQL + pgAdmin) |
@@ -339,6 +352,84 @@ php artisan test    # run tests
 
 ---
 
+## Backend — NestJS
+
+**Stack:** NestJS, TypeScript, Express.js, class-validator, Prisma (optional).
+
+**Always included:** Class-based controllers, dependency injection, OpenAPI ready.
+
+**Optional:** Prisma ORM (`--prisma`) for type-safe database access, JWT (`--auth`) for stateless authentication.
+
+```
+backend/
+├── src/
+│   ├── main.ts                  # NestJS entry point
+│   ├── app.module.ts            # Root module
+│   ├── health/
+│   │   ├── health.controller.ts # GET /health
+│   │   └── health.service.ts
+│   ├── prisma/                  # (--prisma)
+│   │   ├── prisma.service.ts
+│   │   └── schema.prisma
+│   └── common/
+│       ├── decorators/
+│       ├── filters/
+│       └── guards/              # (--auth) JWT guard
+├── test/
+├── package.json
+├── tsconfig.json
+├── docker-compose.yml           # PostgreSQL + pgAdmin
+└── Dockerfile                   # Node.js + pnpm
+```
+
+**Start the backend:**
+```bash
+cd backend
+npm install
+npm run start:dev   # port 3000
+npm test            # run tests
+```
+
+---
+
+## Backend — Next.js
+
+**Stack:** Next.js 15, React 19, TypeScript, API routes.
+
+**Features:** Built as a fullstack framework (frontend + API routes in same project), supports both static and dynamic API endpoints.
+
+**Optional:** Auth scaffold with middleware and route protection.
+
+```
+backend/
+├── app/
+│   ├── layout.tsx               # Root layout
+│   ├── page.tsx                 # Home page
+│   ├── api/
+│   │   ├── health/
+│   │   │   └── route.ts         # GET /api/health
+│   │   └── auth/                # (--auth) Auth routes
+│   └── (routes)/                # Feature pages
+├── middleware.ts                # (--auth) Auth middleware
+├── lib/
+│   └── auth.ts                  # (--auth) Auth utilities
+├── public/
+├── package.json
+├── next.config.js
+└── Dockerfile
+```
+
+**Start the application:**
+```bash
+cd backend
+npm install
+npm run dev         # port 3000
+npm run build       # production build
+npm test            # run tests
+```
+
+---
+
 ## Frontend — Angular
 
 **UI framework (mutually exclusive):**
@@ -392,6 +483,36 @@ frontend/src/
 ```
 
 **With `--auth`:** generates `useAuth.ts`, `ProtectedRoute.tsx`, and `lib/http.ts` (axios instance that reads the token from `localStorage` and attaches it as `Authorization: Bearer …` on every request).
+
+**Start the frontend:**
+```bash
+cd frontend
+npm install
+npm run dev     # port 5173
+npm run build   # production build
+npm run lint    # TypeScript check (tsc --noEmit)
+```
+
+---
+
+## Frontend — Vue.js (Vite + Tailwind)
+
+**Stack:** Vue 3, Vite 7, Tailwind CSS v4, Vue Router 4.
+
+```
+frontend/src/
+├── main.ts                # Entry point
+├── App.vue                # Root component
+├── index.css              # Tailwind @import
+├── router/
+│   └── index.ts           # Routes (createRouter + lazy-ready)
+├── stores/                # (--auth) Pinia store for auth state
+├── components/
+│   └── ProtectedRoute.vue # (--auth) Route protection component
+└── lib/                   # (--auth) axios instance with JWT interceptor
+```
+
+**With `--auth`:** generates Pinia store for auth state, `ProtectedRoute.vue` component, and `lib/http.ts` (axios instance that reads the token from `localStorage` and attaches it as `Authorization: Bearer …`).
 
 **Start the frontend:**
 ```bash
@@ -539,23 +660,31 @@ src/
 │   ├── backend/index.ts         # Spring Boot generator
 │   ├── fastapi/index.ts         # FastAPI generator
 │   ├── laravel/index.ts         # Laravel generator
-│   ├── frontend/index.ts        # Frontend router (Angular or React)
+│   ├── nestjs/index.ts          # NestJS generator
+│   ├── nextjs/index.ts          # Next.js generator
+│   ├── frontend/index.ts        # Frontend router (Angular, React, or Vue)
 │   ├── frontend/react-vite.ts   # React / Vite generator
+│   ├── frontend/vue.ts          # Vue.js generator
 │   ├── docker/index.ts          # Docker Compose generator
 │   ├── claude-code/index.ts     # Claude Code config generator
+│   ├── ci/index.ts              # GitHub Actions CI generator
 │   ├── root/index.ts            # README + .gitignore
 │   ├── speckit.ts               # Calls specify init
 │   └── git.ts                   # Git init + first commit
 ├── templates/                   # Handlebars (.hbs) templates
-│   ├── backend/                 # 14 Spring Boot templates
-│   ├── fastapi/                 # 9 FastAPI templates
-│   ├── laravel/                 # 21 Laravel templates
-│   ├── frontend/angular/        # 22 Angular templates
-│   ├── frontend/react-vite/     # 13 React/Vite templates
-│   ├── docker/
+│   ├── backend/                 # Spring Boot templates
+│   ├── fastapi/                 # FastAPI templates
+│   ├── laravel/                 # Laravel templates
+│   ├── nestjs/                  # NestJS templates
+│   ├── nextjs/                  # Next.js templates
+│   ├── frontend/angular/        # Angular templates
+│   ├── frontend/react-vite/     # React/Vite templates
+│   ├── frontend/vue/            # Vue.js templates
+│   ├── docker/                  # Docker Compose templates
 │   ├── claude-code/             # CLAUDE.md, settings.json, hooks, hookify
-│   ├── ci/
-│   └── root/
+│   ├── ci/                      # GitHub Actions templates
+│   ├── root/                    # Root templates
+│   └── shared/                  # Shared templates (prettier, git, etc)
 ├── utils/
 │   ├── template-engine.ts       # Handlebars compile + render
 │   ├── validation.ts            # Input validators
