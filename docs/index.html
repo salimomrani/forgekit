@@ -422,6 +422,92 @@
         color: var(--muted);
       }
 
+      /* Terminal demo */
+      .terminal-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        max-width: 680px;
+        margin: 40px auto 0;
+        text-align: left;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      }
+      .terminal-bar {
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .terminal-dot.red {
+        background: #ff5f57;
+      }
+      .terminal-dot.yellow {
+        background: #febc2e;
+      }
+      .terminal-dot.green {
+        background: #28c840;
+      }
+      .terminal-title {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+        margin-right: 36px;
+      }
+      .terminal-body {
+        padding: 20px 24px;
+        font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        min-height: 280px;
+      }
+      .t-prompt {
+        color: var(--accent2);
+      }
+      .t-cmd {
+        color: var(--text);
+      }
+      .t-q {
+        color: var(--accent3);
+      }
+      .t-ans {
+        color: var(--accent2);
+      }
+      .t-ok {
+        color: var(--accent2);
+      }
+      .t-muted {
+        color: var(--muted);
+      }
+      .t-warn {
+        color: var(--warn);
+      }
+      .t-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 14px;
+        background: var(--text);
+        vertical-align: text-bottom;
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
       @media (max-width: 600px) {
         .hero h1 {
           font-size: 30px;
@@ -434,6 +520,10 @@
         }
         nav .links {
           display: none;
+        }
+        .terminal-body {
+          font-size: 11px;
+          padding: 14px 16px;
         }
       }
     </style>
@@ -500,6 +590,19 @@
           href="https://github.com/salimomrani/forgekit"
           >View on GitHub</a
         >
+      </div>
+    </div>
+
+    <!-- Terminal demo -->
+    <div class="container">
+      <div class="terminal-wrap">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">bash</span>
+        </div>
+        <div class="terminal-body" id="terminal-body"></div>
       </div>
     </div>
 
@@ -1136,6 +1239,135 @@
     </footer>
 
     <script>
+      // Terminal animation
+      (function () {
+        const el = document.getElementById("terminal-body");
+        if (!el) return;
+
+        const FRAMES = [
+          { type: "input", text: "forgekit new my-app", delay: 600 },
+          { type: "blank" },
+          { type: "prompt", text: "? Project name:", answer: " my-app" },
+          {
+            type: "prompt",
+            text: "? Backend:",
+            answer: " Spring Boot (Java 21)",
+          },
+          {
+            type: "prompt",
+            text: "? Frontend:",
+            answer: " Angular (standalone, OnPush)",
+          },
+          { type: "prompt", text: "? Group ID:", answer: " com.example" },
+          {
+            type: "prompt",
+            text: "? UI framework:",
+            answer: " PrimeNG (Aura)",
+          },
+          { type: "prompt", text: "? Include auth scaffold?", answer: " No" },
+          {
+            type: "prompt",
+            text: "? Infrastructure:",
+            answer: " Docker ✓  CI/CD ✓  Claude Code ✓  Git ✓",
+          },
+          { type: "blank" },
+          {
+            type: "ok",
+            text: "  ✔ Backend Spring Boot 3.5.0 (Java 21) generated",
+          },
+          { type: "ok", text: "  ✔ Frontend Angular 19.2.0 generated" },
+          { type: "ok", text: "  ✔ Docker Compose configured" },
+          { type: "ok", text: "  ✔ GitHub Actions CI generated" },
+          { type: "ok", text: "  ✔ Claude Code config generated" },
+          { type: "ok", text: "  ✔ Git initialized — initial commit done" },
+          { type: "blank" },
+          { type: "done", text: "  🚀 Project my-app ready in 2.1s" },
+        ];
+
+        const TYPE_SPEED = 38;
+        const LINE_DELAY = 120;
+        const LOOP_PAUSE = 4000;
+
+        function span(cls, text) {
+          const s = document.createElement("span");
+          s.className = cls;
+          s.textContent = text;
+          return s;
+        }
+
+        function addLine(...nodes) {
+          const div = document.createElement("div");
+          nodes.forEach((n) =>
+            div.appendChild(
+              typeof n === "string" ? document.createTextNode(n) : n,
+            ),
+          );
+          el.appendChild(div);
+        }
+
+        function typeText(target, text, speed, cb) {
+          let i = 0;
+          const cursor = document.createElement("span");
+          cursor.className = "t-cursor";
+          target.appendChild(cursor);
+          const iv = setInterval(() => {
+            cursor.before(document.createTextNode(text[i++]));
+            if (i >= text.length) {
+              clearInterval(iv);
+              cursor.remove();
+              cb && cb();
+            }
+          }, speed);
+        }
+
+        function runFrames(frames, idx, done) {
+          if (idx >= frames.length) {
+            done && done();
+            return;
+          }
+          const f = frames[idx];
+          const next = () =>
+            setTimeout(() => runFrames(frames, idx + 1, done), LINE_DELAY);
+
+          if (f.type === "blank") {
+            el.appendChild(document.createElement("div"));
+            next();
+          } else if (f.type === "input") {
+            const div = document.createElement("div");
+            div.appendChild(span("t-prompt", "$ "));
+            const cmd = document.createElement("span");
+            cmd.className = "t-cmd";
+            div.appendChild(cmd);
+            el.appendChild(div);
+            setTimeout(
+              () => typeText(cmd, f.text, TYPE_SPEED, next),
+              f.delay || 0,
+            );
+          } else if (f.type === "prompt") {
+            const div = document.createElement("div");
+            div.appendChild(span("t-q", f.text));
+            div.appendChild(span("t-ans", f.answer));
+            el.appendChild(div);
+            next();
+          } else if (f.type === "ok") {
+            addLine(span("t-ok", f.text));
+            next();
+          } else if (f.type === "done") {
+            addLine(span("t-warn", f.text));
+            next();
+          }
+        }
+
+        function start() {
+          el.innerHTML = "";
+          runFrames(FRAMES, 0, () => {
+            setTimeout(start, LOOP_PAUSE);
+          });
+        }
+
+        start();
+      })();
+
       function switchTab(e, id) {
         document
           .querySelectorAll(".tab")
