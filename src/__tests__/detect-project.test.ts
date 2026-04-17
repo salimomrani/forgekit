@@ -52,6 +52,18 @@ describe("detectProject", () => {
     expect(result.config.frontend).toBe("react-vite");
   });
 
+  it("detects svelte frontend from App.svelte", async () => {
+    await fs.ensureDir(path.join(tmpDir, "frontend", "src"));
+    await fs.writeFile(
+      path.join(tmpDir, "frontend", "src", "App.svelte"),
+      "<main />",
+    );
+
+    const result = await detectProject(tmpDir);
+    expect(result.source).toBe("filesystem");
+    expect(result.config.frontend).toBe("svelte");
+  });
+
   it("detects multiple layers from sentinel files", async () => {
     await fs.writeFile(path.join(tmpDir, "docker-compose.yml"), "version: 3");
     await fs.ensureDir(path.join(tmpDir, ".github", "workflows"));

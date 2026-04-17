@@ -98,4 +98,14 @@ describe("resolveVersions", () => {
       );
     });
   });
+
+  it("resolves Svelte frontend versions with fallback data", async () => {
+    vi.stubGlobal("fetch", () => Promise.resolve({ ok: false } as Response));
+
+    const result = await resolveVersions({ backendType: null, frontend: "svelte" });
+
+    expect(result.svelte).toBe(FALLBACK_VERSIONS.svelte);
+    expect(result.vitePluginSvelte).toBe(FALLBACK_VERSIONS.vitePluginSvelte);
+    expect(result.tailwind).toBe(FALLBACK_VERSIONS.tailwind);
+  });
 });

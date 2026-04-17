@@ -29,6 +29,9 @@ export async function promptAddLayerConfig(
   if (layer === "vue") {
     return promptVue(defaults);
   }
+  if (layer === "svelte") {
+    return promptSvelte(defaults);
+  }
   if (layer === "prettier") {
     if (existingConfig.frontend === null) {
       throw new Error(
@@ -213,6 +216,12 @@ async function promptAuth(
 }
 
 async function promptVue(
+  defaults: Partial<ProjectConfig>,
+): Promise<Partial<ProjectConfig>> {
+  return promptAuth(defaults);
+}
+
+async function promptSvelte(
   defaults: Partial<ProjectConfig>,
 ): Promise<Partial<ProjectConfig>> {
   return promptAuth(defaults);

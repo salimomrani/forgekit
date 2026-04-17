@@ -1,0 +1,30 @@
+<script lang="ts">
+  import Layout from './components/Layout.svelte'
+{{#if auth}}
+  import { isAuthenticated, signIn } from './stores/auth'
+{{/if}}
+</script>
+
+{{#if auth}}
+{#if $isAuthenticated}
+  <Layout />
+{:else}
+  <main class="flex min-h-screen items-center justify-center px-6">
+    <section class="w-full max-w-md rounded-3xl bg-white/80 p-8 shadow-xl ring-1 ring-slate-200 backdrop-blur">
+      <p class="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-sky-600">ForgeKit</p>
+      <h1 class="text-3xl font-bold text-slate-900">Welcome to {{name}}</h1>
+      <p class="mt-3 text-sm leading-6 text-slate-600">
+        Your Svelte frontend is ready. Use this starter screen to wire your real authentication flow.
+      </p>
+      <button
+        class="mt-6 inline-flex rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+        on:click={signIn}
+      >
+        Sign in
+      </button>
+    </section>
+  </main>
+{/if}
+{{else}}
+<Layout />
+{{/if}}

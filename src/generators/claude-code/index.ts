@@ -114,6 +114,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
     const hasFrontend = this.config.frontend !== null;
     const angular = this.config.frontend === "angular";
     const reactVite = this.config.frontend === "react-vite";
+    const vue = this.config.frontend === "vue";
+    const svelte = this.config.frontend === "svelte";
 
     const parentHooks = await this.readParentHooks();
 
@@ -128,6 +130,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       hasFrontend,
       angular,
       reactVite,
+      vue,
+      svelte,
       frontend: hasFrontend,
       docker: this.config.docker,
       flyway: this.config.flyway,
@@ -138,9 +142,8 @@ class ClaudeCodeGenerator extends BaseGenerator {
       claudeDir: ".claude",
       workflowSpeckit: this.config.workflowMode === "speckit",
       workflowVibe: this.config.workflowMode === "vibe",
-      gitStrategy:
-        this.config.workflowMode === "vibe" ? "no-pr" : "pr-required",
-      gitStrategyNoPr: this.config.workflowMode === "vibe",
+      gitStrategy: this.config.gitStrategy,
+      gitStrategyNoPr: this.config.gitStrategy === "no-pr",
       hasParentSessionStart: parentHooks.has("SessionStart"),
       hasParentPreCompact: parentHooks.has("PreCompact"),
       ...this.resolveSpeckitData(),
@@ -396,6 +399,16 @@ class ClaudeCodeGenerator extends BaseGenerator {
     }
 
     if (this.config.frontend === "vue") {
+      commands.push(
+        "Bash(npm run dev)",
+        "Bash(npm run build)",
+        "Bash(npm run lint)",
+        "Bash(npm install)",
+        "Bash(npm run)",
+      );
+    }
+
+    if (this.config.frontend === "svelte") {
       commands.push(
         "Bash(npm run dev)",
         "Bash(npm run build)",

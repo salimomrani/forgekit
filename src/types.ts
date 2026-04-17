@@ -1,6 +1,7 @@
 export type UIFramework = "primeng" | "tailwind" | "none";
 export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
 export type WorkflowMode = "speckit" | "vibe" | "none";
+export type GitStrategy = "pr-required" | "no-pr";
 export type SpeckitPreset = "rigorous" | "balanced" | "fast" | "bare-metal";
 export type BackendType =
   | "spring-boot"
@@ -9,7 +10,7 @@ export type BackendType =
   | "nextjs"
   | "nestjs"
   | null;
-export type FrontendType = "angular" | "react-vite" | "vue" | null;
+export type FrontendType = "angular" | "react-vite" | "vue" | "svelte" | null;
 
 export interface ProjectConfig {
   name: string;
@@ -36,6 +37,7 @@ export interface ProjectConfig {
   claudeCode: boolean;
   speckit: boolean;
   workflowMode: WorkflowMode;
+  gitStrategy: GitStrategy;
   speckitPreset: SpeckitPreset | null;
   gitInit: boolean;
 }

@@ -32,6 +32,17 @@ describe("generateFrontend router", () => {
     ).toBe(true);
   });
 
+  it("generates Svelte files when frontend is svelte", async () => {
+    const config = { ...baseConfig, frontend: "svelte" as const };
+    await generateFrontend(tmpDir, config, baseVersions);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "vite.config.ts")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(tmpDir, "frontend", "src", "App.svelte")),
+    ).toBe(true);
+  });
+
   it("generates Angular files when frontend is angular (US1 regression)", async () => {
     const config = { ...baseConfig, frontend: "angular" as const };
     await generateFrontend(tmpDir, config, baseVersions);

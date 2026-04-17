@@ -26,6 +26,8 @@ export interface ResolvedVersions {
   reactRouter: string;
   vite: string;
   axiosReact: string;
+  svelte: string;
+  vitePluginSvelte: string;
   // Backend — Next.js
   next: string;
   nextAuth: string;
@@ -69,6 +71,8 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   reactRouter: "7.5.0", // renovate: datasource=npm depName=react-router
   vite: "7.0.0", // renovate: datasource=npm depName=vite
   axiosReact: "1.8.0", // renovate: datasource=npm depName=axios
+  svelte: "5.38.7", // renovate: datasource=npm depName=svelte
+  vitePluginSvelte: "6.2.0", // renovate: datasource=npm depName=@sveltejs/vite-plugin-svelte
   next: "15.3.0", // renovate: datasource=npm depName=next
   nextAuth: "5.0.0-beta.31", // renovate: datasource=npm depName=next-auth
   prismaClient: "6.6.0", // renovate: datasource=npm depName=prisma
@@ -257,6 +261,17 @@ export async function resolveVersions(opts: {
       fetchNpmVersion("pinia").then(set("pinia")),
       fetchNpmVersion("vue-router").then(set("vueRouter")),
       fetchNpmVersion("tailwindcss").then(set("tailwind")),
+    );
+  }
+
+  if (opts.frontend === "svelte") {
+    tasks.push(
+      fetchNpmVersion("svelte").then(set("svelte")),
+      fetchNpmVersion("@sveltejs/vite-plugin-svelte").then(
+        set("vitePluginSvelte"),
+      ),
+      fetchNpmVersion("tailwindcss").then(set("tailwind")),
+      fetchNpmVersion("vite").then(set("vite")),
     );
   }
 
