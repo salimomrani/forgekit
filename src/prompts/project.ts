@@ -347,6 +347,24 @@ export async function promptProjectConfig(
     });
   }
 
+  let gitStrategy: GitStrategy = defaults.gitStrategy ?? "pr-required";
+  if (workflowMode === "vibe" && defaults.gitStrategy === undefined) {
+    gitStrategy = await select<GitStrategy>({
+      message: "Stratégie git",
+      choices: [
+        {
+          name: "PR obligatoire (plus sûr)",
+          value: "pr-required",
+        },
+        {
+          name: "Push direct sur master (plus rapide)",
+          value: "no-pr",
+        },
+      ],
+      default: "pr-required",
+    });
+  }
+
   return {
     name,
     groupId,
@@ -364,6 +382,7 @@ export async function promptProjectConfig(
     docker,
     speckit,
     workflowMode,
+    gitStrategy,
     speckitPreset,
     ci,
     claudeCode,
