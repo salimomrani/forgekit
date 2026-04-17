@@ -135,7 +135,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       auth: this.config.auth,
       versions: this.versions,
       allowedCommands,
-      claudeDir: path.join(this.projectDir, ".claude"),
+      claudeDir: ".claude",
       workflowSpeckit: this.config.workflowMode === "speckit",
       workflowVibe: this.config.workflowMode === "vibe",
       gitStrategy:
