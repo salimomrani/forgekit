@@ -49,6 +49,12 @@ const SENTINEL_MAP: Array<{
     },
   },
   {
+    files: ["frontend/src/App.svelte", "frontend/svelte.config.js"],
+    apply: (c) => {
+      c.frontend = "svelte";
+    },
+  },
+  {
     files: ["frontend/vite.config.ts"],
     apply: (c) => {
       if (c.frontend === null) c.frontend = "react-vite";
@@ -108,6 +114,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     claudeCode: false,
     speckit: false,
     workflowMode: "none",
+    gitStrategy: "pr-required",
     speckitPreset: null,
     gitInit: false,
   };

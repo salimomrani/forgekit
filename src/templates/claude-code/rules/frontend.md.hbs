@@ -20,3 +20,18 @@ paths: ["**/frontend/**"]
 - **CSS:** Tailwind CSS v4
 - **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
 {{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Vite + Tailwind)
+
+- **Vue {{versions.vue}}** — Composition API, single-file components
+- **State:** Pinia
+- **CSS:** Tailwind CSS v4
+- **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
+{{/if}}
+{{#if svelte}}
+## Frontend — Svelte {{versions.svelte}} (Vite + Tailwind)
+
+- **Svelte {{versions.svelte}}** — component-first, minimal client-side setup
+- **CSS:** Tailwind CSS v4
+- **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
+{{/if}}

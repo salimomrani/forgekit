@@ -380,4 +380,34 @@ describe("ForgeKit e2e — generation pipeline", () => {
     );
     expect(dockerCompose).toContain("postgres:");
   }, 15_000);
+
+  it("S11: Svelte only — generates key files and package.json contains svelte", async () => {
+    const projectDir = await run(
+      baseConfig({
+        frontend: "svelte",
+        uiFramework: "tailwind",
+      }),
+    );
+
+    const frontendDir = path.join(projectDir, "frontend");
+    const srcDir = path.join(frontendDir, "src");
+
+    expect(await fs.pathExists(path.join(frontendDir, "package.json"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(frontendDir, "vite.config.ts"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(frontendDir, "svelte.config.js"))).toBe(
+      true,
+    );
+    expect(await fs.pathExists(path.join(srcDir, "App.svelte"))).toBe(true);
+    expect(await fs.pathExists(path.join(srcDir, "main.ts"))).toBe(true);
+    expect(
+      await fs.pathExists(path.join(srcDir, "components", "Layout.svelte")),
+    ).toBe(true);
+
+    const pkg = await fs.readJson(path.join(frontendDir, "package.json"));
+    expect(pkg.dependencies["svelte"]).toBeDefined();
+  }, 15_000);
 });

@@ -81,6 +81,39 @@ describe("forgekit add — integration", () => {
     ).toBe(true);
   });
 
+  it("adds svelte frontend to a spring-boot-only project", async () => {
+    await generateBase({ backendType: "spring-boot" });
+
+    const existingResult = await detectProject(projectDir);
+    const updatedConfig: ProjectConfig = {
+      ...existingResult.config,
+      frontend: "svelte",
+      auth: false,
+    };
+
+    const addTmpDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "forgekit-add-svelte-gen-"),
+    );
+    try {
+      const { generateFrontend } =
+        await import("../generators/frontend/index.js");
+      await generateFrontend(addTmpDir, updatedConfig, BASE_VERSIONS);
+      await fs.copy(addTmpDir, projectDir, { overwrite: false });
+    } finally {
+      await fs.remove(addTmpDir);
+    }
+
+    expect(
+      await fs.pathExists(path.join(projectDir, "frontend", "package.json")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "frontend", "src", "App.svelte")),
+    ).toBe(true);
+    expect(
+      await fs.pathExists(path.join(projectDir, "backend", "pom.xml")),
+    ).toBe(true);
+  });
+
   it("detects conflict when adding spring-boot to project with existing backend", async () => {
     await generateBase({ backendType: "fastapi" });
 

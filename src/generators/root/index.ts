@@ -20,6 +20,8 @@ class RootGenerator extends BaseGenerator {
     const hasFrontend = this.config.frontend !== null;
     const angular = this.config.frontend === "angular";
     const reactVite = this.config.frontend === "react-vite";
+    const vue = this.config.frontend === "vue";
+    const svelte = this.config.frontend === "svelte";
 
     const data = {
       name: this.config.name,
@@ -31,6 +33,8 @@ class RootGenerator extends BaseGenerator {
       hasFrontend,
       angular,
       reactVite,
+      vue,
+      svelte,
       docker: this.config.docker,
       versions: this.versions,
     };
