@@ -54,19 +54,9 @@
           }
         ]
       }
-    ],
+    ]{{#unless hasParentPreCompact}},{{/unless}}
 {{/unless}}
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "{{claudeDir}}/hooks/pre-bash.sh"
-          }
-        ]
-      }
-    ]{{#unless hasParentPreCompact}},
+{{#unless hasParentPreCompact}}
     "PreCompact": [
       {
         "matcher": "",
@@ -77,6 +67,7 @@
           }
         ]
       }
-    ]{{/unless}}
+    ]
+{{/unless}}
   }
 }

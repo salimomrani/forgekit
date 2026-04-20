@@ -6,6 +6,6 @@ pattern: (^|/)\.env(\.|$)
 action: warn
 ---
 
-⚠️ **Fichier .env détecté**
+⚠️ **`.env` file detected**
 
-Tu es sur le point de modifier un fichier d'environnement. Assure-toi de ne pas committer de secrets — utilise `.env.example` pour les valeurs de référence.
+You're about to modify an environment file. Do not commit secrets — use `.env.example` for reference values.

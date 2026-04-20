@@ -172,12 +172,6 @@ class ClaudeCodeGenerator extends BaseGenerator {
       ),
       // Hook scripts (templated, then chmod)
       renderAndWrite(
-        "claude-code/hooks/pre-bash.sh.hbs",
-        path.join(hooksDir, "pre-bash.sh"),
-        data,
-        { mode: 0o755 },
-      ),
-      renderAndWrite(
         "claude-code/hooks/session-start.sh.hbs",
         path.join(hooksDir, "session-start.sh"),
         data,

@@ -57,9 +57,6 @@ describe("ClaudeCodeGenerator", () => {
   it("generates hooks directory with scripts", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     expect(
-      await fs.pathExists(path.join(tmpDir, ".claude", "hooks", "pre-bash.sh")),
-    ).toBe(true);
-    expect(
       await fs.pathExists(
         path.join(tmpDir, ".claude", "hooks", "session-start.sh"),
       ),
@@ -69,7 +66,7 @@ describe("ClaudeCodeGenerator", () => {
   it("makes hook scripts executable", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const stat = await fs.stat(
-      path.join(tmpDir, ".claude", "hooks", "pre-bash.sh"),
+      path.join(tmpDir, ".claude", "hooks", "session-start.sh"),
     );
     expect(stat.mode & 0o100).toBeTruthy();
   });
@@ -102,16 +99,13 @@ describe("ClaudeCodeGenerator", () => {
     ).toBe(true);
   });
 
-  it("settings.json contains hooks configuration", async () => {
+  it("settings.json contains a hooks object", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const settings = await fs.readJson(
       path.join(tmpDir, ".claude", "settings.json"),
     );
     expect(settings.hooks).toBeDefined();
-    // PreToolUse is always present (project-specific pre-bash guards)
-    expect(settings.hooks.PreToolUse).toBeDefined();
-    // In test environment (no parent ~/.claude/settings.json), SessionStart and PreCompact should be included
-    expect(Object.keys(settings.hooks).length).toBeGreaterThanOrEqual(1);
+    expect(typeof settings.hooks).toBe("object");
   });
 
   it("generates angular skill when frontend is enabled", async () => {
@@ -371,98 +365,85 @@ describe("ClaudeCodeGenerator", () => {
     expect(content).not.toContain("## Workflow Mode: vibe");
   });
 
-  it("CLAUDE.md contains ## Claude Settings block when workflowMode is speckit", async () => {
+  it("CLAUDE.md never contains a Claude Settings table (settings.json is the SSOT)", async () => {
+    for (const mode of ["speckit", "vibe", "none"] as const) {
+      const dir = await fs.mkdtemp(path.join(os.tmpdir(), "forgekit-test-"));
+      await generateClaudeCode(
+        dir,
+        {
+          ...baseConfig,
+          workflowMode: mode,
+          speckitPreset: mode === "speckit" ? ("balanced" as const) : null,
+        },
+        baseVersions,
+      );
+      const content = await fs.readFile(path.join(dir, "CLAUDE.md"), "utf-8");
+      expect(content).not.toContain("## Claude Settings");
+      expect(content).not.toContain("`speckit.tests`");
+      expect(content).not.toContain("`git.strategy`");
+      await fs.remove(dir);
+    }
+  });
+
+  it("settings.json reflects balanced preset values in speckit mode", async () => {
     const config = {
       ...baseConfig,
       workflowMode: "speckit" as const,
       speckitPreset: "balanced" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).toContain("## Claude Settings");
-    expect(content).toContain("| `speckit.tests` | `settings.json` | `true` |");
-    expect(content).toContain("| `speckit.tdd` | `settings.json` | `false` |");
-    expect(content).toContain(
-      "| `speckit.code-review` | `settings.json` | `true` |",
-    );
-    expect(content).toContain(
-      "| `speckit.verification` | `settings.json` | `minimal` |",
-    );
-    expect(content).toContain(
-      "| `speckit.plan-detail` | `settings.json` | `medium` |",
-    );
-
-    const settingsContent = await fs.readFile(
+    const settings = await fs.readJson(
       path.join(tmpDir, ".claude", "settings.json"),
-      "utf-8",
     );
-    const settings = JSON.parse(settingsContent);
     expect(settings.git.strategy).toBe("pr-required");
     expect(settings.speckit.tests).toBe(true);
     expect(settings.speckit.tdd).toBe(false);
+    expect(settings.speckit["code-review"]).toBe(true);
+    expect(settings.speckit.verification).toBe("minimal");
+    expect(settings.speckit["plan-detail"]).toBe("medium");
   });
 
-  it("CLAUDE.md Speckit Config — rigorous preset", async () => {
+  it("settings.json reflects rigorous preset values", async () => {
     const config = {
       ...baseConfig,
       workflowMode: "speckit" as const,
       speckitPreset: "rigorous" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).toContain("| `speckit.tdd` | `settings.json` | `true` |");
-    expect(content).toContain(
-      "| `speckit.verification` | `settings.json` | `full` |",
+    const settings = await fs.readJson(
+      path.join(tmpDir, ".claude", "settings.json"),
     );
-    expect(content).toContain(
-      "| `speckit.plan-detail` | `settings.json` | `high` |",
-    );
+    expect(settings.speckit.tdd).toBe(true);
+    expect(settings.speckit.verification).toBe("full");
+    expect(settings.speckit["plan-detail"]).toBe("high");
   });
 
-  it("CLAUDE.md Speckit Config — fast preset (skip-clarify: true, no fast-mode line)", async () => {
+  it("settings.json reflects fast preset values", async () => {
     const config = {
       ...baseConfig,
       workflowMode: "speckit" as const,
       speckitPreset: "fast" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).toContain(
-      "| `speckit.skip-clarify` | `settings.json` | `true` |",
+    const settings = await fs.readJson(
+      path.join(tmpDir, ".claude", "settings.json"),
     );
-    expect(content).toContain(
-      "| `speckit.code-review` | `settings.json` | `false` |",
-    );
+    expect(settings.speckit["skip-clarify"]).toBe(true);
+    expect(settings.speckit["code-review"]).toBe(false);
   });
 
-  it("CLAUDE.md Speckit Config — bare-metal preset", async () => {
+  it("settings.json reflects bare-metal preset values", async () => {
     const config = {
       ...baseConfig,
       workflowMode: "speckit" as const,
       speckitPreset: "bare-metal" as const,
     };
     await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).toContain(
-      "| `speckit.tests` | `settings.json` | `false` |",
+    const settings = await fs.readJson(
+      path.join(tmpDir, ".claude", "settings.json"),
     );
-    expect(content).toContain(
-      "| `speckit.verification` | `settings.json` | `skip` |",
-    );
-  });
-
-  it("CLAUDE.md does not contain ## Claude Settings when workflowMode is vibe", async () => {
-    const config = { ...baseConfig, workflowMode: "vibe" as const };
-    await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).not.toContain("`speckit.tests`");
-  });
-
-  it("CLAUDE.md does not contain ## Claude Settings when workflowMode is none", async () => {
-    const config = { ...baseConfig, workflowMode: "none" as const };
-    await generateClaudeCode(tmpDir, config, baseVersions);
-    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
-    expect(content).not.toContain("`speckit.tests`");
+    expect(settings.speckit.tests).toBe(false);
+    expect(settings.speckit.verification).toBe("skip");
   });
 
   it("CLAUDE.md contains '## Workflow Mode: vibe' when workflowMode is vibe", async () => {
@@ -488,7 +469,6 @@ describe("ClaudeCodeGenerator", () => {
     expect(content).toContain("Merge direct sur `master`");
     expect(content).toContain("`commit-commands:commit`");
     expect(content).not.toContain("`commit-commands:commit-push-pr`");
-    expect(content).toContain("| `git.strategy` | `settings.json` | `no-pr` |");
   });
 
   it("speckit mode → settings.json git.strategy=pr-required and CLAUDE.md uses commit-push-pr skill", async () => {
@@ -505,9 +485,6 @@ describe("ClaudeCodeGenerator", () => {
     const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
     expect(content).toContain("PR obligatoire");
     expect(content).toContain("`commit-commands:commit-push-pr`");
-    expect(content).toContain(
-      "| `git.strategy` | `settings.json` | `pr-required` |",
-    );
   });
 
   it("none mode → settings.json git.strategy=pr-required (default)", async () => {

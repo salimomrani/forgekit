@@ -6,6 +6,6 @@ pattern: git\s+push\s+.*--force(?!-with-lease)|git\s+push\s+.*\s-f\b
 action: block
 ---
 
-🚫 **git push --force bloqué**
+🚫 **`git push --force` blocked**
 
-Le force push est interdit sur ce projet. Utilise `--force-with-lease` si tu sais ce que tu fais, ou ouvre une PR à la place.
+Force push is not allowed on this project. Use `--force-with-lease` if you know what you're doing, or open a PR instead.

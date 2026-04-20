@@ -6,13 +6,13 @@ pattern: git\s+commit
 action: warn
 ---
 
-⚠️ **Commit détecté — tests lancés ?**
+⚠️ **Commit detected — tests run?**
 
-Avant de committer, confirme :
-{{#if fastapi}}- [ ] `cd backend && .venv/bin/pytest tests/ -v` → vert
-{{/if}}{{#if springBoot}}- [ ] `cd backend && ./mvnw test` → vert
-{{/if}}{{#if frontend}}- [ ] `cd frontend && npm test -- --watch=false` → vert
-{{/if}}{{#if fastapi}}- [ ] `cd backend && .venv/bin/ruff check .` → propre
-{{/if}}{{#if frontend}}- [ ] `cd frontend && npm run lint` → propre
+Before committing, confirm:
+{{#if fastapi}}- [ ] `cd backend && .venv/bin/pytest tests/ -v` → green
+{{/if}}{{#if springBoot}}- [ ] `cd backend && ./mvnw test` → green
+{{/if}}{{#if frontend}}- [ ] `cd frontend && npm test -- --watch=false` → green
+{{/if}}{{#if fastapi}}- [ ] `cd backend && .venv/bin/ruff check .` → clean
+{{/if}}{{#if frontend}}- [ ] `cd frontend && npm run lint` → clean
 {{/if}}
-Iron law : aucun commit sans tests verts.
+Iron law: no commit without green tests.

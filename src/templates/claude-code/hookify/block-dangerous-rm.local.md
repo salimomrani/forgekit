@@ -6,6 +6,6 @@ pattern: rm\s+(-rf|-fr)
 action: block
 ---
 
-⚠️ **Commande rm -rf détectée**
+⚠️ **`rm -rf` detected**
 
-Cette commande peut supprimer des fichiers de façon irréversible. Vérifie bien le chemin avant de continuer.
+This command can irreversibly delete files. Double-check the path before proceeding.
