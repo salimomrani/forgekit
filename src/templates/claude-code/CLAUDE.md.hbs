@@ -49,12 +49,101 @@ Read `.specify/memory/constitution.md` before any architectural decision. It is 
 - **Docker:** `docker compose up -d` | `docker compose down`
 
 {{/if}}
+{{#if springBoot}}
+## Backend — Spring Boot {{versions.springBoot}}
+
+- **Java 21** — records, pattern matching, sealed classes, virtual threads
+- **Architecture:** `com.<groupId>.<feature>.{domain,application,infrastructure}`{{#if flyway}}
+- **DB:** PostgreSQL, Flyway migrations in `backend/src/main/resources/db/migration/`{{/if}}
+
+### Commands
+```bash
+cd backend
+./mvnw spring-boot:run   # Start dev server
+./mvnw test              # Run tests
+./mvnw package           # Build jar
+```
+{{/if}}
+{{#if fastapi}}
+## Backend — FastAPI (Python 3.12)
+
+- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
+- **Conventions:** Pydantic models, async endpoints, dependency injection
+
+### Commands
+```bash
+cd backend
+.venv/bin/uvicorn app.main:app --reload   # Start dev server
+.venv/bin/pytest tests/ -v                # Run tests
+.venv/bin/ruff check .                    # Lint
+```
+{{/if}}
+{{#if laravel}}
+## Backend — Laravel {{versions.laravel}} (PHP 8.3+)
+
+- **Architecture:** `app/Http/Controllers/`, `app/Models/`, `app/Services/`, `database/migrations/`
+- **Conventions:** Form Requests for validation, API Resources for serialization, Eloquent over raw SQL
+
+### Commands
+```bash
+cd backend
+php artisan serve        # Start dev server
+php artisan test         # Run tests (Pest/PHPUnit)
+php artisan migrate      # Run DB migrations
+./vendor/bin/pint        # Format / lint
+```
+{{/if}}
+{{#if nextjs}}
+## Backend — Next.js {{versions.next}} (App Router)
+
+- **Architecture:** `app/` (routes + server components), `app/api/` (route handlers), `lib/`, `components/`
+- **Conventions:** Server components by default, `"use client"` only when needed{{#if prisma}}, Prisma for DB access{{/if}}
+- **Auth:** {{#if auth}}NextAuth {{versions.nextAuth}}{{else}}None{{/if}}
+
+### Commands
+```bash
+npm run dev      # Start dev server (port 3000)
+npm run build    # Production build
+npm run lint     # ESLint{{#if prisma}}
+npx prisma migrate dev    # Run DB migrations
+npx prisma studio         # Open DB GUI{{/if}}
+```
+{{/if}}
+{{#if angular}}
+## Frontend — Angular {{versions.angular}}
+
+- **Architecture:** Standalone components, signals, OnPush
+- **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex{{#if ngrx}}
+- **State:** NgRx SignalStore{{/if}}
+
+### Commands
+```bash
+cd frontend
+ng serve         # Start dev server (port 4200)
+ng test          # Run unit tests
+ng build         # Production build
+```
+{{/if}}
 {{#if reactVite}}
-## Frontend — React {{versions.react}} (Vite)
+## Frontend — React {{versions.react}} (Vite + Tailwind)
 
 - **Architecture:** `src/router/`, `src/hooks/`, `src/components/`, `src/lib/`
-- **Conventions:** Functional components, hooks-first, no class components
-- **Skill:** apply `applying-react-conventions` for all React/TypeScript code
+- **Conventions:** Functional components, hooks-first, React Router v7
+- **CSS:** Tailwind CSS v4
+
+### Commands
+```bash
+cd frontend
+npm run dev      # Start dev server (port 4200)
+npm run build    # Production build
+npm run lint     # TypeScript check
+```
+{{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Composition API + Vite)
+
+- **Architecture:** `src/composables/`, `src/stores/` (Pinia), `src/components/`, `src/router/`
+- **Conventions:** Composition API with `<script setup>`, Pinia for state, Vue Router {{versions.vueRouter}}
 
 ### Commands
 ```bash

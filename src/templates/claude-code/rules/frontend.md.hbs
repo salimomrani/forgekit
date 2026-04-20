@@ -20,3 +20,11 @@ paths: ["**/frontend/**"]
 - **CSS:** Tailwind CSS v4
 - **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
 {{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Composition API + Vite)
+
+- **Vue {{versions.vue}}** — `<script setup>`, Composition API, no Options API
+- **State:** Pinia stores in `src/stores/`
+- **Router:** Vue Router {{versions.vueRouter}}
+- **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
+{{/if}}

@@ -114,6 +114,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
     const hasFrontend = this.config.frontend !== null;
     const angular = this.config.frontend === "angular";
     const reactVite = this.config.frontend === "react-vite";
+    const vue = this.config.frontend === "vue";
 
     const parentHooks = await this.readParentHooks();
 
@@ -128,11 +129,13 @@ class ClaudeCodeGenerator extends BaseGenerator {
       hasFrontend,
       angular,
       reactVite,
+      vue,
       frontend: hasFrontend,
       docker: this.config.docker,
       flyway: this.config.flyway,
       ngrx: this.config.ngrx,
       auth: this.config.auth,
+      prisma: this.config.prisma,
       versions: this.versions,
       allowedCommands,
       claudeDir: ".claude",
