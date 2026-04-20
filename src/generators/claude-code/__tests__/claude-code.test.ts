@@ -542,6 +542,115 @@ describe("ClaudeCodeGenerator", () => {
     expect(content).not.toContain("## Workflow Mode");
   });
 
+  it("generates .claude/rules/backend.md when laravel backend", async () => {
+    const config = { ...baseConfig, backendType: "laravel" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "backend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/backend/**"]');
+    expect(content).toContain("Laravel");
+    expect(content).toContain("php artisan");
+    expect(content).toContain("./vendor/bin/pint");
+  });
+
+  it("generates .claude/rules/backend.md when nextjs backend", async () => {
+    const config = { ...baseConfig, backendType: "nextjs" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "backend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/backend/**"]');
+    expect(content).toContain("Next.js");
+    expect(content).toContain("App Router");
+  });
+
+  it("generates .claude/rules/backend.md mentions Prisma when nextjs + prisma", async () => {
+    const config = {
+      ...baseConfig,
+      backendType: "nextjs" as const,
+      prisma: true,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "backend.md"),
+      "utf-8",
+    );
+    expect(content).toContain("Prisma");
+    expect(content).toContain("npx prisma migrate dev");
+  });
+
+  it("generates .claude/rules/frontend.md when frontend is vue", async () => {
+    const config = { ...baseConfig, frontend: "vue" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(
+      path.join(tmpDir, ".claude", "rules", "frontend.md"),
+      "utf-8",
+    );
+    expect(content).toContain('paths: ["**/frontend/**"]');
+    expect(content).toContain("Vue");
+    expect(content).toContain("Pinia");
+    expect(content).toContain("Composition API");
+  });
+
+  it("CLAUDE.md contains Angular stack block when frontend is angular", async () => {
+    const config = { ...baseConfig, frontend: "angular" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Frontend — Angular");
+    expect(content).toContain("ng serve");
+    expect(content).toContain("PrimeNG");
+  });
+
+  it("CLAUDE.md contains Vue stack block when frontend is vue", async () => {
+    const config = { ...baseConfig, frontend: "vue" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Frontend — Vue");
+    expect(content).toContain("Pinia");
+  });
+
+  it("CLAUDE.md contains FastAPI stack block when backendType is fastapi", async () => {
+    const config = { ...baseConfig, backendType: "fastapi" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Backend — FastAPI");
+    expect(content).toContain(".venv/bin/pytest");
+  });
+
+  it("CLAUDE.md contains Spring Boot stack block when backendType is spring-boot", async () => {
+    const config = { ...baseConfig, backendType: "spring-boot" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Backend — Spring Boot");
+    expect(content).toContain("./mvnw");
+  });
+
+  it("CLAUDE.md contains Laravel stack block when backendType is laravel", async () => {
+    const config = { ...baseConfig, backendType: "laravel" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Backend — Laravel");
+    expect(content).toContain("php artisan");
+  });
+
+  it("CLAUDE.md contains Next.js stack block when backendType is nextjs", async () => {
+    const config = { ...baseConfig, backendType: "nextjs" as const };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Backend — Next.js");
+    expect(content).toContain("App Router");
+  });
+
+  it("CLAUDE.md contains no stack blocks when claude-only (no backend, no frontend)", async () => {
+    await generateClaudeCode(tmpDir, baseConfig, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).not.toContain("## Frontend — ");
+    expect(content).not.toContain("## Backend — ");
+  });
+
   it("session-start hook detects unfilled constitution and instructs to run speckit.constitution", async () => {
     await generateClaudeCode(tmpDir, baseConfig, baseVersions);
     const content = await fs.readFile(
