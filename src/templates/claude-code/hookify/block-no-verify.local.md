@@ -6,6 +6,6 @@ pattern: --no-verify
 action: block
 ---
 
-🚫 **--no-verify bloqué**
+🚫 **`--no-verify` blocked**
 
-Le bypass des hooks de commit est interdit. Les tests et le lint doivent passer avant tout commit.
+Bypassing commit hooks is not allowed. Tests and lint must pass before any commit.

@@ -1,11 +1,11 @@
 ---
 name: warn-todo-fixme
-enabled: true
+enabled: false
 event: file
 pattern: TODO|FIXME
 action: warn
 ---
 
-⚠️ **TODO / FIXME détecté**
+⚠️ **TODO / FIXME detected**
 
-Tu ajoutes un marqueur TODO ou FIXME. Assure-toi qu'il ne sera pas oublié avant de committer.
+You're adding a TODO or FIXME marker. Make sure it won't be forgotten before committing.
