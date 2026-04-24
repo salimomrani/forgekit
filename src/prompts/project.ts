@@ -2,7 +2,11 @@ import { input, confirm, checkbox, select } from "@inquirer/prompts";
 import path from "node:path";
 import { loadConfig } from "../config.js";
 import { validateProjectName, validateGroupId } from "../utils/validation.js";
-import { isClaudeInstalled, isSpecifyInstalled } from "../utils/system.js";
+import {
+  isClaudeInstalled,
+  isCodexInstalled,
+  isSpecifyInstalled,
+} from "../utils/system.js";
 import type {
   ProjectConfig,
   UIFramework,
@@ -12,6 +16,7 @@ import type {
   WorkflowMode,
   GitStrategy,
   SpeckitPreset,
+  AITool,
 } from "../types.js";
 
 export async function promptProjectConfig(
@@ -237,7 +242,7 @@ export async function promptProjectConfig(
   // ── Section 5: Infrastructure ─────────────────────────────────────────────
   let docker = defaults.docker ?? true;
   let ci = defaults.ci ?? true;
-  let claudeCode = defaults.claudeCode ?? true;
+  let aiTool: AITool = defaults.aiTool ?? "claude";
   let speckit = defaults.speckit ?? true;
   let workflowMode: WorkflowMode = defaults.workflowMode ?? "none";
   let gitInit = defaults.gitInit ?? true;
@@ -247,14 +252,12 @@ export async function promptProjectConfig(
   if (
     defaults.docker === undefined &&
     defaults.ci === undefined &&
-    defaults.claudeCode === undefined &&
     defaults.speckit === undefined &&
     defaults.gitInit === undefined &&
     defaults.prettier === undefined &&
     defaults.eslint === undefined
   ) {
     const hasBackend = backendType !== null;
-    const claudeDetected = isClaudeInstalled();
     const specifyDetected = isSpecifyInstalled();
     const infra = await checkbox({
       message: "Infrastructure",
@@ -268,13 +271,6 @@ export async function promptProjectConfig(
           name: "GitHub Actions CI",
           value: "ci",
           checked: hasBackend || frontend !== null,
-        },
-        {
-          name: claudeDetected
-            ? "Claude Code"
-            : "Claude Code (claude CLI non détecté)",
-          value: "claudeCode",
-          checked: claudeDetected,
         },
         {
           name: specifyDetected
@@ -300,16 +296,39 @@ export async function promptProjectConfig(
     });
     docker = infra.includes("docker");
     ci = infra.includes("ci");
-    claudeCode = infra.includes("claudeCode");
     speckit = infra.includes("speckit");
     gitInit = infra.includes("gitInit");
     prettier = infra.includes("prettier");
     eslint = infra.includes("eslint");
   }
 
-  if (claudeCode && defaults.workflowMode === undefined) {
+  if (defaults.aiTool === undefined) {
+    const claudeDetected = isClaudeInstalled();
+    const codexDetected = isCodexInstalled();
+    aiTool = await select<AITool>({
+      message: "Assistant IA",
+      choices: [
+        {
+          name: claudeDetected
+            ? "Claude Code"
+            : "Claude Code (claude CLI non détecté)",
+          value: "claude",
+        },
+        {
+          name: codexDetected
+            ? "Codex CLI"
+            : "Codex CLI (codex CLI non détecté)",
+          value: "codex",
+        },
+        { name: "Aucun", value: "none" },
+      ],
+      default: claudeDetected ? "claude" : codexDetected ? "codex" : "none",
+    });
+  }
+
+  if (aiTool !== "none" && defaults.workflowMode === undefined) {
     workflowMode = await select<WorkflowMode>({
-      message: "Workflow mode (Claude Code)",
+      message: `Workflow mode (${aiTool === "claude" ? "Claude Code" : "Codex CLI"})`,
       choices: [
         {
           name: "speckit — spec → plan → tasks → impl → review → PR",
@@ -323,7 +342,11 @@ export async function promptProjectConfig(
   }
 
   let speckitPreset: SpeckitPreset | null = defaults.speckitPreset ?? null;
-  if (workflowMode === "speckit" && defaults.speckitPreset === undefined) {
+  if (
+    aiTool === "claude" &&
+    workflowMode === "speckit" &&
+    defaults.speckitPreset === undefined
+  ) {
     speckitPreset = await select<SpeckitPreset>({
       message: "Speckit preset",
       choices: [
@@ -386,7 +409,7 @@ export async function promptProjectConfig(
     gitStrategy,
     speckitPreset,
     ci,
-    claudeCode,
+    aiTool,
     gitInit,
     prettier,
     eslint,

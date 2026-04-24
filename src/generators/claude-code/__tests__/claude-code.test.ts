@@ -9,7 +9,7 @@ import { makeBaseConfig, BASE_VERSIONS } from "../../../__tests__/fixtures.js";
 let fakeSkillsDir: string;
 let fakeCommandsDir: string;
 
-const baseConfig = makeBaseConfig({ claudeCode: true });
+const baseConfig = makeBaseConfig({ aiTool: "claude" });
 const baseVersions = BASE_VERSIONS;
 
 describe("ClaudeCodeGenerator", () => {

@@ -3,6 +3,7 @@ export type PrimeNGPreset = "Aura" | "Lara" | "Nora";
 export type WorkflowMode = "speckit" | "vibe" | "none";
 export type GitStrategy = "pr-required" | "no-pr";
 export type SpeckitPreset = "rigorous" | "balanced" | "fast" | "bare-metal";
+export type AITool = "claude" | "codex" | "none";
 export type BackendType =
   | "spring-boot"
   | "fastapi"
@@ -34,7 +35,7 @@ export interface ProjectConfig {
   // Infrastructure
   docker: boolean;
   ci: boolean;
-  claudeCode: boolean;
+  aiTool: AITool;
   speckit: boolean;
   workflowMode: WorkflowMode;
   gitStrategy: GitStrategy;
