@@ -22,7 +22,7 @@ export function makeBaseConfig(
     ngrx: false,
     docker: false,
     ci: false,
-    claudeCode: false,
+    aiTool: "none",
     speckit: false,
     workflowMode: "none",
     gitStrategy: "pr-required",

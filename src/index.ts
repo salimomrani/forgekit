@@ -26,7 +26,7 @@ Workflow:
 Layers disponibles:
   Backends    spring-boot | fastapi | laravel
   Frontends   angular | react
-  Infra       docker | ci | claude-code | speckit | prettier
+  Infra       docker | ci | claude-code | codex | speckit | prettier
 
 Exemples:
   $ forgekit new my-app

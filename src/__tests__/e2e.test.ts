@@ -191,7 +191,7 @@ describe("ForgeKit e2e — generation pipeline", () => {
       baseConfig({
         backendType: null,
         frontend: null,
-        claudeCode: true,
+        aiTool: "claude",
       }),
     );
 
@@ -220,7 +220,7 @@ describe("ForgeKit e2e — generation pipeline", () => {
         frontend: "react-vite",
         docker: true,
         ci: true,
-        claudeCode: true,
+        aiTool: "claude",
         speckit: true,
         prettier: true,
       }),

@@ -1,0 +1,142 @@
+# {{name}}
+
+{{description}}
+
+{{#if workflowSpeckit}}
+## Workflow Mode: speckit
+{{/if}}
+{{#if workflowVibe}}
+## Workflow Mode: vibe
+{{/if}}
+
+## Git
+
+{{#if gitStrategyNoPr}}
+- Merge direct sur `master` — pas de PR requis.
+{{else}}
+- PR obligatoire avant tout merge sur `master` — pas de push direct.
+{{/if}}
+
+## Architecture Constitution
+
+Read `.specify/memory/constitution.md` before any architectural decision.
+
+{{#if docker}}
+## Infrastructure
+
+- **Docker:** `docker compose up -d` | `docker compose down`
+
+{{/if}}
+{{#if springBoot}}
+## Backend — Spring Boot {{versions.springBoot}}
+
+- **Java 21** — records, pattern matching, sealed classes, virtual threads
+- **Architecture:** `com.<groupId>.<feature>.{domain,application,infrastructure}`{{#if flyway}}
+- **DB:** PostgreSQL, Flyway migrations in `backend/src/main/resources/db/migration/` — never modify existing migration files{{/if}}
+- **Conventions:** Records for DTOs, Lombok, MapStruct for mappings
+- **Validation:** Jakarta Bean Validation | **Logging:** `@Slf4j`
+- **Config:** `application.yml` (never `application.properties`)
+
+### Commands
+```bash
+cd backend
+./mvnw spring-boot:run   # Start dev server
+./mvnw test              # Run tests
+./mvnw package           # Build jar
+```
+{{/if}}
+{{#if fastapi}}
+## Backend — FastAPI (Python 3.12)
+
+- **FastAPI** with uvicorn, pydantic-settings
+- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
+- **Conventions:** Pydantic models, async endpoints, dependency injection
+- **HTTP status codes:** POST (create) → `201`, GET → `200`, PUT/PATCH → `200`, DELETE → `204`
+
+### Commands
+```bash
+cd backend
+.venv/bin/uvicorn app.main:app --reload   # Start dev server
+.venv/bin/pytest tests/ -v                # Run tests
+.venv/bin/ruff check .                    # Lint
+```
+{{/if}}
+{{#if laravel}}
+## Backend — Laravel {{versions.laravel}} (PHP 8.3+)
+
+- **Architecture:** `app/Http/Controllers/`, `app/Models/`, `app/Services/`, `database/migrations/`
+- **Conventions:** Form Requests for validation, API Resources for serialization, Eloquent over raw SQL, typed properties everywhere
+- **HTTP status codes:** POST (create) → `201`, GET → `200`, PUT/PATCH → `200`, DELETE → `204`
+
+### Commands
+```bash
+cd backend
+php artisan serve        # Start dev server
+php artisan test         # Run tests (Pest/PHPUnit)
+php artisan migrate      # Run DB migrations
+./vendor/bin/pint        # Format / lint
+```
+{{/if}}
+{{#if nextjs}}
+## Backend — Next.js {{versions.next}} (App Router)
+
+- **Architecture:** `app/` (routes + server components), `app/api/` (route handlers), `lib/`, `components/`
+- **Conventions:** Server components by default, `"use client"` only when strictly needed{{#if prisma}}
+- **DB:** Prisma ORM — schema in `prisma/schema.prisma`, never edit generated client{{/if}}{{#if auth}}
+- **Auth:** NextAuth {{versions.nextAuth}}{{/if}}
+
+### Commands
+```bash
+npm run dev      # Start dev server (port 3000)
+npm run build    # Production build
+npm run lint     # ESLint{{#if prisma}}
+npx prisma migrate dev    # Run DB migrations
+npx prisma studio         # Open DB GUI{{/if}}
+```
+{{/if}}
+{{#if angular}}
+## Frontend — Angular {{versions.angular}}
+
+- **Angular {{versions.angular}}** — strict mode, standalone components, signals
+- **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex{{#if ngrx}}
+- **State:** NgRx SignalStore{{/if}}
+- **Conventions:** OnPush, `input()`/`output()`, `inject()`, `@if`/`@for` control flow
+
+### Commands
+```bash
+cd frontend
+ng serve         # Start dev server (port 4200)
+ng test          # Run unit tests
+ng build         # Production build
+```
+{{/if}}
+{{#if reactVite}}
+## Frontend — React {{versions.react}} (Vite + Tailwind)
+
+- **React {{versions.react}}** — functional components, hooks-first, no class components
+- **Router:** React Router v7 (declarative mode)
+- **CSS:** Tailwind CSS v4
+
+### Commands
+```bash
+cd frontend
+npm run dev      # Start dev server (port 4200)
+npm run build    # Production build
+npm run lint     # TypeScript check
+```
+{{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Composition API + Vite)
+
+- **Vue {{versions.vue}}** — `<script setup>`, Composition API, no Options API
+- **State:** Pinia stores in `src/stores/`
+- **Router:** Vue Router {{versions.vueRouter}}
+
+### Commands
+```bash
+cd frontend
+npm run dev      # Start dev server (port 4200)
+npm run build    # Production build
+npm run lint     # TypeScript check
+```
+{{/if}}

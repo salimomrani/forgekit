@@ -1,0 +1,45 @@
+{{#if springBoot}}
+## Backend — Spring Boot {{versions.springBoot}}
+
+- **Java 21** — records, pattern matching, sealed classes, virtual threads
+- **Architecture:** Feature-based packages — `com.<groupId>.<feature>.{domain,application,infrastructure}`
+- **DB:** PostgreSQL{{#if flyway}}, Flyway migrations in `backend/src/main/resources/db/migration/`{{/if}} — snake_case naming
+- **Conventions:** Records for DTOs, Lombok, MapStruct for mappings
+- **Validation:** Jakarta Bean Validation | **Logging:** `@Slf4j`
+- **Config:** `application.yml` (never `application.properties`)
+- **Commands:** `cd backend` → `./mvnw spring-boot:run` | `./mvnw test` | `./mvnw package -DskipTests`
+
+## Source of Truth
+
+- **API contract:** OpenAPI annotations on controllers (Springdoc)
+{{#if flyway}}
+- **DB schema:** Flyway migrations — never modify existing migration files
+{{/if}}
+{{/if}}
+{{#if fastapi}}
+## Backend — FastAPI (Python 3.12)
+
+- **FastAPI** with uvicorn, pydantic-settings
+- **Architecture:** `app/routers/`, `app/config.py`, `tests/`
+- **Conventions:** Pydantic models, async endpoints, dependency injection
+- **HTTP status codes:** POST (create) → `201`, GET → `200`, PUT/PATCH → `200`, DELETE → `204`
+- **Commands:** `cd backend` → `uvicorn app.main:app --reload` | `pip install -r requirements.txt`
+- **Tests:** run via `.venv/bin/pytest` (not bare `pytest` — not in PATH until venv is activated)
+{{/if}}
+{{#if laravel}}
+## Backend — Laravel {{versions.laravel}} (PHP 8.3+)
+
+- **Architecture:** `app/Http/Controllers/`, `app/Models/`, `app/Services/`, `database/migrations/`
+- **Conventions:** Form Requests for validation, API Resources for serialization, Eloquent over raw SQL, typed properties everywhere
+- **HTTP status codes:** POST (create) → `201`, GET → `200`, PUT/PATCH → `200`, DELETE → `204`
+- **Commands:** `cd backend` → `composer install` | `php artisan serve` | `php artisan test` | `php artisan migrate` | `./vendor/bin/pint`
+{{/if}}
+{{#if nextjs}}
+## Backend — Next.js {{versions.next}} (App Router, fullstack)
+
+- **Architecture:** `app/` (routes + server components), `app/api/` (route handlers), `lib/` (shared modules), `components/`
+- **Conventions:** Server components by default, `"use client"` only when strictly needed (interactivity, browser APIs){{#if prisma}}
+- **DB:** Prisma ORM — schema in `prisma/schema.prisma`, never edit generated client{{/if}}{{#if auth}}
+- **Auth:** NextAuth {{versions.nextAuth}}{{/if}}
+- **Commands:** `npm install` | `npm run dev` | `npm run build` | `npm run lint`{{#if prisma}} | `npx prisma migrate dev` | `npx prisma studio`{{/if}}
+{{/if}}

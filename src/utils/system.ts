@@ -14,3 +14,10 @@ export function isClaudeInstalled(): boolean {
   const result = spawnSync("claude", ["--version"], { stdio: "ignore" });
   return result.status === 0;
 }
+
+/** Returns true if the codex CLI binary is discoverable in PATH. */
+export function isCodexInstalled(): boolean {
+  // codex --help returns 0 when the binary exists; --version is unsupported on older builds.
+  const result = spawnSync("codex", ["--help"], { stdio: "ignore" });
+  return result.status === 0;
+}

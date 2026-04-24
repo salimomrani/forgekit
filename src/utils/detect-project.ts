@@ -69,7 +69,15 @@ const SENTINEL_MAP: Array<{
   {
     files: [".claude/settings.json"],
     apply: (c) => {
-      c.claudeCode = true;
+      c.aiTool = "claude";
+    },
+  },
+  {
+    files: ["AGENTS.md", ".codex/config.toml"],
+    apply: (c) => {
+      // Claude wins if both are present (Claude scaffolds also write AGENTS.md is not the case today,
+      // so this is safe). The previous sentinel above sets aiTool='claude' first if Claude artifacts exist.
+      if (c.aiTool === "none") c.aiTool = "codex";
     },
   },
   {
@@ -105,7 +113,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     ngrx: false,
     docker: false,
     ci: false,
-    claudeCode: false,
+    aiTool: "none",
     speckit: false,
     workflowMode: "none",
     gitStrategy: "pr-required",

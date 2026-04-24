@@ -1,0 +1,27 @@
+{{#if angular}}
+## Frontend — Angular {{versions.angular}}
+
+- **Angular {{versions.angular}}** — strict mode, standalone components, signals
+- **UI:** PrimeNG {{versions.primeng}}, theme Aura, PrimeFlex
+{{#if ngrx}}
+- **State:** NgRx SignalStore
+{{/if}}
+- **Conventions:** OnPush, `input()`/`output()`, `inject()`, `@if`/`@for` control flow
+- **Commands:** `cd frontend` → `npm install` | `ng serve` | `ng test` | `ng build`
+{{/if}}
+{{#if reactVite}}
+## Frontend — React {{versions.react}} (Vite + Tailwind)
+
+- **React {{versions.react}}** — functional components, hooks-first, no class components
+- **Router:** React Router v7 (declarative mode)
+- **CSS:** Tailwind CSS v4
+- **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
+{{/if}}
+{{#if vue}}
+## Frontend — Vue {{versions.vue}} (Composition API + Vite)
+
+- **Vue {{versions.vue}}** — `<script setup>`, Composition API, no Options API
+- **State:** Pinia stores in `src/stores/`
+- **Router:** Vue Router {{versions.vueRouter}}
+- **Commands:** `cd frontend` → `npm install` | `npm run dev` | `npm run build` | `npm run lint`
+{{/if}}

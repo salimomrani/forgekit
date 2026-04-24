@@ -9,6 +9,7 @@ import { generateFrontend } from "../generators/frontend/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
+import { generateCodex } from "../generators/codex/index.js";
 import { generateFastAPIBackend } from "../generators/fastapi/index.js";
 import { generateLaravelBackend } from "../generators/laravel/index.js";
 import { generateNestJsBackend } from "../generators/nestjs/index.js";
@@ -24,6 +25,7 @@ import type {
   BackendType,
   FrontendType,
   WorkflowMode,
+  AITool,
 } from "../types.js";
 
 export async function generateProject(
@@ -117,7 +119,7 @@ export async function generateProject(
       console.log(chalk.green("\r  ✔ GitHub Actions CI configuré       "));
     }
 
-    if (config.claudeCode) {
+    if (config.aiTool === "claude") {
       process.stdout.write(chalk.yellow("  ⏳ Claude Code..."));
       const { speckitWorkflowCopied } = await generateClaudeCode(
         projectDir,
@@ -134,11 +136,15 @@ export async function generateProject(
           ),
         );
       }
+    } else if (config.aiTool === "codex") {
+      process.stdout.write(chalk.yellow("  ⏳ Codex CLI..."));
+      await generateCodex(projectDir, config, versions);
+      console.log(chalk.green("\r  ✔ Codex CLI configuré               "));
     }
 
-    if (config.speckit) {
+    if (config.speckit && config.aiTool !== "none") {
       process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
-      initSpecify(projectDir);
+      initSpecify(projectDir, config.aiTool);
       console.log(chalk.green("\r  ✔ Speckit initialisé                "));
     }
 
@@ -188,8 +194,7 @@ export const newCommand = new Command("new")
   .option("--no-docker", "Exclure Docker Compose")
   .option("--ci", "Inclure GitHub Actions CI")
   .option("--no-ci", "Exclure GitHub Actions CI")
-  .option("--claude-code", "Inclure config Claude Code")
-  .option("--no-claude-code", "Exclure config Claude Code")
+  .option("--ai-tool <tool>", "Assistant IA : claude | codex | none")
   .option("--prettier", "Inclure Prettier + Husky + lint-staged")
   .option("--no-prettier", "Exclure Prettier")
   .option("--workflow <mode>", "Mode workflow Claude : speckit | vibe | none")
@@ -210,7 +215,7 @@ Frontends:
 Infrastructure:
   --docker        Docker Compose (PostgreSQL + pgAdmin)   [défaut: oui si backend]
   --ci            GitHub Actions CI                       [défaut: oui si stack]
-  --claude-code   Config Claude Code                      [défaut: si claude CLI détecté]
+  --ai-tool       Assistant IA : claude | codex | none    [défaut: claude si détecté]
   --prettier      Prettier + Husky + lint-staged          [défaut: non]
   --no-git        Ne pas initialiser Git
 
@@ -259,8 +264,18 @@ Exemples:
         cmd.getOptionValueSource(key) === "cli";
       if (isExplicit("ci")) defaults.ci = options.ci as boolean;
       if (isExplicit("docker")) defaults.docker = options.docker as boolean;
-      if (isExplicit("claudeCode"))
-        defaults.claudeCode = options.claudeCode as boolean;
+      if (options.aiTool) {
+        const value = options.aiTool as string;
+        if (value !== "claude" && value !== "codex" && value !== "none") {
+          console.log(
+            chalk.red(
+              `\n✖ --ai-tool invalide : "${value}". Valeurs acceptées : claude, codex, none.`,
+            ),
+          );
+          process.exit(1);
+        }
+        defaults.aiTool = value as AITool;
+      }
       if (options.workflow)
         defaults.workflowMode = options.workflow as WorkflowMode;
       if (isExplicit("git")) defaults.gitInit = options.git as boolean;

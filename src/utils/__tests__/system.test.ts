@@ -4,7 +4,11 @@ vi.mock("node:child_process", () => ({
   spawnSync: vi.fn(),
 }));
 
-import { isClaudeInstalled, isSpecifyInstalled } from "../system.js";
+import {
+  isClaudeInstalled,
+  isCodexInstalled,
+  isSpecifyInstalled,
+} from "../system.js";
 import { spawnSync } from "node:child_process";
 
 describe("isClaudeInstalled", () => {
@@ -28,6 +32,30 @@ describe("isClaudeInstalled", () => {
       error: new Error("ENOENT"),
     } as ReturnType<typeof spawnSync>);
     expect(isClaudeInstalled()).toBe(false);
+  });
+});
+
+describe("isCodexInstalled", () => {
+  it("returns true when codex binary is found in PATH", () => {
+    vi.mocked(spawnSync).mockReturnValue({ status: 0 } as ReturnType<
+      typeof spawnSync
+    >);
+    expect(isCodexInstalled()).toBe(true);
+  });
+
+  it("returns false when codex binary is not found", () => {
+    vi.mocked(spawnSync).mockReturnValue({ status: 1 } as ReturnType<
+      typeof spawnSync
+    >);
+    expect(isCodexInstalled()).toBe(false);
+  });
+
+  it("returns false when spawnSync throws ENOENT", () => {
+    vi.mocked(spawnSync).mockReturnValue({
+      status: null,
+      error: new Error("ENOENT"),
+    } as ReturnType<typeof spawnSync>);
+    expect(isCodexInstalled()).toBe(false);
   });
 });
 

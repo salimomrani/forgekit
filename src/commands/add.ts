@@ -16,6 +16,7 @@ import { generateNextJsBackend } from "../generators/nextjs/index.js";
 import { generateDocker } from "../generators/docker/index.js";
 import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
+import { generateCodex } from "../generators/codex/index.js";
 import { initSpecify } from "../generators/speckit.js";
 import type { ProjectConfig } from "../types.js";
 import type { ResolvedVersions } from "../versions.js";
@@ -23,7 +24,7 @@ import type { ResolvedVersions } from "../versions.js";
 interface LayerDef {
   configField: keyof ProjectConfig;
   configValue: string | boolean;
-  conflictGroup: "backend" | "frontend" | null;
+  conflictGroup: "backend" | "frontend" | "ai-tool" | null;
 }
 
 const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
@@ -65,9 +66,14 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
   docker: { configField: "docker", configValue: true, conflictGroup: null },
   ci: { configField: "ci", configValue: true, conflictGroup: null },
   "claude-code": {
-    configField: "claudeCode",
-    configValue: true,
-    conflictGroup: null,
+    configField: "aiTool",
+    configValue: "claude",
+    conflictGroup: "ai-tool",
+  },
+  codex: {
+    configField: "aiTool",
+    configValue: "codex",
+    conflictGroup: "ai-tool",
   },
   speckit: { configField: "speckit", configValue: true, conflictGroup: null },
   prettier: {
@@ -91,6 +97,9 @@ function checkConflict(layer: string, config: ProjectConfig): string | null {
   }
   if (def.conflictGroup === "frontend" && config.frontend !== null) {
     return `A frontend (${config.frontend}) already exists. Remove it before adding a new one.`;
+  }
+  if (def.conflictGroup === "ai-tool" && config.aiTool !== "none") {
+    return `An AI tool (${config.aiTool}) is already configured. Remove it before adding a new one.`;
   }
   if (
     def.conflictGroup === null &&
@@ -134,8 +143,11 @@ async function runLayerGenerator(
     case "claude-code":
       await generateClaudeCode(projectDir, config, versions);
       break;
+    case "codex":
+      await generateCodex(projectDir, config, versions);
+      break;
     case "speckit":
-      initSpecify(projectDir);
+      initSpecify(projectDir, config.aiTool);
       break;
     case "prettier":
     case "eslint":
@@ -173,10 +185,14 @@ async function regenerateDependentLayers(
     console.log(chalk.green("\r  ✔ GitHub Actions CI mis à jour         "));
   }
 
-  if (config.claudeCode) {
+  if (config.aiTool === "claude") {
     process.stdout.write(chalk.yellow("  ⏳ Mise à jour Claude Code..."));
     await generateClaudeCode(projectDir, config, versions);
     console.log(chalk.green("\r  ✔ Claude Code mis à jour               "));
+  } else if (config.aiTool === "codex") {
+    process.stdout.write(chalk.yellow("  ⏳ Mise à jour Codex CLI..."));
+    await generateCodex(projectDir, config, versions);
+    console.log(chalk.green("\r  ✔ Codex CLI mis à jour                  "));
   }
 }
 
@@ -284,7 +300,7 @@ Exemples:
         ngrx: false,
         docker: false,
         ci: false,
-        claudeCode: false,
+        aiTool: "none",
         speckit: false,
         workflowMode: "none",
         gitStrategy: "pr-required",
@@ -303,8 +319,10 @@ Exemples:
         console.log(chalk.gray(`  Frontend: ${existingConfig.frontend}`));
       if (existingConfig.docker) console.log(chalk.gray("  Docker: yes"));
       if (existingConfig.ci) console.log(chalk.gray("  CI: yes"));
-      if (existingConfig.claudeCode)
+      if (existingConfig.aiTool === "claude")
         console.log(chalk.gray("  Claude Code: yes"));
+      if (existingConfig.aiTool === "codex")
+        console.log(chalk.gray("  Codex CLI: yes"));
       if (existingConfig.speckit) console.log(chalk.gray("  Speckit: yes"));
       if (existingConfig.prettier) console.log(chalk.gray("  Prettier: yes"));
       console.log("");
