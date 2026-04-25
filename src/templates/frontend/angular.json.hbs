@@ -17,11 +17,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "styles": [
-              "node_modules/primeicons/primeicons.css",
-              "node_modules/primeflex/primeflex.css",
-              "src/styles.scss"
-            ]
+            "styles": {{{stylesJson}}}
           },
           "configurations": {
             "production": {
@@ -55,6 +51,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            {{#if proxyConfig}}"proxyConfig": "{{proxyConfig}}"{{/if}}
+          },
           "configurations": {
             "production": {
               "buildTarget": "{{projectName}}:build:production"
@@ -64,6 +63,15 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "styles": {{{stylesJson}}}
+          }
         }
       }
     }

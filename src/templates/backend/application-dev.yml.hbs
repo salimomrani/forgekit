@@ -1,7 +1,9 @@
+{{#if databasePostgres}}
 spring:
   jpa:
     show-sql: true
 
+{{/if}}
 logging:
   level:
 {{#if auth}}

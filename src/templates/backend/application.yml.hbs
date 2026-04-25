@@ -4,6 +4,7 @@ spring:
   profiles:
     active: dev
 
+{{#if databasePostgres}}
   datasource:
     url: {{datasourceUrl}}
     username: ${DB_USERNAME:postgres}
@@ -23,6 +24,7 @@ spring:
     locations: classpath:db/migration
 
   {{/if}}
+{{/if}}
 server:
   port: 8080
 

@@ -66,6 +66,94 @@ describe("resolveVersions", () => {
     });
   });
 
+  describe("@angular/cli is fetched independently from @angular/core", () => {
+    it("should resolve angularCli to a value distinct from angular when the registry returns asymmetric versions", async () => {
+      vi.stubGlobal("fetch", (url: string) => {
+        const m = url.match(
+          /registry\.npmjs\.org\/([^/]+(?:\/[^/]+)?)\/latest/,
+        );
+        const pkg = m ? decodeURIComponent(m[1]) : "";
+        const versionsByPkg: Record<string, string> = {
+          "@angular/core": "21.2.10",
+          "@angular/cli": "21.2.8",
+        };
+        const v = versionsByPkg[pkg];
+        return Promise.resolve(
+          v
+            ? ({
+                ok: true,
+                json: () => Promise.resolve({ version: v }),
+              } as Response)
+            : ({ ok: false } as Response),
+        );
+      });
+
+      const result = await resolveVersions({
+        backendType: null,
+        frontend: "angular",
+      });
+
+      expect(result.angular).toBe("21.2.10");
+      expect(result.angularCli).toBe("21.2.8");
+      expect(result.angularCli).not.toBe(result.angular);
+    });
+
+    it("should fall back to FALLBACK_VERSIONS.angularCli when the @angular/cli fetch fails", async () => {
+      vi.stubGlobal("fetch", () => Promise.resolve({ ok: false } as Response));
+
+      const result = await resolveVersions({
+        backendType: null,
+        frontend: "angular",
+      });
+
+      expect(result.angularCli).toBe(FALLBACK_VERSIONS.angularCli);
+    });
+  });
+
+  describe("typescript is capped on the Angular peer range", () => {
+    it("should keep the fallback typescript value when the registry returns a 6.x release for an Angular project", async () => {
+      vi.stubGlobal("fetch", (url: string) => {
+        const isTypescript = url.includes("/typescript/latest");
+        return Promise.resolve(
+          isTypescript
+            ? ({
+                ok: true,
+                json: () => Promise.resolve({ version: "6.0.0" }),
+              } as Response)
+            : ({ ok: false } as Response),
+        );
+      });
+
+      const result = await resolveVersions({
+        backendType: null,
+        frontend: "angular",
+      });
+
+      expect(result.typescript).toBe(FALLBACK_VERSIONS.typescript);
+    });
+
+    it("should adopt the fetched typescript value when it is within the Angular peer range", async () => {
+      vi.stubGlobal("fetch", (url: string) => {
+        const isTypescript = url.includes("/typescript/latest");
+        return Promise.resolve(
+          isTypescript
+            ? ({
+                ok: true,
+                json: () => Promise.resolve({ version: "5.9.3" }),
+              } as Response)
+            : ({ ok: false } as Response),
+        );
+      });
+
+      const result = await resolveVersions({
+        backendType: null,
+        frontend: "angular",
+      });
+
+      expect(result.typescript).toBe("5.9.3");
+    });
+  });
+
   describe("fallback warning (win 2)", () => {
     it("prints a warning when all fetches fail and fallbacks are used", async () => {
       vi.stubGlobal("fetch", () => Promise.resolve({ ok: false } as Response));

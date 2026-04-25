@@ -180,6 +180,9 @@ export const newCommand = new Command("new")
   .option("--react", "Inclure le frontend React (Vite + Tailwind)")
   .option("--angular", "Inclure le frontend Angular (standalone, OnPush)")
   .option("--auth", "Inclure l'authentification")
+  .option("--no-auth", "Exclure l'authentification")
+  .option("-y, --yes", "Skip confirmations and apply defaults")
+  .option("--database <type>", "Base de données : postgres | none")
   .option("--flyway", "Inclure Flyway (migrations SQL)")
   .option("--no-flyway", "Exclure Flyway")
   .option("--openapi", "Inclure OpenAPI / Swagger UI")
@@ -247,6 +250,17 @@ Exemples:
         defaults.frontend = "angular" as FrontendType;
       else if (options.frontend === false) defaults.frontend = null;
       if (typeof options.auth === "boolean") defaults.auth = options.auth;
+      if (typeof options.database === "string") {
+        if (options.database !== "postgres" && options.database !== "none") {
+          console.log(
+            chalk.red(
+              `\n✖ Valeur invalide pour --database : "${options.database}". Attendu : postgres | none.`,
+            ),
+          );
+          process.exit(1);
+        }
+        defaults.database = options.database;
+      }
       if (typeof options.flyway === "boolean") defaults.flyway = options.flyway;
       if (typeof options.openapi === "boolean")
         defaults.openapi = options.openapi;
@@ -280,9 +294,12 @@ Exemples:
         defaults.workflowMode = options.workflow as WorkflowMode;
       if (isExplicit("git")) defaults.gitInit = options.git as boolean;
 
+      const nonInteractive =
+        options.yes === true || process.stdin.isTTY !== true;
+
       let config;
       try {
-        config = await promptProjectConfig(defaults);
+        config = await promptProjectConfig(defaults, { nonInteractive });
       } catch {
         console.log(chalk.yellow("\n\n👋 Génération annulée."));
         process.exit(0);

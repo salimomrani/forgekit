@@ -101,6 +101,7 @@ function defaultConfig(projectDir: string): ProjectConfig {
     description: "",
     backendType: null,
     frontend: null,
+    database: "postgres",
     flyway: false,
     openapi: false,
     auth: false,

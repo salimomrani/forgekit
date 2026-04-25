@@ -1,33 +1,40 @@
 import { input, confirm, checkbox, select } from "@inquirer/prompts";
 import { loadConfig } from "../config.js";
 import { validateGroupId } from "../utils/validation.js";
-import type { ProjectConfig, UIFramework, PrimeNGPreset } from "../types.js";
+import type {
+  ProjectConfig,
+  UIFramework,
+  PrimeNGPreset,
+  DatabaseType,
+} from "../types.js";
 
 export async function promptAddLayerConfig(
   layer: string,
   existingConfig: ProjectConfig,
   defaults: Partial<ProjectConfig> = {},
+  options: { nonInteractive?: boolean } = {},
 ): Promise<Partial<ProjectConfig>> {
+  const nonInteractive = options.nonInteractive === true;
   if (layer === "spring-boot") {
-    return promptSpringBoot(defaults);
+    return promptSpringBoot(defaults, nonInteractive);
   }
   if (layer === "fastapi") {
-    return promptAuth(defaults);
+    return promptAuth(defaults, nonInteractive);
   }
   if (layer === "nextjs") {
-    return promptNextJs(defaults);
+    return promptNextJs(defaults, nonInteractive);
   }
   if (layer === "laravel") {
-    return promptLaravel(defaults);
+    return promptLaravel(defaults, nonInteractive);
   }
   if (layer === "angular") {
-    return promptAngular(defaults);
+    return promptAngular(defaults, nonInteractive);
   }
   if (layer === "react") {
-    return promptAuth(defaults);
+    return promptAuth(defaults, nonInteractive);
   }
   if (layer === "vue") {
-    return promptVue(defaults);
+    return promptVue(defaults, nonInteractive);
   }
   if (layer === "prettier") {
     if (existingConfig.frontend === null) {
@@ -50,23 +57,39 @@ export async function promptAddLayerConfig(
 
 async function promptSpringBoot(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
   const saved = await loadConfig();
 
   const groupId =
     defaults.groupId ??
-    (await input({
-      message: "Group ID",
-      default: saved.groupId ?? "com.example",
-      validate: validateGroupId,
-    }));
+    (nonInteractive
+      ? (saved.groupId ?? "com.example")
+      : await input({
+          message: "Group ID",
+          default: saved.groupId ?? "com.example",
+          validate: validateGroupId,
+        }));
 
+  let database: DatabaseType = defaults.database ?? "postgres";
   let flyway = defaults.flyway ?? true;
   let openapi = defaults.openapi ?? true;
   let auth = defaults.auth ?? false;
   let mapstruct = defaults.mapstruct ?? true;
 
+  if (!nonInteractive && defaults.database === undefined) {
+    database = await select<DatabaseType>({
+      message: "Base de données",
+      choices: [
+        { name: "PostgreSQL (par défaut)", value: "postgres" },
+        { name: "Aucune (pas de JPA, pas de driver)", value: "none" },
+      ],
+      default: "postgres",
+    });
+  }
+
   if (
+    !nonInteractive &&
     defaults.flyway === undefined &&
     defaults.openapi === undefined &&
     defaults.auth === undefined &&
@@ -87,17 +110,18 @@ async function promptSpringBoot(
     mapstruct = features.includes("mapstruct");
   }
 
-  return { groupId, flyway, openapi, auth, mapstruct };
+  return { groupId, database, flyway, openapi, auth, mapstruct };
 }
 
 async function promptAngular(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
   let uiFramework: UIFramework = defaults.uiFramework ?? "primeng";
   let primeNGPreset: PrimeNGPreset = defaults.primeNGPreset ?? "Aura";
   let ngrx = defaults.ngrx ?? false;
 
-  if (defaults.uiFramework === undefined) {
+  if (!nonInteractive && defaults.uiFramework === undefined) {
     uiFramework = await select({
       message: "Framework UI",
       choices: [
@@ -109,7 +133,11 @@ async function promptAngular(
     });
   }
 
-  if (uiFramework === "primeng" && defaults.primeNGPreset === undefined) {
+  if (
+    !nonInteractive &&
+    uiFramework === "primeng" &&
+    defaults.primeNGPreset === undefined
+  ) {
     primeNGPreset = await select({
       message: "Preset PrimeNG",
       choices: [
@@ -121,24 +149,29 @@ async function promptAngular(
     });
   }
 
-  if (defaults.ngrx === undefined) {
+  if (!nonInteractive && defaults.ngrx === undefined) {
     ngrx = await confirm({
       message: "Inclure NgRx SignalStore ?",
       default: false,
     });
   }
 
-  const authResult = await promptAuth(defaults);
+  const authResult = await promptAuth(defaults, nonInteractive);
   return { uiFramework, primeNGPreset, ngrx, ...authResult };
 }
 
 async function promptLaravel(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
   let auth = defaults.auth ?? false;
   let openapi = defaults.openapi ?? false;
 
-  if (defaults.auth === undefined && defaults.openapi === undefined) {
+  if (
+    !nonInteractive &&
+    defaults.auth === undefined &&
+    defaults.openapi === undefined
+  ) {
     const features = await checkbox({
       message: "Fonctionnalités Laravel",
       choices: [
@@ -163,12 +196,14 @@ async function promptLaravel(
 
 async function promptNextJs(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
   let auth = defaults.auth ?? false;
   let prisma = defaults.prisma ?? false;
   let openapi = defaults.openapi ?? false;
 
   if (
+    !nonInteractive &&
     defaults.auth === undefined &&
     defaults.prisma === undefined &&
     defaults.openapi === undefined
@@ -199,10 +234,11 @@ async function promptNextJs(
 
 async function promptAuth(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
   let auth = defaults.auth ?? false;
 
-  if (defaults.auth === undefined) {
+  if (!nonInteractive && defaults.auth === undefined) {
     auth = await confirm({
       message: "Inclure l'authentification ?",
       default: false,
@@ -214,6 +250,7 @@ async function promptAuth(
 
 async function promptVue(
   defaults: Partial<ProjectConfig>,
+  nonInteractive: boolean,
 ): Promise<Partial<ProjectConfig>> {
-  return promptAuth(defaults);
+  return promptAuth(defaults, nonInteractive);
 }

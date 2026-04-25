@@ -46,24 +46,24 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
     .welcome-card {
       text-align: center;
       padding: 3rem 2rem;
-      background: var(--p-surface-0);
-      border-radius: var(--p-content-border-radius);
-      border: 1px solid var(--p-surface-200);
+      background: var(--app-card-bg);
+      border-radius: var(--app-radius);
+      border: 1px solid var(--app-border);
       margin-bottom: 2rem;
     }
     .welcome-icon {
       font-size: 3rem;
-      color: var(--p-primary-color);
+      color: var(--app-primary);
       margin-bottom: 1rem;
     }
     .welcome-card h1 {
       margin: 0 0 0.5rem;
-      color: var(--p-text-color);
+      color: var(--app-text);
       font-size: 1.75rem;
     }
     .welcome-card p {
       margin: 0;
-      color: var(--p-text-muted-color);
+      color: var(--app-text-muted);
       font-size: 1.1rem;
     }
     .cards {
@@ -72,9 +72,9 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
       gap: 1.25rem;
     }
     .card {
-      background: var(--p-surface-0);
-      border: 1px solid var(--p-surface-200);
-      border-radius: var(--p-content-border-radius);
+      background: var(--app-card-bg);
+      border: 1px solid var(--app-border);
+      border-radius: var(--app-radius);
       padding: 1.5rem;
       transition: box-shadow 0.2s;
     }
@@ -83,21 +83,21 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
     }
     .card-icon {
       font-size: 1.5rem;
-      color: var(--p-primary-color);
+      color: var(--app-primary);
       margin-bottom: 0.75rem;
     }
     .card h3 {
       margin: 0 0 0.5rem;
-      color: var(--p-text-color);
+      color: var(--app-text);
     }
     .card p {
       margin: 0;
-      color: var(--p-text-muted-color);
+      color: var(--app-text-muted);
       font-size: 0.9rem;
       line-height: 1.5;
     }
     .card code {
-      background: var(--p-surface-100);
+      background: var(--app-hover-bg);
       padding: 0.15rem 0.4rem;
       border-radius: 4px;
       font-size: 0.85rem;
