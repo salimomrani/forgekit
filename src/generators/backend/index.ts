@@ -52,7 +52,10 @@ class BackendGenerator extends BaseGenerator {
       path.join(backendDir, ".mvn/wrapper"),
     ];
 
-    if (this.config.flyway) {
+    const databasePostgres = this.config.database === "postgres";
+    const flyway = this.config.flyway && databasePostgres;
+
+    if (flyway) {
       dirs.push(path.join(resourcesDir, "db/migration"));
     }
 
@@ -65,7 +68,9 @@ class BackendGenerator extends BaseGenerator {
       name: this.config.name,
       description: this.config.description,
       auth: this.config.auth,
-      flyway: this.config.flyway,
+      database: this.config.database,
+      databasePostgres,
+      flyway,
       openapi: this.config.openapi,
       mapstruct: this.config.mapstruct,
       dbName: this.dbName,
@@ -132,7 +137,7 @@ class BackendGenerator extends BaseGenerator {
         path.join(backendDir, "mvnw.cmd"),
         data,
       ),
-      ...(this.config.flyway
+      ...(flyway
         ? [
             fs.writeFile(
               path.join(resourcesDir, "db/migration/V1__init.sql"),

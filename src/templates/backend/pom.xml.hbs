@@ -33,10 +33,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        {{#if databasePostgres}}
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        {{/if}}
         {{#if auth}}
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,6 +54,7 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        {{#if databasePostgres}}
         <!-- Database -->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -67,6 +70,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
+        {{/if}}
         {{/if}}
 
         {{#if openapi}}

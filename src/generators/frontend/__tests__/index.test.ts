@@ -187,4 +187,179 @@ describe("generateFrontend router", () => {
     expect(tsStaged).toContain("eslint --fix");
     expect(tsStaged).toContain("prettier --write");
   });
+
+  describe("Angular: angular.json styles array reflects UI choice (FR-2.1)", () => {
+    it("should include primeicons and primeflex stylesheets when uiFramework is primeng", async () => {
+      const config = {
+        ...baseConfig,
+        frontend: "angular" as const,
+        uiFramework: "primeng" as const,
+      };
+      await generateFrontend(tmpDir, config, baseVersions);
+      const angularJson = await fs.readJson(
+        path.join(tmpDir, "frontend", "angular.json"),
+      );
+      const styles =
+        angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+          .build.options.styles;
+      expect(styles).toEqual([
+        "node_modules/primeicons/primeicons.css",
+        "node_modules/primeflex/primeflex.css",
+        "src/styles.scss",
+      ]);
+    });
+
+    it("should include only src/styles.scss when uiFramework is none", async () => {
+      const config = {
+        ...baseConfig,
+        frontend: "angular" as const,
+        uiFramework: "none" as const,
+      };
+      await generateFrontend(tmpDir, config, baseVersions);
+      const angularJson = await fs.readJson(
+        path.join(tmpDir, "frontend", "angular.json"),
+      );
+      const styles =
+        angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+          .build.options.styles;
+      expect(styles).toEqual(["src/styles.scss"]);
+    });
+
+    it("should include only src/styles.scss when uiFramework is tailwind", async () => {
+      const config = {
+        ...baseConfig,
+        frontend: "angular" as const,
+        uiFramework: "tailwind" as const,
+      };
+      await generateFrontend(tmpDir, config, baseVersions);
+      const angularJson = await fs.readJson(
+        path.join(tmpDir, "frontend", "angular.json"),
+      );
+      const styles =
+        angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+          .build.options.styles;
+      expect(styles).toEqual(["src/styles.scss"]);
+    });
+  });
+
+  describe("Angular: dev-server proxy reflects backend pairing (FR-6)", () => {
+    it.each([
+      ["spring-boot" as const, 8080],
+      ["fastapi" as const, 8000],
+      ["nestjs" as const, 3000],
+      ["nextjs" as const, 3000],
+      ["laravel" as const, 8000],
+    ])(
+      "should emit proxy.conf.json with port %i when backendType is %s",
+      async (backendType, expectedPort) => {
+        const config = {
+          ...baseConfig,
+          frontend: "angular" as const,
+          backendType,
+        };
+        await generateFrontend(tmpDir, config, baseVersions);
+        const proxyPath = path.join(tmpDir, "frontend", "proxy.conf.json");
+        expect(await fs.pathExists(proxyPath)).toBe(true);
+        const proxy = await fs.readJson(proxyPath);
+        expect(proxy["/api/**"].target).toBe(
+          `http://localhost:${expectedPort}`,
+        );
+        const angularJson = await fs.readJson(
+          path.join(tmpDir, "frontend", "angular.json"),
+        );
+        const serveOptions =
+          angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+            .serve.options;
+        expect(serveOptions.proxyConfig).toBe("proxy.conf.json");
+      },
+    );
+
+    it("should not emit proxy.conf.json when no backend is scaffolded", async () => {
+      const config = {
+        ...baseConfig,
+        frontend: "angular" as const,
+        backendType: null,
+      };
+      await generateFrontend(tmpDir, config, baseVersions);
+      expect(
+        await fs.pathExists(path.join(tmpDir, "frontend", "proxy.conf.json")),
+      ).toBe(false);
+      const angularJson = await fs.readJson(
+        path.join(tmpDir, "frontend", "angular.json"),
+      );
+      const serveOptions =
+        angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+          .serve.options;
+      expect(serveOptions?.proxyConfig).toBeUndefined();
+    });
+  });
+
+  describe("Angular: ng test target is configured out of the box (FR-5)", () => {
+    it("should declare a test architect target backed by @angular/build:karma", async () => {
+      const config = { ...baseConfig, frontend: "angular" as const };
+      await generateFrontend(tmpDir, config, baseVersions);
+      const angularJson = await fs.readJson(
+        path.join(tmpDir, "frontend", "angular.json"),
+      );
+      const testTarget =
+        angularJson.projects[Object.keys(angularJson.projects)[0]].architect
+          .test;
+      expect(testTarget).toBeDefined();
+      expect(testTarget.builder).toBe("@angular/build:karma");
+      expect(testTarget.options.tsConfig).toBe("tsconfig.spec.json");
+      expect(testTarget.options.polyfills).toContain("zone.js/testing");
+    });
+
+    it("should ship tsconfig.spec.json and app.component.spec.ts so ng test exits 0", async () => {
+      const config = { ...baseConfig, frontend: "angular" as const };
+      await generateFrontend(tmpDir, config, baseVersions);
+      expect(
+        await fs.pathExists(
+          path.join(tmpDir, "frontend", "tsconfig.spec.json"),
+        ),
+      ).toBe(true);
+      expect(
+        await fs.pathExists(
+          path.join(tmpDir, "frontend", "src/app/app.component.spec.ts"),
+        ),
+      ).toBe(true);
+    });
+
+    it("should pin Karma + Jasmine devDependencies so npm install resolves them", async () => {
+      const config = { ...baseConfig, frontend: "angular" as const };
+      await generateFrontend(tmpDir, config, baseVersions);
+      const pkg = await fs.readJson(
+        path.join(tmpDir, "frontend", "package.json"),
+      );
+      expect(pkg.devDependencies.karma).toBeDefined();
+      expect(pkg.devDependencies["karma-jasmine"]).toBeDefined();
+      expect(pkg.devDependencies["karma-chrome-launcher"]).toBeDefined();
+      expect(pkg.devDependencies["jasmine-core"]).toBeDefined();
+      expect(pkg.devDependencies["@types/jasmine"]).toBeDefined();
+    });
+  });
+
+  describe("Angular: component templates do not reference --p-* tokens (FR-2.2)", () => {
+    it.each([
+      ["src/app/features/home/home.component.ts"],
+      ["src/app/layout/layout.component.ts"],
+      ["src/app/layout/topbar/topbar.component.ts"],
+      ["src/app/layout/sidebar/sidebar.component.ts"],
+    ])(
+      "should emit no --p-* token in %s when uiFramework is none",
+      async (relPath) => {
+        const config = {
+          ...baseConfig,
+          frontend: "angular" as const,
+          uiFramework: "none" as const,
+        };
+        await generateFrontend(tmpDir, config, baseVersions);
+        const content = await fs.readFile(
+          path.join(tmpDir, "frontend", relPath),
+          "utf-8",
+        );
+        expect(content).not.toMatch(/var\(--p-/);
+      },
+    );
+  });
 });

@@ -12,6 +12,7 @@ export type BackendType =
   | "nestjs"
   | null;
 export type FrontendType = "angular" | "react-vite" | "vue" | null;
+export type DatabaseType = "postgres" | "none";
 
 export interface ProjectConfig {
   name: string;
@@ -21,6 +22,7 @@ export interface ProjectConfig {
   backendType: BackendType;
   frontend: FrontendType;
   // Backend features (Spring Boot + Laravel)
+  database: DatabaseType;
   flyway: boolean;
   openapi: boolean;
   auth: boolean;

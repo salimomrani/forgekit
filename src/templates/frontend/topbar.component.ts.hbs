@@ -25,8 +25,8 @@ import { Component, ChangeDetectionStrategy, output } from '@angular/core';
       justify-content: space-between;
       padding: 0 1.5rem;
       height: 60px;
-      background: var(--p-surface-0);
-      border-bottom: 1px solid var(--p-surface-200);
+      background: var(--app-card-bg);
+      border-bottom: 1px solid var(--app-border);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     .topbar-left {
@@ -39,18 +39,18 @@ import { Component, ChangeDetectionStrategy, output } from '@angular/core';
       border: none;
       cursor: pointer;
       font-size: 1.25rem;
-      color: var(--p-text-color);
+      color: var(--app-text);
       padding: 0.5rem;
       border-radius: 50%;
       transition: background 0.2s;
     }
     .topbar-menu-btn:hover, .topbar-avatar:hover {
-      background: var(--p-surface-100);
+      background: var(--app-hover-bg);
     }
     .topbar-title {
       font-size: 1.25rem;
       font-weight: 600;
-      color: var(--p-text-color);
+      color: var(--app-text);
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

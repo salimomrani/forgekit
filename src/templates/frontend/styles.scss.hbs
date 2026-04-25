@@ -1,16 +1,40 @@
 {{#if uiPrimeNG}}
 @import "primeicons/primeicons.css";
 
+:root {
+  --app-card-bg: var(--p-surface-0);
+  --app-page-bg: var(--p-surface-ground);
+  --app-hover-bg: var(--p-surface-100);
+  --app-border: var(--p-surface-200);
+  --app-primary: var(--p-primary-color);
+  --app-primary-contrast: var(--p-primary-contrast-color);
+  --app-text: var(--p-text-color);
+  --app-text-muted: var(--p-text-muted-color);
+  --app-radius: var(--p-content-border-radius);
+}
+
 html, body {
   height: 100%;
   margin: 0;
   font-family: var(--p-font-family);
-  background: var(--p-surface-ground);
-  color: var(--p-text-color);
+  background: var(--app-page-bg);
+  color: var(--app-text);
 }
 {{/if}}
 {{#if uiTailwind}}
 @import "tailwindcss";
+
+:root {
+  --app-card-bg: #ffffff;
+  --app-page-bg: #f9fafb;
+  --app-hover-bg: #f4f4f5;
+  --app-border: #e5e7eb;
+  --app-primary: #3b82f6;
+  --app-primary-contrast: #ffffff;
+  --app-text: #111827;
+  --app-text-muted: #6b7280;
+  --app-radius: 6px;
+}
 
 html, body {
   height: 100%;
@@ -18,9 +42,23 @@ html, body {
 }
 {{/if}}
 {{#if uiNone}}
+:root {
+  --app-card-bg: #ffffff;
+  --app-page-bg: #f9fafb;
+  --app-hover-bg: #f4f4f5;
+  --app-border: #e5e7eb;
+  --app-primary: #3b82f6;
+  --app-primary-contrast: #ffffff;
+  --app-text: #111827;
+  --app-text-muted: #6b7280;
+  --app-radius: 6px;
+}
+
 html, body {
   height: 100%;
   margin: 0;
   font-family: sans-serif;
+  background: var(--app-page-bg);
+  color: var(--app-text);
 }
 {{/if}}

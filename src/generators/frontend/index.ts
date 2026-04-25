@@ -2,10 +2,20 @@ import path from "node:path";
 import fs from "fs-extra";
 import { renderAndWrite } from "../../utils/template-engine.js";
 import { BaseGenerator } from "../base-generator.js";
-import type { ProjectConfig } from "../../types.js";
+import type { BackendType, ProjectConfig } from "../../types.js";
 import type { ResolvedVersions } from "../../versions.js";
 import { generateReactViteFrontend } from "./react-vite.js";
 import { generateVueFrontend } from "./vue.js";
+
+// Local port map for the dev-server proxy (FR-6).
+// Inline literal — single callsite, rule #6 forbids extracting a helper.
+const BACKEND_DEV_PORTS: Record<Exclude<BackendType, null>, number> = {
+  "spring-boot": 8080,
+  fastapi: 8000,
+  nestjs: 3000,
+  nextjs: 3000,
+  laravel: 8000,
+};
 
 class FrontendGenerator extends BaseGenerator {
   private readonly versions: ResolvedVersions;
@@ -49,9 +59,19 @@ class FrontendGenerator extends BaseGenerator {
 
     const devDeps: Record<string, string> = {
       "@angular/build": `^${this.versions.angularBuild}`,
-      "@angular/cli": `^${this.versions.angular}`,
+      "@angular/cli": `^${this.versions.angularCli}`,
       "@angular/compiler-cli": `^${this.versions.angular}`,
       typescript: `~${this.versions.typescript}`,
+      // Karma + Jasmine — hard-pinned (renovate-tracked).
+      // Versions move slowly; adding 7 fields to ResolvedVersions for
+      // marginal benefit would violate constitution rule #6.
+      "@types/jasmine": "~5.1.0",
+      "jasmine-core": "~5.1.0",
+      karma: "~6.4.0",
+      "karma-chrome-launcher": "~3.2.0",
+      "karma-coverage": "~2.2.0",
+      "karma-jasmine": "~5.1.0",
+      "karma-jasmine-html-reporter": "~2.1.0",
     };
 
     if (this.config.uiFramework === "tailwind") {
@@ -137,6 +157,20 @@ class FrontendGenerator extends BaseGenerator {
 
     await this.ensureDirs(dirs);
 
+    const styles =
+      this.config.uiFramework === "primeng"
+        ? [
+            "node_modules/primeicons/primeicons.css",
+            "node_modules/primeflex/primeflex.css",
+            "src/styles.scss",
+          ]
+        : ["src/styles.scss"];
+
+    const backendType = this.config.backendType;
+    const backendPort =
+      backendType !== null ? BACKEND_DEV_PORTS[backendType] : null;
+    const proxyConfig = backendPort !== null ? "proxy.conf.json" : null;
+
     const data = {
       projectName: this.projectName,
       name: this.config.name,
@@ -149,6 +183,9 @@ class FrontendGenerator extends BaseGenerator {
       versions: this.versions,
       eslintWithPrettier: this.config.eslint && this.config.prettier,
       isAngular: true,
+      stylesJson: JSON.stringify(styles),
+      backendPort,
+      proxyConfig,
     };
 
     await Promise.all([
@@ -162,6 +199,15 @@ class FrontendGenerator extends BaseGenerator {
         path.join(frontendDir, "angular.json"),
         data,
       ),
+      ...(proxyConfig
+        ? [
+            renderAndWrite(
+              "frontend/proxy.conf.json.hbs",
+              path.join(frontendDir, "proxy.conf.json"),
+              data,
+            ),
+          ]
+        : []),
       renderAndWrite(
         "frontend/tsconfig.json.hbs",
         path.join(frontendDir, "tsconfig.json"),
@@ -170,6 +216,16 @@ class FrontendGenerator extends BaseGenerator {
       renderAndWrite(
         "frontend/tsconfig.app.json.hbs",
         path.join(frontendDir, "tsconfig.app.json"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/tsconfig.spec.json.hbs",
+        path.join(frontendDir, "tsconfig.spec.json"),
+        data,
+      ),
+      renderAndWrite(
+        "frontend/app.component.spec.ts.hbs",
+        path.join(appDir, "app.component.spec.ts"),
         data,
       ),
       renderAndWrite(

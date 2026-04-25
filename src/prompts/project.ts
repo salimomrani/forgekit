@@ -17,72 +17,98 @@ import type {
   GitStrategy,
   SpeckitPreset,
   AITool,
+  DatabaseType,
 } from "../types.js";
 
 export async function promptProjectConfig(
   defaults: Partial<ProjectConfig> = {},
+  options: { nonInteractive?: boolean } = {},
 ): Promise<ProjectConfig> {
   const saved = await loadConfig();
   const currentDir = path.basename(process.cwd());
+  const nonInteractive = options.nonInteractive === true;
+  const ask = <T>(promptFn: () => Promise<T>, fallback: T): Promise<T> =>
+    nonInteractive ? Promise.resolve(fallback) : promptFn();
 
   // ── Section 1: Projet ─────────────────────────────────────────────────────
   const name =
     defaults.name ??
-    (await input({
-      message: "Nom du projet",
-      default: currentDir,
-      validate: validateProjectName,
-    }));
+    (await ask(
+      () =>
+        input({
+          message: "Nom du projet",
+          default: currentDir,
+          validate: validateProjectName,
+        }),
+      currentDir,
+    ));
 
   const description =
     defaults.description ??
-    (await input({
-      message: "Description",
-      default: "Mon application",
-    }));
+    (await ask(
+      () =>
+        input({
+          message: "Description",
+          default: "Mon application",
+        }),
+      "Mon application",
+    ));
 
   // ── Section 2: Stack ──────────────────────────────────────────────────────
   const backendType: BackendType =
     defaults.backendType !== undefined
       ? defaults.backendType
-      : await select<BackendType>({
-          message: "Backend",
-          choices: [
-            { name: "Spring Boot (Java 21)", value: "spring-boot" },
-            { name: "FastAPI (Python)", value: "fastapi" },
-            { name: "Laravel (PHP 8.3)", value: "laravel" },
-            { name: "NestJS (Node.js/TypeScript)", value: "nestjs" },
-            { name: "Next.js (Node.js)", value: "nextjs" },
-            { name: "Aucun", value: null },
-          ],
-          default: "spring-boot",
-        });
+      : await ask<BackendType>(
+          () =>
+            select<BackendType>({
+              message: "Backend",
+              choices: [
+                { name: "Spring Boot (Java 21)", value: "spring-boot" },
+                { name: "FastAPI (Python)", value: "fastapi" },
+                { name: "Laravel (PHP 8.3)", value: "laravel" },
+                { name: "NestJS (Node.js/TypeScript)", value: "nestjs" },
+                { name: "Next.js (Node.js)", value: "nextjs" },
+                { name: "Aucun", value: null },
+              ],
+              default: "spring-boot",
+            }),
+          "spring-boot",
+        );
 
   const frontend: FrontendType =
     defaults.frontend !== undefined
       ? defaults.frontend
-      : await select<FrontendType>({
-          message: "Frontend",
-          choices: [
-            { name: "Angular (standalone, OnPush)", value: "angular" },
-            { name: "React (Vite + Tailwind)", value: "react-vite" },
-            { name: "Vue.js (Vite + Tailwind)", value: "vue" },
-            { name: "Aucun", value: null },
-          ],
-          default: "angular",
-        });
+      : await ask<FrontendType>(
+          () =>
+            select<FrontendType>({
+              message: "Frontend",
+              choices: [
+                { name: "Angular (standalone, OnPush)", value: "angular" },
+                { name: "React (Vite + Tailwind)", value: "react-vite" },
+                { name: "Vue.js (Vite + Tailwind)", value: "vue" },
+                { name: "Aucun", value: null },
+              ],
+              default: "angular",
+            }),
+          "angular",
+        );
 
   const groupId =
     backendType === "spring-boot"
       ? (defaults.groupId ??
-        (await input({
-          message: "Group ID",
-          default: saved.groupId ?? "com.example",
-          validate: validateGroupId,
-        })))
+        (await ask(
+          () =>
+            input({
+              message: "Group ID",
+              default: saved.groupId ?? "com.example",
+              validate: validateGroupId,
+            }),
+          saved.groupId ?? "com.example",
+        )))
       : "com.example";
 
   // ── Section 3: Backend features ───────────────────────────────────────────
+  let database: DatabaseType = defaults.database ?? "postgres";
   let flyway = defaults.flyway ?? true;
   let openapi = defaults.openapi ?? true;
   let auth = defaults.auth ?? false;
@@ -90,6 +116,22 @@ export async function promptProjectConfig(
   let prisma = defaults.prisma ?? false;
 
   if (
+    !nonInteractive &&
+    backendType === "spring-boot" &&
+    defaults.database === undefined
+  ) {
+    database = await select<DatabaseType>({
+      message: "Base de données",
+      choices: [
+        { name: "PostgreSQL (par défaut)", value: "postgres" },
+        { name: "Aucune (pas de JPA, pas de driver)", value: "none" },
+      ],
+      default: "postgres",
+    });
+  }
+
+  if (
+    !nonInteractive &&
     backendType === "spring-boot" &&
     defaults.flyway === undefined &&
     defaults.openapi === undefined &&
@@ -112,6 +154,7 @@ export async function promptProjectConfig(
   }
 
   if (
+    !nonInteractive &&
     backendType === "laravel" &&
     defaults.auth === undefined &&
     defaults.openapi === undefined
@@ -136,6 +179,7 @@ export async function promptProjectConfig(
   }
 
   if (
+    !nonInteractive &&
     backendType === "nestjs" &&
     defaults.auth === undefined &&
     defaults.prisma === undefined &&
@@ -167,6 +211,7 @@ export async function promptProjectConfig(
   }
 
   if (
+    !nonInteractive &&
     backendType === "nextjs" &&
     defaults.auth === undefined &&
     defaults.prisma === undefined &&
@@ -203,7 +248,7 @@ export async function promptProjectConfig(
   let ngrx = defaults.ngrx ?? false;
 
   if (frontend === "angular") {
-    if (defaults.uiFramework === undefined) {
+    if (!nonInteractive && defaults.uiFramework === undefined) {
       uiFramework = await select({
         message: "Framework UI",
         choices: [
@@ -215,7 +260,11 @@ export async function promptProjectConfig(
       });
     }
 
-    if (uiFramework === "primeng" && defaults.primeNGPreset === undefined) {
+    if (
+      !nonInteractive &&
+      uiFramework === "primeng" &&
+      defaults.primeNGPreset === undefined
+    ) {
       primeNGPreset = await select({
         message: "Preset PrimeNG",
         choices: [
@@ -227,7 +276,7 @@ export async function promptProjectConfig(
       });
     }
 
-    if (defaults.ngrx === undefined) {
+    if (!nonInteractive && defaults.ngrx === undefined) {
       ngrx = await confirm({
         message: "Inclure NgRx SignalStore ?",
         default: false,
@@ -250,6 +299,7 @@ export async function promptProjectConfig(
   let eslint = defaults.eslint ?? false;
 
   if (
+    !nonInteractive &&
     defaults.docker === undefined &&
     defaults.ci === undefined &&
     defaults.speckit === undefined &&
@@ -302,7 +352,7 @@ export async function promptProjectConfig(
     eslint = infra.includes("eslint");
   }
 
-  if (defaults.aiTool === undefined) {
+  if (!nonInteractive && defaults.aiTool === undefined) {
     const claudeDetected = isClaudeInstalled();
     const codexDetected = isCodexInstalled();
     aiTool = await select<AITool>({
@@ -326,7 +376,11 @@ export async function promptProjectConfig(
     });
   }
 
-  if (aiTool !== "none" && defaults.workflowMode === undefined) {
+  if (
+    !nonInteractive &&
+    aiTool !== "none" &&
+    defaults.workflowMode === undefined
+  ) {
     workflowMode = await select<WorkflowMode>({
       message: `Workflow mode (${aiTool === "claude" ? "Claude Code" : "Codex CLI"})`,
       choices: [
@@ -343,6 +397,7 @@ export async function promptProjectConfig(
 
   let speckitPreset: SpeckitPreset | null = defaults.speckitPreset ?? null;
   if (
+    !nonInteractive &&
     aiTool === "claude" &&
     workflowMode === "speckit" &&
     defaults.speckitPreset === undefined
@@ -395,6 +450,7 @@ export async function promptProjectConfig(
     description,
     backendType,
     frontend,
+    database,
     flyway,
     openapi,
     auth,

@@ -203,6 +203,9 @@ export const addCommand = new Command("add")
   .argument("<layer>", `Layer à ajouter : ${VALID_LAYERS.join(", ")}`)
   .option("--group <groupId>", "Group ID Java")
   .option("--auth", "Inclure l'authentification")
+  .option("--no-auth", "Exclure l'authentification")
+  .option("-y, --yes", "Skip confirmations and apply defaults")
+  .option("--database <type>", "Base de données : postgres | none")
   .option("--flyway", "Inclure Flyway (migrations SQL)")
   .option("--no-flyway", "Exclure Flyway")
   .option("--openapi", "Inclure OpenAPI / Swagger UI")
@@ -251,6 +254,8 @@ Exemples:
   .action(async (layer: string, options: Record<string, unknown>) => {
     console.log(chalk.bold.hex("#FF6B35")("\n🔨 ForgeKit — Add layer\n"));
 
+    const nonInteractive = options.yes === true || process.stdin.isTTY !== true;
+
     // Validate layer
     if (!VALID_LAYERS.includes(layer)) {
       console.log(
@@ -288,6 +293,7 @@ Exemples:
         description: "",
         backendType: null,
         frontend: null,
+        database: "postgres",
         flyway: false,
         openapi: false,
         auth: false,
@@ -311,7 +317,7 @@ Exemples:
     }
 
     // Filesystem fallback confirmation
-    if (detectionSource === "filesystem") {
+    if (detectionSource === "filesystem" && !nonInteractive) {
       console.log(chalk.yellow("No forgekit.json found. Detected config:\n"));
       if (existingConfig.backendType)
         console.log(chalk.gray(`  Backend: ${existingConfig.backendType}`));
@@ -348,6 +354,17 @@ Exemples:
     const defaults: Partial<ProjectConfig> = {};
     if (options.group) defaults.groupId = options.group as string;
     if (typeof options.auth === "boolean") defaults.auth = options.auth;
+    if (typeof options.database === "string") {
+      if (options.database !== "postgres" && options.database !== "none") {
+        console.log(
+          chalk.red(
+            `\n✖ Valeur invalide pour --database : "${options.database}". Attendu : postgres | none.`,
+          ),
+        );
+        process.exit(1);
+      }
+      defaults.database = options.database;
+    }
     if (typeof options.flyway === "boolean") defaults.flyway = options.flyway;
     if (typeof options.openapi === "boolean")
       defaults.openapi = options.openapi;
@@ -362,7 +379,12 @@ Exemples:
     // Prompt for layer-specific options
     let layerConfig: Partial<ProjectConfig>;
     try {
-      layerConfig = await promptAddLayerConfig(layer, existingConfig, defaults);
+      layerConfig = await promptAddLayerConfig(
+        layer,
+        existingConfig,
+        defaults,
+        { nonInteractive },
+      );
     } catch (error) {
       if (
         error instanceof Error &&

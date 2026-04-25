@@ -12,6 +12,7 @@ export interface ResolvedVersions {
   scramble: string;
   // Frontend
   angular: string;
+  angularCli: string;
   angularBuild: string;
   primeng: string;
   primeuixThemes: string;
@@ -55,6 +56,7 @@ export const FALLBACK_VERSIONS: ResolvedVersions = {
   sanctum: "4.3.1", // renovate: datasource=packagist depName=laravel/sanctum
   scramble: "0.13.16", // renovate: datasource=packagist depName=dedoc/scramble
   angular: "21.0.0", // renovate: datasource=npm depName=@angular/core
+  angularCli: "21.0.0", // renovate: datasource=npm depName=@angular/cli
   angularBuild: "21.0.0", // renovate: datasource=npm depName=@angular/build
   primeng: "21.1.1", // renovate: datasource=npm depName=primeng
   primeuixThemes: "2.0.3", // renovate: datasource=npm depName=@primeuix/themes
@@ -225,6 +227,7 @@ export async function resolveVersions(opts: {
   if (opts.frontend === "angular") {
     tasks.push(
       fetchNpmVersion("@angular/core").then(set("angular")),
+      fetchNpmVersion("@angular/cli").then(set("angularCli")),
       fetchNpmVersion("@angular/build").then(set("angularBuild")),
       fetchNpmVersion("primeng").then(set("primeng")),
       fetchNpmVersion("@primeuix/themes").then(set("primeuixThemes")),
@@ -233,7 +236,13 @@ export async function resolveVersions(opts: {
       fetchNpmVersion("@ngrx/signals").then(set("ngrxSignals")),
       fetchNpmVersion("rxjs").then(set("rxjs")),
       fetchNpmVersion("zone.js").then(set("zoneJs")),
-      fetchNpmVersion("typescript").then(set("typescript")),
+      fetchNpmVersion("typescript").then((v) => {
+        // Cap at v5 — @angular/build@21 declares peerDependencies.typescript: ">=5.9 <6.0"
+        if (v && !/^[6-9]\d*\./.test(v)) {
+          versions.typescript = v;
+          anyResolved = true;
+        }
+      }),
       fetchNpmVersion("tailwindcss").then(set("tailwind")),
     );
   }
