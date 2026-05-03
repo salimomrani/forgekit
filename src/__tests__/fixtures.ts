@@ -24,13 +24,22 @@ export function makeBaseConfig(
     docker: false,
     ci: false,
     aiTool: "none",
-    speckit: false,
     workflowMode: "none",
     gitStrategy: "pr-required",
     speckitPreset: null,
     gitInit: false,
     ...overrides,
   };
+}
+
+export function makeOpenSpecConfig(
+  overrides: Partial<ProjectConfig> = {},
+): ProjectConfig {
+  return makeBaseConfig({
+    aiTool: "codex",
+    workflowMode: "openspec",
+    ...overrides,
+  });
 }
 
 export const BASE_VERSIONS: ResolvedVersions = {

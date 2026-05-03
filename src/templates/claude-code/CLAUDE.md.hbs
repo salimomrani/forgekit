@@ -5,6 +5,9 @@
 {{#if workflowSpeckit}}
 ## Workflow Mode: speckit
 {{/if}}
+{{#if workflowOpenspec}}
+## Workflow Mode: openspec
+{{/if}}
 {{#if workflowVibe}}
 ## Workflow Mode: vibe
 {{/if}}
@@ -22,6 +25,30 @@
 ## Architecture Constitution
 
 Read `.specify/memory/constitution.md` before any architectural decision. It is auto-loaded at session start.
+
+{{#if workflowOpenspec}}
+## OpenSpec workflow
+
+This project uses **OpenSpec** for spec-driven development. The change lifecycle for `{{name}}` is:
+
+    proposal → specs → design → tasks → apply → archive
+
+Native slash commands (skills installed under `.claude/skills/openspec-*/`):
+
+- `/opsx:propose <name>` — start a new change with proposal + design + specs + tasks generated in one step
+- `/opsx:explore` — thinking-partner mode for clarifying requirements before proposing
+- `/opsx:apply` — execute the tasks in the active change
+- `/opsx:archive` — finalize and archive a completed change
+
+Artifact locations (relative to the `{{name}}` project root):
+
+- `openspec/specs/<capability>/spec.md` — capability specifications (single source of truth)
+- `openspec/changes/<change-name>/` — in-progress change proposals (proposal.md + design.md + tasks.md)
+- `openspec/changes/archive/` — completed changes
+- `openspec/config.yaml` — project schema and rules
+
+Run `openspec --help` for the full CLI reference.
+{{/if}}
 
 {{#if docker}}
 ## Infrastructure

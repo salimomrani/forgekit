@@ -17,6 +17,7 @@ import { generateNextJsBackend } from "../generators/nextjs/index.js";
 import { generateRoot } from "../generators/root/index.js";
 import { initGit } from "../generators/git.js";
 import { initSpecify } from "../generators/speckit.js";
+import { initOpenspec } from "../generators/openspec.js";
 import { resolveVersions } from "../versions.js";
 import type { ResolvedVersions } from "../versions.js";
 import { writeManifest } from "../utils/forgekit-json.js";
@@ -142,10 +143,24 @@ export async function generateProject(
       console.log(chalk.green("\r  ✔ Codex CLI configuré               "));
     }
 
-    if (config.speckit && config.aiTool !== "none") {
-      process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
-      initSpecify(projectDir, config.aiTool);
-      console.log(chalk.green("\r  ✔ Speckit initialisé                "));
+    if (config.aiTool !== "none") {
+      if (config.workflowMode === "speckit") {
+        process.stdout.write(chalk.yellow("  ⏳ Speckit..."));
+        initSpecify(projectDir, config.aiTool);
+        console.log(chalk.green("\r  ✔ Speckit initialisé                "));
+      } else if (config.workflowMode === "openspec") {
+        process.stdout.write(chalk.yellow("  ⏳ OpenSpec..."));
+        const ok = initOpenspec(projectDir, config.aiTool);
+        if (ok) {
+          console.log(chalk.green("\r  ✔ OpenSpec initialisé               "));
+        } else {
+          console.log(
+            chalk.yellow(
+              `\r  ⚠ OpenSpec init skipped — run manually: cd ${config.name} && npx --yes @fission-ai/openspec@latest init --tools ${config.aiTool} --force .`,
+            ),
+          );
+        }
+      }
     }
 
     await generateRoot(projectDir, config, versions);
@@ -200,7 +215,18 @@ export const newCommand = new Command("new")
   .option("--ai-tool <tool>", "Assistant IA : claude | codex | none")
   .option("--prettier", "Inclure Prettier + Husky + lint-staged")
   .option("--no-prettier", "Exclure Prettier")
-  .option("--workflow <mode>", "Mode workflow Claude : speckit | vibe | none")
+  .option(
+    "--workflow <mode>",
+    "Mode workflow Claude : speckit | openspec | vibe | none",
+  )
+  .option(
+    "--speckit",
+    "Bootstrap Speckit workflow (équivaut à --workflow speckit)",
+  )
+  .option(
+    "--openspec",
+    "Bootstrap OpenSpec workflow (équivaut à --workflow openspec)",
+  )
   .option("--no-git", "Ne pas initialiser Git")
   .addHelpText(
     "after",
@@ -290,8 +316,21 @@ Exemples:
         }
         defaults.aiTool = value as AITool;
       }
-      if (options.workflow)
-        defaults.workflowMode = options.workflow as WorkflowMode;
+      const flagModes: WorkflowMode[] = [];
+      if (options.speckit) flagModes.push("speckit");
+      if (options.openspec) flagModes.push("openspec");
+      if (typeof options.workflow === "string")
+        flagModes.push(options.workflow as WorkflowMode);
+      const distinctModes = [...new Set(flagModes)];
+      if (distinctModes.length > 1) {
+        console.log(
+          chalk.red(
+            `\n✖ Conflit de flags workflow : ${distinctModes.join(", ")}. Choisissez un seul mode.`,
+          ),
+        );
+        process.exit(1);
+      }
+      if (distinctModes.length === 1) defaults.workflowMode = distinctModes[0];
       if (isExplicit("git")) defaults.gitInit = options.git as boolean;
 
       const nonInteractive =

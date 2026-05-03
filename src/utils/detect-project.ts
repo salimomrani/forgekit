@@ -83,7 +83,13 @@ const SENTINEL_MAP: Array<{
   {
     files: [".specify/memory/constitution.md"],
     apply: (c) => {
-      c.speckit = true;
+      if (c.workflowMode === "none") c.workflowMode = "speckit";
+    },
+  },
+  {
+    files: ["openspec/config.yaml"],
+    apply: (c) => {
+      c.workflowMode = "openspec";
     },
   },
   {
@@ -115,7 +121,6 @@ function defaultConfig(projectDir: string): ProjectConfig {
     docker: false,
     ci: false,
     aiTool: "none",
-    speckit: false,
     workflowMode: "none",
     gitStrategy: "pr-required",
     speckitPreset: null,

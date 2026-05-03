@@ -363,6 +363,31 @@ describe("ClaudeCodeGenerator", () => {
     const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
     expect(content).toContain("## Workflow Mode: speckit");
     expect(content).not.toContain("## Workflow Mode: vibe");
+    expect(content).not.toContain("## Workflow Mode: openspec");
+    expect(content).not.toContain("OpenSpec workflow");
+  });
+
+  it("CLAUDE.md renders OpenSpec doc section when workflowMode is openspec", async () => {
+    const config = {
+      ...baseConfig,
+      name: "my-cool-project",
+      workflowMode: "openspec" as const,
+      speckitPreset: null,
+    };
+    await generateClaudeCode(tmpDir, config, baseVersions);
+    const content = await fs.readFile(path.join(tmpDir, "CLAUDE.md"), "utf-8");
+    expect(content).toContain("## Workflow Mode: openspec");
+    expect(content).toContain("OpenSpec workflow");
+    expect(content).toContain("/opsx:propose");
+    expect(content).toContain("/opsx:explore");
+    expect(content).toContain("/opsx:apply");
+    expect(content).toContain("/opsx:archive");
+    expect(content).toContain(".claude/skills/openspec-*/");
+    expect(content).toContain("openspec/specs/");
+    expect(content).toContain("openspec/changes/");
+    expect(content).toContain("openspec/config.yaml");
+    expect(content).toContain("my-cool-project");
+    expect(content).not.toContain("relationship-crm");
   });
 
   it("CLAUDE.md never contains a Claude Settings table (settings.json is the SSOT)", async () => {
