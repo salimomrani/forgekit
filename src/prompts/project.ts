@@ -7,6 +7,7 @@ import {
   isCodexInstalled,
   isSpecifyInstalled,
 } from "../utils/system.js";
+import { isNpxAvailable } from "../generators/openspec.js";
 import type {
   ProjectConfig,
   UIFramework,
@@ -292,7 +293,6 @@ export async function promptProjectConfig(
   let docker = defaults.docker ?? true;
   let ci = defaults.ci ?? true;
   let aiTool: AITool = defaults.aiTool ?? "claude";
-  let speckit = defaults.speckit ?? true;
   let workflowMode: WorkflowMode = defaults.workflowMode ?? "none";
   let gitInit = defaults.gitInit ?? true;
   let prettier = defaults.prettier ?? false;
@@ -302,13 +302,11 @@ export async function promptProjectConfig(
     !nonInteractive &&
     defaults.docker === undefined &&
     defaults.ci === undefined &&
-    defaults.speckit === undefined &&
     defaults.gitInit === undefined &&
     defaults.prettier === undefined &&
     defaults.eslint === undefined
   ) {
     const hasBackend = backendType !== null;
-    const specifyDetected = isSpecifyInstalled();
     const infra = await checkbox({
       message: "Infrastructure",
       choices: [
@@ -321,13 +319,6 @@ export async function promptProjectConfig(
           name: "GitHub Actions CI",
           value: "ci",
           checked: hasBackend || frontend !== null,
-        },
-        {
-          name: specifyDetected
-            ? "Speckit (specify templates)"
-            : "Speckit (specify CLI non détecté)",
-          value: "speckit",
-          checked: specifyDetected,
         },
         { name: "Initialiser Git", value: "gitInit", checked: true },
         {
@@ -346,7 +337,6 @@ export async function promptProjectConfig(
     });
     docker = infra.includes("docker");
     ci = infra.includes("ci");
-    speckit = infra.includes("speckit");
     gitInit = infra.includes("gitInit");
     prettier = infra.includes("prettier");
     eslint = infra.includes("eslint");
@@ -376,22 +366,36 @@ export async function promptProjectConfig(
     });
   }
 
-  if (
-    !nonInteractive &&
-    aiTool !== "none" &&
-    defaults.workflowMode === undefined
-  ) {
+  if (!nonInteractive && defaults.workflowMode === undefined) {
+    const specifyDetected = isSpecifyInstalled();
+    const npxDetected = isNpxAvailable();
+    const choices: { name: string; value: WorkflowMode }[] = [];
+    if (aiTool !== "none") {
+      choices.push({
+        name: specifyDetected
+          ? "speckit  — spec → plan → tasks → impl → review → PR"
+          : "speckit  — spec → plan → tasks → impl → review → PR (specify CLI non détecté)",
+        value: "speckit",
+      });
+      choices.push({
+        name: npxDetected
+          ? "openspec — proposal → specs → design → tasks → apply → archive"
+          : "openspec — proposal → specs → design → tasks → apply → archive (npx non détecté)",
+        value: "openspec",
+      });
+    }
+    choices.push({
+      name: "vibe     — itérations rapides, pas de spec",
+      value: "vibe",
+    });
+    choices.push({ name: "aucun", value: "none" });
     workflowMode = await select<WorkflowMode>({
-      message: `Workflow mode (${aiTool === "claude" ? "Claude Code" : "Codex CLI"})`,
-      choices: [
-        {
-          name: "speckit — spec → plan → tasks → impl → review → PR",
-          value: "speckit",
-        },
-        { name: "vibe   — itérations rapides, pas de spec", value: "vibe" },
-        { name: "aucun", value: "none" },
-      ],
-      default: "speckit",
+      message:
+        aiTool === "none"
+          ? "Workflow mode"
+          : `Workflow mode (${aiTool === "claude" ? "Claude Code" : "Codex CLI"})`,
+      choices,
+      default: aiTool !== "none" ? "speckit" : "none",
     });
   }
 
@@ -460,7 +464,6 @@ export async function promptProjectConfig(
     primeNGPreset,
     ngrx,
     docker,
-    speckit,
     workflowMode,
     gitStrategy,
     speckitPreset,

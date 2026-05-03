@@ -221,7 +221,7 @@ describe("ForgeKit e2e — generation pipeline", () => {
         docker: true,
         ci: true,
         aiTool: "claude",
-        speckit: true,
+        workflowMode: "speckit",
         prettier: true,
       }),
     );

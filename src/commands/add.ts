@@ -18,13 +18,14 @@ import { generateCI } from "../generators/ci/index.js";
 import { generateClaudeCode } from "../generators/claude-code/index.js";
 import { generateCodex } from "../generators/codex/index.js";
 import { initSpecify } from "../generators/speckit.js";
+import { initOpenspec } from "../generators/openspec.js";
 import type { ProjectConfig } from "../types.js";
 import type { ResolvedVersions } from "../versions.js";
 
 interface LayerDef {
   configField: keyof ProjectConfig;
   configValue: string | boolean;
-  conflictGroup: "backend" | "frontend" | "ai-tool" | null;
+  conflictGroup: "backend" | "frontend" | "ai-tool" | "spec-mode" | null;
 }
 
 const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
@@ -75,7 +76,16 @@ const LAYER_CONFIG_MAP: Record<string, LayerDef> = {
     configValue: "codex",
     conflictGroup: "ai-tool",
   },
-  speckit: { configField: "speckit", configValue: true, conflictGroup: null },
+  speckit: {
+    configField: "workflowMode",
+    configValue: "speckit",
+    conflictGroup: "spec-mode",
+  },
+  openspec: {
+    configField: "workflowMode",
+    configValue: "openspec",
+    conflictGroup: "spec-mode",
+  },
   prettier: {
     configField: "prettier",
     configValue: true,
@@ -100,6 +110,9 @@ function checkConflict(layer: string, config: ProjectConfig): string | null {
   }
   if (def.conflictGroup === "ai-tool" && config.aiTool !== "none") {
     return `An AI tool (${config.aiTool}) is already configured. Remove it before adding a new one.`;
+  }
+  if (def.conflictGroup === "spec-mode" && config.workflowMode !== "none") {
+    return `A workflow mode (${config.workflowMode}) is already configured. Remove it before adding a new one.`;
   }
   if (
     def.conflictGroup === null &&
@@ -148,6 +161,9 @@ async function runLayerGenerator(
       break;
     case "speckit":
       initSpecify(projectDir, config.aiTool);
+      break;
+    case "openspec":
+      initOpenspec(projectDir, config.aiTool);
       break;
     case "prettier":
     case "eslint":
@@ -241,7 +257,8 @@ Layers:
   ci            GitHub Actions CI (lint + test + build)
   claude-code   Config Claude Code (.claude/, CLAUDE.md, skills, hooks)
                   ★ Fonctionne sur n'importe quel projet (pas besoin de forgekit.json)
-  speckit       Templates Speckit (specify CLI)
+  speckit       Workflow Speckit (specify CLI, exclusif avec openspec)
+  openspec      Workflow OpenSpec (npx @fission-ai/openspec, exclusif avec speckit)
   prettier      Prettier + Husky + lint-staged (nécessite un frontend)
 
 Exemples:
@@ -307,7 +324,6 @@ Exemples:
         docker: false,
         ci: false,
         aiTool: "none",
-        speckit: false,
         workflowMode: "none",
         gitStrategy: "pr-required",
         speckitPreset: null,
@@ -329,7 +345,10 @@ Exemples:
         console.log(chalk.gray("  Claude Code: yes"));
       if (existingConfig.aiTool === "codex")
         console.log(chalk.gray("  Codex CLI: yes"));
-      if (existingConfig.speckit) console.log(chalk.gray("  Speckit: yes"));
+      if (existingConfig.workflowMode === "speckit")
+        console.log(chalk.gray("  Speckit: yes"));
+      if (existingConfig.workflowMode === "openspec")
+        console.log(chalk.gray("  OpenSpec: yes"));
       if (existingConfig.prettier) console.log(chalk.gray("  Prettier: yes"));
       console.log("");
 

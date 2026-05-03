@@ -97,6 +97,44 @@ describe("CodexGenerator", () => {
     await generateCodex(tmpDir, config, baseVersions);
     const agents = await fs.readFile(path.join(tmpDir, "AGENTS.md"), "utf-8");
     expect(agents).toContain("Workflow Mode: speckit");
+    expect(agents).not.toContain("Workflow Mode: openspec");
+    expect(agents).not.toContain("OpenSpec workflow");
+  });
+
+  it("renders openspec workflow banner and doc section when workflowMode is openspec", async () => {
+    const config = makeBaseConfig({
+      name: "my-cool-project",
+      aiTool: "codex",
+      workflowMode: "openspec",
+    });
+    await generateCodex(tmpDir, config, baseVersions);
+    const agents = await fs.readFile(path.join(tmpDir, "AGENTS.md"), "utf-8");
+    expect(agents).toContain("Workflow Mode: openspec");
+    expect(agents).toContain("OpenSpec workflow");
+    expect(agents).toContain("/opsx:propose");
+    expect(agents).toContain("/opsx:explore");
+    expect(agents).toContain("/opsx:apply");
+    expect(agents).toContain("/opsx:archive");
+    expect(agents).toContain("openspec/specs/");
+    expect(agents).toContain("openspec/changes/");
+    expect(agents).toContain("openspec/config.yaml");
+    expect(agents).toContain(".codex/skills/openspec-*/");
+    // {{name}} substituted, no hard-coded reference project name
+    expect(agents).toContain("my-cool-project");
+    expect(agents).not.toContain("relationship-crm");
+  });
+
+  it("omits OpenSpec doc section for non-openspec workflow modes", async () => {
+    for (const mode of ["speckit", "vibe", "none"] as const) {
+      const config = makeBaseConfig({
+        aiTool: "codex",
+        workflowMode: mode,
+      });
+      await generateCodex(tmpDir, config, baseVersions);
+      const agents = await fs.readFile(path.join(tmpDir, "AGENTS.md"), "utf-8");
+      expect(agents, `mode=${mode}`).not.toContain("OpenSpec workflow");
+      expect(agents, `mode=${mode}`).not.toContain("/opsx:propose");
+    }
   });
 
   it("renders no-PR git note when gitStrategy is no-pr", async () => {

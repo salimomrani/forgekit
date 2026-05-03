@@ -140,6 +140,7 @@ class ClaudeCodeGenerator extends BaseGenerator {
       allowedCommands,
       claudeDir: ".claude",
       workflowSpeckit: this.config.workflowMode === "speckit",
+      workflowOpenspec: this.config.workflowMode === "openspec",
       workflowVibe: this.config.workflowMode === "vibe",
       gitStrategy: this.config.gitStrategy,
       gitStrategyNoPr: this.config.gitStrategy === "no-pr",
